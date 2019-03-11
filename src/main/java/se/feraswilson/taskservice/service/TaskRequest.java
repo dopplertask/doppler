@@ -1,17 +1,17 @@
-package se.feraswilson.automationservice.service;
+package se.feraswilson.taskservice.service;
 
 import java.util.Map;
 
-public class AutomationRequest {
+public class TaskRequest {
     private Long automationId;
     private Map<String, String> parameters;
 
-    public AutomationRequest(Long automationId, Map<String, String> parameters) {
+    public TaskRequest(Long automationId, Map<String, String> parameters) {
         this.automationId = automationId;
         this.parameters = parameters;
     }
 
-    public AutomationRequest() {
+    public TaskRequest() {
     }
 
     public Long getAutomationId() {
@@ -32,7 +32,7 @@ public class AutomationRequest {
 
     @Override
     public String toString() {
-        return "AutomationRequest{" +
+        return "TaskRequest{" +
                 "automationId=" + automationId +
                 ", parameters=" + parameters +
                 '}';

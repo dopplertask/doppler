@@ -1,7 +1,8 @@
-package se.feraswilson.automationservice.domain.action;
+package se.feraswilson.taskservice.domain.action;
 
-import se.feraswilson.automationservice.domain.ActionResult;
-import se.feraswilson.automationservice.domain.Task;
+import se.feraswilson.taskservice.domain.ActionResult;
+import se.feraswilson.taskservice.domain.Task;
+import se.feraswilson.taskservice.domain.TaskExecution;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -29,6 +30,9 @@ public class Action {
     @JoinColumn
     private Task task;
 
+    @Column
+    private Integer orderPosition;
+
     public Long getId() {
         return id;
     }
@@ -45,8 +49,17 @@ public class Action {
         this.task = task;
     }
 
-    public ActionResult run() {
+    public ActionResult run(TaskExecution execution) {
 
         return new ActionResult();
+    }
+
+
+    public Integer getOrderPosition() {
+        return orderPosition;
+    }
+
+    public void setOrderPosition(Integer orderPosition) {
+        this.orderPosition = orderPosition;
     }
 }
