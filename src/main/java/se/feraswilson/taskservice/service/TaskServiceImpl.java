@@ -1,4 +1,4 @@
-package se.feraswilson.automationservice.service;
+package se.feraswilson.taskservice.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,23 +6,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
-import se.feraswilson.automationservice.dao.TaskDao;
-import se.feraswilson.automationservice.dao.TaskExecutionDao;
-import se.feraswilson.automationservice.domain.ActionResult;
-import se.feraswilson.automationservice.domain.StatusCode;
-import se.feraswilson.automationservice.domain.Task;
-import se.feraswilson.automationservice.domain.TaskExecution;
-import se.feraswilson.automationservice.domain.TaskExecutionLog;
-import se.feraswilson.automationservice.domain.action.Action;
+import se.feraswilson.taskservice.dao.TaskDao;
+import se.feraswilson.taskservice.dao.TaskExecutionDao;
+import se.feraswilson.taskservice.domain.ActionResult;
+import se.feraswilson.taskservice.domain.StatusCode;
+import se.feraswilson.taskservice.domain.Task;
+import se.feraswilson.taskservice.domain.TaskExecution;
+import se.feraswilson.taskservice.domain.TaskExecutionLog;
+import se.feraswilson.taskservice.domain.action.Action;
 
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.Optional;
 
 @Service
-public class AutomationServiceImpl implements AutomationService {
+public class TaskServiceImpl implements TaskService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AutomationServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TaskServiceImpl.class);
 
     @Autowired
     private JmsTemplate jmsTemplate;
@@ -34,7 +34,7 @@ public class AutomationServiceImpl implements AutomationService {
     private TaskExecutionDao taskExecutionDao;
 
     @Override
-    public void delegate(AutomationRequest request) {
+    public void delegate(TaskRequest request) {
         LOG.info("Delegating action");
 
         jmsTemplate.convertAndSend("automation_destination", request);
@@ -44,7 +44,7 @@ public class AutomationServiceImpl implements AutomationService {
     @Override
     @JmsListener(destination = "automation_destination", containerFactory = "jmsFactory")
     @Transactional
-    public void handleAutomationRequest(AutomationRequest automationRequest) {
+    public void handleAutomationRequest(TaskRequest automationRequest) {
         Optional<Task> taskRequest = taskDao.findById(automationRequest.getAutomationId());
 
         if (taskRequest.isPresent()) {
@@ -68,7 +68,7 @@ public class AutomationServiceImpl implements AutomationService {
                 TaskExecutionLog log = new TaskExecutionLog();
                 log.setTaskExecution(execution);
 
-                LOG.info("Ran current action: {} with result: {}", actionResult.getStatusCode(), actionResult.getErrorMsg());
+                LOG.info("Ran current action: {} with status code: {} and with result: {}", currentAction.getClass().getSimpleName(), actionResult.getStatusCode(), actionResult.getOutput());
 
                 log.setOutput(actionResult.getOutput());
 

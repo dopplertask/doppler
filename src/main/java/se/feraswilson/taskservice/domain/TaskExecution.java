@@ -1,4 +1,4 @@
-package se.feraswilson.automationservice.domain;
+package se.feraswilson.taskservice.domain;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;

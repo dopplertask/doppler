@@ -1,4 +1,4 @@
-package se.feraswilson.automationservice.domain;
+package se.feraswilson.taskservice.domain;
 
 public class ActionResult {
     private StatusCode statusCode;

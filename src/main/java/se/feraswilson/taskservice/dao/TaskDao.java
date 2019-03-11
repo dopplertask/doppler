@@ -1,8 +1,8 @@
-package se.feraswilson.automationservice.dao;
+package se.feraswilson.taskservice.dao;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import se.feraswilson.automationservice.domain.Task;
+import se.feraswilson.taskservice.domain.Task;
 
 @Repository
 public interface TaskDao extends JpaRepository<Task, Long> {
