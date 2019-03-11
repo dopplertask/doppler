@@ -1,6 +1,8 @@
 package se.feraswilson.automationservice.domain.action;
 
 import se.feraswilson.automationservice.domain.ActionResult;
+import se.feraswilson.automationservice.domain.StatusCode;
+import se.feraswilson.automationservice.domain.TaskExecution;
 import se.feraswilson.automationservice.service.VariableExtractorUtil;
 
 import javax.persistence.Column;
@@ -25,14 +27,22 @@ public class PrintAction extends Action {
 
 
     @Override
-    public ActionResult run() {
+    public ActionResult run(TaskExecution execution) {
         String messageVar = message;
         String messageVariable = VariableExtractorUtil.extract(messageVar);
         if (!messageVariable.equals(message)) {
-            messageVar = getTask().getParameters().get(messageVariable);
+            messageVar = execution.getParameters().get(messageVariable);
         }
 
-        System.out.println(messageVar);
-        return new ActionResult();
+        ActionResult actionResult = new ActionResult();
+
+        if (messageVar != null && !messageVar.isEmpty()) {
+            actionResult.setOutput(messageVar);
+            actionResult.setStatusCode(StatusCode.SUCCESS);
+        } else {
+            actionResult.setErrorMsg("No output");
+            actionResult.setStatusCode(StatusCode.FAILURE);
+        }
+        return actionResult;
     }
 }

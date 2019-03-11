@@ -21,7 +21,7 @@ public class TaskController {
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put("testmsg", "Hello my friend");
-        AutomationRequest request = new AutomationRequest(1L, parameters);
+        AutomationRequest request = new AutomationRequest(2L, parameters);
         automationService.delegate(request);
 
 

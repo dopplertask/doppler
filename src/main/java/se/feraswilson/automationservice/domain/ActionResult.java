@@ -3,6 +3,7 @@ package se.feraswilson.automationservice.domain;
 public class ActionResult {
     private StatusCode statusCode;
     private String errorMsg;
+    private String output;
 
     public ActionResult() {
         this.statusCode = StatusCode.SUCCESS;
@@ -12,8 +13,9 @@ public class ActionResult {
         this.statusCode = statusCode;
     }
 
-    public ActionResult(StatusCode statusCode, String errorMsg) {
+    public ActionResult(StatusCode statusCode, String output, String errorMsg) {
         this.statusCode = statusCode;
+        this.output = output;
         this.errorMsg = errorMsg;
     }
 
@@ -31,5 +33,13 @@ public class ActionResult {
 
     public void setErrorMsg(String errorMsg) {
         this.errorMsg = errorMsg;
+    }
+
+    public String getOutput() {
+        return output;
+    }
+
+    public void setOutput(String output) {
+        this.output = output;
     }
 }

@@ -9,24 +9,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Entity
 @Table(name = "Task")
 public class Task {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
-
-    @Transient
-    private Map<String, String> parameters = new HashMap<String, String>();
 
     @OneToMany(mappedBy = "task")
     private List<Action> actionList = new ArrayList<>();
@@ -45,10 +39,6 @@ public class Task {
 
     public void setActionList(List<Action> actionList) {
         this.actionList = actionList;
-    }
-
-    public Map<String, String> getParameters() {
-        return parameters;
     }
 
     public String getName() {

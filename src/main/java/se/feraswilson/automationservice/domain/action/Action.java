@@ -2,6 +2,7 @@ package se.feraswilson.automationservice.domain.action;
 
 import se.feraswilson.automationservice.domain.ActionResult;
 import se.feraswilson.automationservice.domain.Task;
+import se.feraswilson.automationservice.domain.TaskExecution;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -45,7 +46,7 @@ public class Action {
         this.task = task;
     }
 
-    public ActionResult run() {
+    public ActionResult run(TaskExecution execution) {
 
         return new ActionResult();
     }
