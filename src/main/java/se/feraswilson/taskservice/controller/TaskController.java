@@ -21,6 +21,7 @@ public class TaskController {
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put("testmsg", "Hello my friend");
+        parameters.put("url", "http://www.google.com");
         TaskRequest request = new TaskRequest(2L, parameters);
         taskService.delegate(request);
 
