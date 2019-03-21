@@ -17,6 +17,7 @@ import se.feraswilson.taskservice.domain.action.Action;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -92,5 +93,10 @@ public class TaskServiceImpl implements TaskService {
         }
 
 
+    }
+
+    @Override
+    public List<Task> getAllTasks() {
+        return taskDao.findAll();
     }
 }
