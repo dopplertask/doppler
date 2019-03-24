@@ -41,4 +41,9 @@ public class PrintAction extends Action {
         }
         return actionResult;
     }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }
+

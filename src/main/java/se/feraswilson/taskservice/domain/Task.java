@@ -1,9 +1,11 @@
 package se.feraswilson.taskservice.domain;
 
 
+import org.hibernate.annotations.Cascade;
 import se.feraswilson.taskservice.domain.action.Action;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -27,7 +29,7 @@ public class Task {
 
     private String name;
 
-    @OneToMany(mappedBy = "task")
+    @OneToMany(mappedBy = "task", cascade = CascadeType.PERSIST)
     @OrderBy("orderPosition ASC")
     private List<Action> actionList = new ArrayList<>();
 

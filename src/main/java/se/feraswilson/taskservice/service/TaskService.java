@@ -1,7 +1,10 @@
 package se.feraswilson.taskservice.service;
 
 import se.feraswilson.taskservice.domain.Task;
+import se.feraswilson.taskservice.domain.TaskExecution;
+import se.feraswilson.taskservice.domain.action.Action;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 /**
@@ -23,10 +26,15 @@ public interface TaskService {
      */
     void handleAutomationRequest(TaskRequest taskRequest);
 
+    @Transactional
+    TaskExecution runRequest(TaskRequest automationRequest);
+
     /**
      * Get all tasks
      *
      * @return all tasks from database.
      */
     List<Task> getAllTasks();
+
+    Long createTask(String name, List<Action> actions);
 }
