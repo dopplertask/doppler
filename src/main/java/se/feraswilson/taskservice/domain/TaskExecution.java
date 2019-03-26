@@ -92,4 +92,8 @@ public class TaskExecution {
     public void addLog(TaskExecutionLog executionLog) {
         logs.add(executionLog);
     }
+
+    public List<TaskExecutionLog> getLogs() {
+        return logs;
+    }
 }

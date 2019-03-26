@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
+import se.feraswilson.taskservice.dao.ActionDao;
 import se.feraswilson.taskservice.dao.TaskDao;
 import se.feraswilson.taskservice.dao.TaskExecutionDao;
 import se.feraswilson.taskservice.domain.ActionResult;
@@ -46,6 +47,12 @@ public class TaskServiceImpl implements TaskService {
     @JmsListener(destination = "automation_destination", containerFactory = "jmsFactory")
     @Transactional
     public void handleAutomationRequest(TaskRequest automationRequest) {
+        runRequest(automationRequest);
+    }
+
+    @Transactional
+    @Override
+    public TaskExecution runRequest(TaskRequest automationRequest) {
         Optional<Task> taskRequest = taskDao.findById(automationRequest.getAutomationId());
 
         if (taskRequest.isPresent()) {
@@ -87,16 +94,30 @@ public class TaskServiceImpl implements TaskService {
 
             execution.setEnddate(new Date());
 
+            return execution;
 
         } else {
             LOG.warn("Task could not be found [taskId={}]", automationRequest.getAutomationId());
+            return null;
         }
-
-
     }
 
     @Override
     public List<Task> getAllTasks() {
         return taskDao.findAll();
+    }
+
+    @Override
+    public Long createTask(String name, List<Action> actions) {
+
+        Task task = new Task();
+        task.setName(name);
+        actions.forEach(action -> action.setTask(task));
+        task.setActionList(actions);
+        task.setCreated(new Date());
+        taskDao.save(task);
+
+
+        return task.getId();
     }
 }
