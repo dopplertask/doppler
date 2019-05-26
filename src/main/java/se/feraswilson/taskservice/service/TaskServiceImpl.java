@@ -85,11 +85,13 @@ public class TaskServiceImpl implements TaskService {
                     log.setOutput(actionResult.getErrorMsg());
                     execution.setSuccess(false);
                     execution.addLog(log);
+                    broadcastResults(log);
                     break;
                 }
 
                 // Add log to the execution
                 execution.addLog(log);
+                broadcastResults(log);
             }
 
             execution.setEnddate(new Date());
@@ -100,6 +102,13 @@ public class TaskServiceImpl implements TaskService {
             LOG.warn("Task could not be found [taskId={}]", automationRequest.getAutomationId());
             return null;
         }
+    }
+
+    private void broadcastResults(TaskExecutionLog taskExecutionLog) {
+        jmsTemplate.convertAndSend("taskexecution_destination", taskExecutionLog.getOutput(), message -> {
+            message.setLongProperty("executionId", taskExecutionLog.getTaskExecution().getId());
+            return message;
+        });
     }
 
     @Override
