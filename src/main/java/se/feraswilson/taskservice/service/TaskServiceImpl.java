@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
-import se.feraswilson.taskservice.dao.ActionDao;
+
 import se.feraswilson.taskservice.dao.TaskDao;
 import se.feraswilson.taskservice.dao.TaskExecutionDao;
 import se.feraswilson.taskservice.domain.ActionResult;
@@ -16,10 +16,11 @@ import se.feraswilson.taskservice.domain.TaskExecution;
 import se.feraswilson.taskservice.domain.TaskExecutionLog;
 import se.feraswilson.taskservice.domain.action.Action;
 
-import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import javax.transaction.Transactional;
 
 @Service
 public class TaskServiceImpl implements TaskService {
