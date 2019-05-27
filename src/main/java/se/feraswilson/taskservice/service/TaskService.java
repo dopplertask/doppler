@@ -4,8 +4,9 @@ import se.feraswilson.taskservice.domain.Task;
 import se.feraswilson.taskservice.domain.TaskExecution;
 import se.feraswilson.taskservice.domain.action.Action;
 
-import javax.transaction.Transactional;
 import java.util.List;
+
+import javax.transaction.Transactional;
 
 /**
  * This service represents the scheduling and execution of tasks

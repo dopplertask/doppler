@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
 import se.feraswilson.taskservice.domain.Task;
 import se.feraswilson.taskservice.domain.TaskExecution;
 import se.feraswilson.taskservice.domain.TaskExecutionLog;
@@ -30,10 +31,9 @@ import java.util.Map;
 @RestController
 public class TaskController {
 
+    Logger logger = LoggerFactory.getLogger(TaskController.class);
     @Autowired
     private TaskService taskService;
-
-    Logger logger = LoggerFactory.getLogger(TaskController.class);
 
     @RequestMapping(path = "/schedule/task", method = RequestMethod.POST)
     public String scheduleTask(@RequestBody TaskRequestDTO taskRequestDTO) {

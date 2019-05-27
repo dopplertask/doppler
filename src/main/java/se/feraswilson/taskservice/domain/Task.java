@@ -1,8 +1,11 @@
 package se.feraswilson.taskservice.domain;
 
 
-import org.hibernate.annotations.Cascade;
 import se.feraswilson.taskservice.domain.action.Action;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -15,9 +18,6 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "Task")
