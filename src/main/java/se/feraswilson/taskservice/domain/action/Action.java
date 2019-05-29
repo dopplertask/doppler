@@ -3,6 +3,7 @@ package se.feraswilson.taskservice.domain.action;
 import se.feraswilson.taskservice.domain.ActionResult;
 import se.feraswilson.taskservice.domain.Task;
 import se.feraswilson.taskservice.domain.TaskExecution;
+import se.feraswilson.taskservice.service.TaskService;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -50,8 +51,7 @@ public class Action {
         this.task = task;
     }
 
-    public ActionResult run(TaskExecution execution) {
-
+    public ActionResult run(TaskService taskService, TaskExecution execution) {
         return new ActionResult();
     }
 

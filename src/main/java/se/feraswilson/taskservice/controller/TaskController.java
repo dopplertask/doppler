@@ -84,7 +84,12 @@ public class TaskController {
                     try {
                         Field field = cls.getDeclaredField(entry.getKey());
                         field.setAccessible(true);
-                        field.set(clsInstance, entry.getValue());
+                        try {
+                            // Try to set it as a long
+                            field.set(clsInstance, Long.parseLong(entry.getValue()));
+                        } catch (NumberFormatException e) {
+                            field.set(clsInstance, entry.getValue());
+                        }
                         logger.debug("Variable set in action type [key={}]", entry.getKey());
                     } catch (NoSuchFieldException | IllegalAccessException e) {
                         logger.warn("Could not set variable for action [key={}, action={}]", entry.getKey(), action.getActionType());
