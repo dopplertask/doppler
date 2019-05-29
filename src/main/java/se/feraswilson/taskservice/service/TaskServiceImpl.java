@@ -73,7 +73,7 @@ public class TaskServiceImpl implements TaskService {
             // Start processing task
             for (Action currentAction : task.getActionList()) {
 
-                ActionResult actionResult = currentAction.run(execution);
+                ActionResult actionResult = currentAction.run(this, execution);
                 TaskExecutionLog log = new TaskExecutionLog();
                 log.setTaskExecution(execution);
 

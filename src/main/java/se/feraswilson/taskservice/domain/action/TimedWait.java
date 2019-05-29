@@ -3,6 +3,7 @@ package se.feraswilson.taskservice.domain.action;
 import se.feraswilson.taskservice.domain.ActionResult;
 import se.feraswilson.taskservice.domain.StatusCode;
 import se.feraswilson.taskservice.domain.TaskExecution;
+import se.feraswilson.taskservice.service.TaskService;
 import se.feraswilson.taskservice.service.VariableExtractorUtil;
 
 import javax.persistence.Column;
@@ -27,7 +28,7 @@ public class TimedWait extends Action {
 
 
     @Override
-    public ActionResult run(TaskExecution execution) {
+    public ActionResult run(TaskService taskService, TaskExecution execution) {
         String amountOfSeconds = VariableExtractorUtil.extract("" + seconds, execution);
 
         ActionResult actionResult = new ActionResult();
