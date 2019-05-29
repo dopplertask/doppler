@@ -2,9 +2,15 @@ package com.dopplertask.doppler.controller;
 
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
+import com.dopplertask.doppler.domain.TaskExecutionLog;
+import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.dto.ActionDTO;
+import com.dopplertask.doppler.dto.TaskCreationDTO;
+import com.dopplertask.doppler.dto.TaskExecutionLogResponseDTO;
 import com.dopplertask.doppler.dto.TaskRequestDTO;
 import com.dopplertask.doppler.dto.TaskResponseDTO;
+import com.dopplertask.doppler.service.TaskRequest;
+import com.dopplertask.doppler.service.TaskService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,13 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.dopplertask.doppler.domain.TaskExecutionLog;
-import com.dopplertask.doppler.domain.action.Action;
-import com.dopplertask.doppler.dto.TaskCreationDTO;
-import com.dopplertask.doppler.dto.TaskExecutionLogResponseDTO;
-import com.dopplertask.doppler.service.TaskRequest;
-import com.dopplertask.doppler.service.TaskService;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -37,11 +36,17 @@ public class TaskController {
     private TaskService taskService;
 
     @RequestMapping(path = "/schedule/task", method = RequestMethod.POST)
-    public String scheduleTask(@RequestBody TaskRequestDTO taskRequestDTO) {
+    public ResponseEntity<SimpleIdResponseDto> scheduleTask(@RequestBody TaskRequestDTO taskRequestDTO) {
         TaskRequest request = new TaskRequest(taskRequestDTO.getAutomationId(), taskRequestDTO.getParameters());
-        taskService.delegate(request);
+        TaskExecution taskExecution = taskService.delegate(request);
 
-        return "{\"success\": 1}";
+        if (taskExecution != null) {
+            SimpleIdResponseDto idResponseDto = new SimpleIdResponseDto();
+            idResponseDto.setId(String.valueOf(taskExecution.getId()));
+            return new ResponseEntity<>(idResponseDto, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
 
@@ -76,7 +81,7 @@ public class TaskController {
         for (ActionDTO action : taskCreationDTO.getActions()) {
             // Determine what actions the user wants to add
             try {
-                Class<?> cls = Class.forName("se.feraswilson.taskservice.domain.action." + action.getActionType());
+                Class<?> cls = Class.forName("com.dopplertask.doppler.domain.action." + action.getActionType());
                 Action clsInstance = (Action) cls.getDeclaredConstructor().newInstance();
 
 

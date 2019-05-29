@@ -1,7 +1,13 @@
 package com.dopplertask.doppler.service;
 
+import com.dopplertask.doppler.dao.TaskDao;
+import com.dopplertask.doppler.dao.TaskExecutionDao;
+import com.dopplertask.doppler.domain.ActionResult;
+import com.dopplertask.doppler.domain.StatusCode;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
+import com.dopplertask.doppler.domain.TaskExecutionLog;
+import com.dopplertask.doppler.domain.action.Action;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,13 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
-
-import com.dopplertask.doppler.dao.TaskDao;
-import com.dopplertask.doppler.dao.TaskExecutionDao;
-import com.dopplertask.doppler.domain.ActionResult;
-import com.dopplertask.doppler.domain.StatusCode;
-import com.dopplertask.doppler.domain.TaskExecutionLog;
-import com.dopplertask.doppler.domain.action.Action;
 
 import java.util.Date;
 import java.util.List;
@@ -38,38 +37,51 @@ public class TaskServiceImpl implements TaskService {
     private TaskExecutionDao taskExecutionDao;
 
     @Override
-    public void delegate(TaskRequest request) {
+    public TaskExecution delegate(TaskRequest request) {
         LOG.info("Delegating action");
 
-        jmsTemplate.convertAndSend("automation_destination", request);
+        TaskExecution execution = new TaskExecution();
+        // Create execution record
+        taskExecutionDao.save(execution);
 
+        TaskExecutionRequest taskExecutionRequest = new TaskExecutionRequest();
+        taskExecutionRequest.setAutomationId(request.getAutomationId());
+        taskExecutionRequest.setParameters(request.getParameters());
+        taskExecutionRequest.setExecutionId(execution.getId());
+
+        jmsTemplate.convertAndSend("automation_destination", taskExecutionRequest);
+
+        return execution;
     }
 
     @Override
     @JmsListener(destination = "automation_destination", containerFactory = "jmsFactory")
     @Transactional
-    public void handleAutomationRequest(TaskRequest automationRequest) {
+    public void handleAutomationRequest(TaskExecutionRequest automationRequest) {
         runRequest(automationRequest);
     }
 
     @Transactional
     @Override
-    public TaskExecution runRequest(TaskRequest automationRequest) {
+    public TaskExecution runRequest(TaskExecutionRequest automationRequest) {
         Optional<Task> taskRequest = taskDao.findById(automationRequest.getAutomationId());
-
-        if (taskRequest.isPresent()) {
+        Optional<TaskExecution> executionReq = taskExecutionDao.findById(automationRequest.getExecutionId());
+        if (taskRequest.isPresent() && executionReq.isPresent()) {
             Task task = taskRequest.get();
-
-            TaskExecution execution = new TaskExecution();
-            execution.setTask(task);
-
-            // Create execution record
-            taskExecutionDao.save(execution);
+            TaskExecution execution = executionReq.get();
 
             // Populate variables
             execution.getParameters().putAll(automationRequest.getParameters());
 
             execution.setStartdate(new Date());
+
+            TaskExecutionLog executionStarted = new TaskExecutionLog();
+            executionStarted.setTaskExecution(execution);
+            executionStarted.setOutput("Task execution started [taskId=" + task.getId() + ", executionId=" + execution.getId() + "]");
+            execution.addLog(executionStarted);
+            broadcastResults(executionStarted);
+
+            LOG.info("Task execution started [taskId={}, executionId={}]", task.getId(), execution.getId());
 
             // Start processing task
             for (Action currentAction : task.getActionList()) {
@@ -96,12 +108,27 @@ public class TaskServiceImpl implements TaskService {
                 broadcastResults(log);
             }
 
-            execution.setEnddate(new Date());
 
+            TaskExecutionLog executionCompleted = new TaskExecutionLog();
+            executionCompleted.setTaskExecution(execution);
+            executionCompleted.setOutput("Task execution completed [taskId=" + task.getId() + ", executionId=" + execution.getId() + "]");
+            execution.addLog(executionCompleted);
+            broadcastResults(executionCompleted);
+
+
+            LOG.info("Task execution completed [taskId={}, executionId={}]", task.getId(), execution.getId());
+
+            execution.setEnddate(new Date());
             return execution;
 
         } else {
             LOG.warn("Task could not be found [taskId={}]", automationRequest.getAutomationId());
+
+            TaskExecution taskExecution = new TaskExecution();
+            taskExecution.setId(0L);
+            TaskExecutionLog noTaskLog = new TaskExecutionLog();
+            noTaskLog.setOutput("Task could not be found [taskId=" + automationRequest.getAutomationId() + "]");
+            broadcastResults(noTaskLog);
             return null;
         }
     }
@@ -130,5 +157,19 @@ public class TaskServiceImpl implements TaskService {
 
 
         return task.getId();
+    }
+
+    @Override
+    public TaskExecution runRequest(TaskRequest request) {
+        TaskExecution execution = new TaskExecution();
+        // Create execution record
+        taskExecutionDao.save(execution);
+
+        TaskExecutionRequest taskExecutionRequest = new TaskExecutionRequest();
+        taskExecutionRequest.setAutomationId(request.getAutomationId());
+        taskExecutionRequest.setParameters(request.getParameters());
+        taskExecutionRequest.setExecutionId(execution.getId());
+
+        return this.runRequest(taskExecutionRequest);
     }
 }
