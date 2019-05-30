@@ -42,6 +42,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.javassist/javassist
     compile group: 'org.javassist', name: 'javassist', version: '3.24.1-GA'
 
+    compile group: 'com.jcraft', name: 'jsch', version: '0.1.55'
+
 // https://mvnrepository.com/artifact/com.h2database/h2
     runtime group: 'com.h2database', name: 'h2', version: '1.4.199'
 
