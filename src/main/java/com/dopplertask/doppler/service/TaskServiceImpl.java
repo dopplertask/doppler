@@ -15,12 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
-import javax.transaction.Transactional;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -37,6 +36,7 @@ public class TaskServiceImpl implements TaskService {
     private TaskExecutionDao taskExecutionDao;
 
     @Override
+    @Transactional
     public TaskExecution delegate(TaskRequest request) {
         LOG.info("Delegating action");
 
@@ -69,6 +69,9 @@ public class TaskServiceImpl implements TaskService {
         if (taskRequest.isPresent() && executionReq.isPresent()) {
             Task task = taskRequest.get();
             TaskExecution execution = executionReq.get();
+
+            // Assign task to execution
+            execution.setTask(task);
 
             // Populate variables
             execution.getParameters().putAll(automationRequest.getParameters());
