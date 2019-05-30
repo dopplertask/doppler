@@ -45,6 +45,7 @@ dependencies {
 // https://mvnrepository.com/artifact/com.h2database/h2
     runtime group: 'com.h2database', name: 'h2', version: '1.4.199'
 
+    compile group: 'org.mockito', name: 'mockito-core', version: '2.22.0'
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('com.jayway.jsonpath:json-path')
