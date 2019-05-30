@@ -12,11 +12,6 @@ To run as a project:
 ## Usage
 
 ### Example
-
-Add a task
-
-```curl -X POST http://localhost:8090/task -H "Content-Type: application/json" -d @add_task.json```
-
 #### Add a task
 
 Below is an example of a Dopplerfile:
@@ -49,7 +44,7 @@ To run a task, send the JSON with the task id and parameters to the REST API:
   "parameters": {
   }
 }
-```
+``` 
 
 Example of the call:
 
@@ -91,8 +86,3 @@ Example of the call:
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details
-
-
-
-
-
