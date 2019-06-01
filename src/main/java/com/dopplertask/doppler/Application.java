@@ -27,7 +27,7 @@ public class Application {
         final BrokerService broker = new BrokerService();
         broker.addConnector("tcp://localhost:61616");
         broker.addConnector("vm://localhost");
-
+        broker.addConnector("stomp://localhost:61617");
         broker.setPersistent(false);
         return broker;
     }
