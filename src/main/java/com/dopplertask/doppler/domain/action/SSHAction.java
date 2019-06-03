@@ -19,7 +19,7 @@ public class SSHAction extends Action {
 
 
     @Column
-    private String host;
+    private String hostname;
 
     @Column
     private String username;
@@ -32,7 +32,7 @@ public class SSHAction extends Action {
 
     @Override
     public ActionResult run(TaskService taskService, TaskExecution execution) {
-        String connectionIP = VariableExtractorUtil.extract(getHost(), execution);
+        String connectionIP = VariableExtractorUtil.extract(getHostname(), execution);
         String userName = VariableExtractorUtil.extract(getUsername(), execution);
         String password = VariableExtractorUtil.extract(getPassword(), execution);
         String command = VariableExtractorUtil.extract(getCommand(), execution);
@@ -59,12 +59,12 @@ public class SSHAction extends Action {
         return actionResult;
     }
 
-    public String getHost() {
-        return host;
+    public String getHostname() {
+        return hostname;
     }
 
-    public void setHost(String host) {
-        this.host = host;
+    public void setHostname(String hostname) {
+        this.hostname = hostname;
     }
 
     public String getUsername() {

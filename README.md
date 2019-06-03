@@ -60,10 +60,18 @@ Example of the call:
 
 #### SSHAction
 ##### Variables
-* host: hostname to connect to
+* hostname: hostname to connect to
 * username
 * password
-* command: A comand to execute once connected
+* command: A command to execute once connected
+
+#### SecureCopyAction
+##### Variables
+* hostname: hostname to connect to
+* username
+* password
+* sourceFilename: location of the file to be transferred
+* destinationFilename: location of where the file will be placed in the remote host
 
 #### HttpAction
 ##### Variables
