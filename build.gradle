@@ -32,6 +32,9 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-activemq', version: '2.1.3.RELEASE'
     compile("org.apache.activemq:activemq-stomp")
 
+    // https://mvnrepository.com/artifact/org.apache.velocity.tools/velocity-tools-generic
+    compile group: 'org.apache.velocity.tools', name: 'velocity-tools-generic', version: '3.0'
+
     // https://mvnrepository.com/artifact/org.apache.activemq/activemq-broker
     compile group: 'org.apache.activemq', name: 'activemq-broker', version: '5.15.8'
 
