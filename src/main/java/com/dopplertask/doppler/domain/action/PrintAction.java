@@ -1,10 +1,10 @@
 package com.dopplertask.doppler.domain.action;
 
 import com.dopplertask.doppler.domain.ActionResult;
-import com.dopplertask.doppler.domain.TaskExecution;
-import com.dopplertask.doppler.service.VariableExtractorUtil;
 import com.dopplertask.doppler.domain.StatusCode;
+import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.service.TaskService;
+import com.dopplertask.doppler.service.VariableExtractorUtil;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
