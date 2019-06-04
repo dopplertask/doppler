@@ -96,10 +96,12 @@ public class TaskServiceImpl implements TaskService {
                 LOG.info("Ran current action: {} with status code: {} and with result: {}", currentAction.getClass().getSimpleName(), actionResult.getStatusCode(), actionResult.getOutput());
 
                 log.setOutput(actionResult.getOutput());
+                log.setOutputType(actionResult.getOutputType());
 
                 // If action did not go well
                 if (actionResult.getStatusCode() == StatusCode.FAILURE) {
                     log.setOutput(actionResult.getErrorMsg());
+                    log.setOutputType(actionResult.getOutputType());
                     execution.setSuccess(false);
                     execution.addLog(log);
                     broadcastResults(log);
@@ -137,7 +139,9 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private void broadcastResults(TaskExecutionLog taskExecutionLog) {
-        jmsTemplate.convertAndSend("taskexecution_destination", taskExecutionLog.getOutput(), message -> {
+        BroadcastResult result = new BroadcastResult(taskExecutionLog.getOutput(), taskExecutionLog.getOutputType());
+
+        jmsTemplate.convertAndSend("taskexecution_destination", result, message -> {
             message.setLongProperty("executionId", taskExecutionLog.getTaskExecution().getId());
             return message;
         });

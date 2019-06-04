@@ -17,7 +17,6 @@ public interface TaskService {
      * Schedule a task
      *
      * @param request containing the information about what to execute.
-     * @return
      */
     TaskExecution delegate(TaskRequest request);
 
@@ -33,7 +32,7 @@ public interface TaskService {
      * Runs task with provided execution.
      *
      * @param taskRequest containing the information about what to execute.
-     *                    @return execution containing the results.
+     * @return execution containing the results.
      */
     @Transactional
     TaskExecution runRequest(TaskExecutionRequest automationRequest);

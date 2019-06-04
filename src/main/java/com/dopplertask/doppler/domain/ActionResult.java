@@ -4,6 +4,7 @@ public class ActionResult {
     private StatusCode statusCode;
     private String errorMsg;
     private String output;
+    private OutputType outputType = OutputType.STRING;
 
     public ActionResult() {
         this.statusCode = StatusCode.SUCCESS;
@@ -41,5 +42,13 @@ public class ActionResult {
 
     public void setOutput(String output) {
         this.output = output;
+    }
+
+    public OutputType getOutputType() {
+        return outputType;
+    }
+
+    public void setOutputType(OutputType outputType) {
+        this.outputType = outputType;
     }
 }

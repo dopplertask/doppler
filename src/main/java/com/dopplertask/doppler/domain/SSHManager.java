@@ -23,21 +23,6 @@ public class SSHManager {
     private Session sesConnection;
     private int intTimeOut;
 
-    private void doCommonConstructorActions(String userName,
-                                            String password, String connectionIP, String knownHostsFileName) {
-        jschSSHChannel = new JSch();
-
-        try {
-            jschSSHChannel.setKnownHosts(knownHostsFileName);
-        } catch (JSchException jschX) {
-            logError(jschX.getMessage());
-        }
-
-        strUserName = userName;
-        strPassword = password;
-        strConnectionIP = connectionIP;
-    }
-
     public SSHManager(String userName, String password,
                       String connectionIP, String knownHostsFileName) {
         doCommonConstructorActions(userName, password,
@@ -60,6 +45,21 @@ public class SSHManager {
                 knownHostsFileName);
         intConnectionPort = connectionPort;
         intTimeOut = timeOutMilliseconds;
+    }
+
+    private void doCommonConstructorActions(String userName,
+                                            String password, String connectionIP, String knownHostsFileName) {
+        jschSSHChannel = new JSch();
+
+        try {
+            jschSSHChannel.setKnownHosts(knownHostsFileName);
+        } catch (JSchException jschX) {
+            logError(jschX.getMessage());
+        }
+
+        strUserName = userName;
+        strPassword = password;
+        strConnectionIP = connectionIP;
     }
 
     public String connect() {
