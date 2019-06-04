@@ -133,4 +133,7 @@ public class SSHManager {
         sesConnection.disconnect();
     }
 
+    public Channel openChannel(String type) throws JSchException {
+        return sesConnection.openChannel(type);
+    }
 }

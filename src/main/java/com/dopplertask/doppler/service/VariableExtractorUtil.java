@@ -19,13 +19,15 @@ public class VariableExtractorUtil {
 
             String replaced = fieldValue.replaceAll("\\$\\{(.*)\\}", "$1");
 
+            // Replace variable and evaluate the parameter
             if (!replaced.equals(fieldValue) && execution.getParameters().get(replaced) != null) {
                 velocityEngine.evaluate(context, writer, "VelExtract", execution.getParameters().get(replaced));
                 return writer.toString();
             }
 
-
-            return fieldValue;
+            // Evaluate the original field
+            velocityEngine.evaluate(context, writer, "VelExtract", fieldValue);
+            return writer.toString();
         }
 
         return "";
