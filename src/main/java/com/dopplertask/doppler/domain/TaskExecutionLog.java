@@ -1,6 +1,9 @@
 package com.dopplertask.doppler.domain;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -24,6 +27,10 @@ public class TaskExecutionLog {
     @Lob
     private String output;
 
+    @Enumerated(EnumType.STRING)
+    @Column
+    private OutputType outputType = OutputType.STRING;
+
     public Long getId() {
         return id;
     }
@@ -46,5 +53,13 @@ public class TaskExecutionLog {
 
     public void setOutput(String output) {
         this.output = output;
+    }
+
+    public OutputType getOutputType() {
+        return outputType;
+    }
+
+    public void setOutputType(OutputType outputType) {
+        this.outputType = outputType;
     }
 }

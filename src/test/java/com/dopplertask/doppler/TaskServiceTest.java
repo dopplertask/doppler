@@ -75,7 +75,7 @@ public class TaskServiceTest {
         Assert.assertEquals(283471L, executionId);
         Assert.assertEquals(1928L, taskId);
         Assert.assertEquals(2, taskExecutionReturned.getLogs().size());
-        Mockito.verify(jmsTemplate, Mockito.times(2)).convertAndSend(eq("taskexecution_destination"), Mockito.anyString(), Mockito.any());
+        Mockito.verify(jmsTemplate, Mockito.times(2)).convertAndSend(eq("taskexecution_destination"), Mockito.any(), Mockito.any());
     }
 
     @Test
@@ -115,7 +115,7 @@ public class TaskServiceTest {
         Assert.assertEquals(283472L, executionId);
         Assert.assertEquals(1928L, taskId);
         Assert.assertEquals(3, taskExecutionReturned.getLogs().size());
-        Mockito.verify(jmsTemplate, Mockito.times(3)).convertAndSend(eq("taskexecution_destination"), Mockito.anyString(), Mockito.any());
+        Mockito.verify(jmsTemplate, Mockito.times(3)).convertAndSend(eq("taskexecution_destination"), Mockito.any(), Mockito.any());
     }
 
     @Test
@@ -178,6 +178,6 @@ public class TaskServiceTest {
         Assert.assertEquals(1928L, taskId);
         Assert.assertEquals(3, taskExecutionReturned.getLogs().size());
         Assert.assertEquals("Successfully executed linked task [id=120]", taskExecutionReturned.getLogs().get(1).getOutput());
-        Mockito.verify(jmsTemplate, Mockito.times(6)).convertAndSend(eq("taskexecution_destination"), Mockito.anyString(), Mockito.any());
+        Mockito.verify(jmsTemplate, Mockito.times(6)).convertAndSend(eq("taskexecution_destination"), Mockito.any(), Mockito.any());
     }
 }
