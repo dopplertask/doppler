@@ -17,12 +17,12 @@ import javax.persistence.Table;
 public class TimedWait extends Action {
 
     @Column
-    private Integer seconds;
+    private Long seconds;
 
     public TimedWait() {
     }
 
-    public TimedWait(Integer seconds) {
+    public TimedWait(Long seconds) {
         this.seconds = seconds;
     }
 

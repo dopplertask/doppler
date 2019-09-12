@@ -9,7 +9,6 @@ import com.dopplertask.doppler.domain.action.LinkedTaskAction;
 import com.dopplertask.doppler.domain.action.PrintAction;
 import com.dopplertask.doppler.service.TaskExecutionRequest;
 import com.dopplertask.doppler.service.TaskServiceImpl;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -155,7 +154,9 @@ public class TaskServiceTest {
             TaskExecution te = ((TaskExecution) invocation.getArguments()[0]);
 
             // Some different id for the task execution of the linked automation.
-            te.setId(linkedTaskExecution.getId());
+            if (te.getId() == null) {
+                te.setId(linkedTaskExecution.getId());
+            }
             return te;
         });
 
