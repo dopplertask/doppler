@@ -8,6 +8,8 @@ import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -39,6 +41,9 @@ public class TaskExecution {
 
     private Date startdate;
     private Date enddate;
+
+    @Enumerated(EnumType.STRING)
+    private TaskExecutionStatus status = TaskExecutionStatus.CREATED;
 
     private boolean success = true;
 
@@ -96,5 +101,13 @@ public class TaskExecution {
 
     public List<TaskExecutionLog> getLogs() {
         return logs;
+    }
+
+    public TaskExecutionStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TaskExecutionStatus status) {
+        this.status = status;
     }
 }

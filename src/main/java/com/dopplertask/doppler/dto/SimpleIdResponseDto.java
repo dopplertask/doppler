@@ -1,4 +1,4 @@
-package com.dopplertask.doppler.controller;
+package com.dopplertask.doppler.dto;
 
 public class SimpleIdResponseDto {
     private String id;

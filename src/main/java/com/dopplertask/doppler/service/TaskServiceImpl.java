@@ -7,8 +7,8 @@ import com.dopplertask.doppler.domain.StatusCode;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.TaskExecutionLog;
+import com.dopplertask.doppler.domain.TaskExecutionStatus;
 import com.dopplertask.doppler.domain.action.Action;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +34,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Autowired
     private TaskExecutionDao taskExecutionDao;
+
+    @Autowired
+    private ExecutionService executionService;
 
     @Override
     @Transactional
@@ -77,11 +80,15 @@ public class TaskServiceImpl implements TaskService {
             execution.getParameters().putAll(automationRequest.getParameters());
 
             execution.setStartdate(new Date());
+            execution.setStatus(TaskExecutionStatus.STARTED);
 
             TaskExecutionLog executionStarted = new TaskExecutionLog();
             executionStarted.setTaskExecution(execution);
             executionStarted.setOutput("Task execution started [taskId=" + task.getId() + ", executionId=" + execution.getId() + "]");
             execution.addLog(executionStarted);
+
+            //executionService.saveExecution(execution);
+
             broadcastResults(executionStarted);
 
             LOG.info("Task execution started [taskId={}, executionId={}]", task.getId(), execution.getId());
@@ -103,6 +110,7 @@ public class TaskServiceImpl implements TaskService {
                     log.setOutput(actionResult.getErrorMsg());
                     log.setOutputType(actionResult.getOutputType());
                     execution.setSuccess(false);
+                    execution.setStatus(TaskExecutionStatus.FAILED);
                     execution.addLog(log);
                     broadcastResults(log);
                     break;
@@ -110,9 +118,10 @@ public class TaskServiceImpl implements TaskService {
 
                 // Add log to the execution
                 execution.addLog(log);
+                //executionService.saveExecution(execution);
                 broadcastResults(log);
-            }
 
+            }
 
             TaskExecutionLog executionCompleted = new TaskExecutionLog();
             executionCompleted.setTaskExecution(execution);
@@ -124,6 +133,7 @@ public class TaskServiceImpl implements TaskService {
             LOG.info("Task execution completed [taskId={}, executionId={}]", task.getId(), execution.getId());
 
             execution.setEnddate(new Date());
+            execution.setStatus(TaskExecutionStatus.FINISHED);
             return execution;
 
         } else {
@@ -164,6 +174,11 @@ public class TaskServiceImpl implements TaskService {
 
 
         return task.getId();
+    }
+
+    @Override
+    public List<TaskExecution> getExecutions() {
+        return taskExecutionDao.findAllByTaskNotNull();
     }
 
     @Override
