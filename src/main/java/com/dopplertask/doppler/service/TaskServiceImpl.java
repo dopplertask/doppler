@@ -181,6 +181,7 @@ public class TaskServiceImpl implements TaskService {
         return taskExecutionDao.findAllByTaskNotNull();
     }
 
+    @Transactional
     @Override
     public TaskExecution runRequest(TaskRequest request) {
         TaskExecution execution = new TaskExecution();

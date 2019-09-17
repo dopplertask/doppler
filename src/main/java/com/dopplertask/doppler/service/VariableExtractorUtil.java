@@ -15,6 +15,12 @@ public class VariableExtractorUtil {
             velocityEngine.init();
             VelocityContext context = new VelocityContext();
             context.put("execution", execution);
+
+            // Easy access to lastLog
+            if(execution != null && execution.getLogs() != null && execution.getLogs().size() > 0) {
+                context.put("lastLog", execution.getLogs().get(execution.getLogs().size() - 1));
+            }
+
             StringWriter writer = new StringWriter();
 
             String replaced = fieldValue.replaceAll("\\$\\{(.*)\\}", "$1");

@@ -1,6 +1,8 @@
 # doppler
 Doppler is a revolutionary open-source software that allows you to automate tasks easily. Whether it’s a bunch of bash scripts or just starting your car remotely, you can automate it. You can build, run, reuse and share automations with anyone around the globe.
 
+On top of all of this life-simplifying project, we  are striving to make an climate friendly software that is fast, easy and consumes as little resources as possible.
+
 ## Build status
 [![Build Status](https://travis-ci.org/dopplertask/doppler.svg?branch=master)](https://travis-ci.org/dopplertask/doppler)
 
@@ -59,6 +61,7 @@ Example of the call:
 * message: A message to be printed
 
 #### SSHAction
+Connects to a machine via SSH and executes a command
 ##### Variables
 * hostname: hostname to connect to
 * username
@@ -79,6 +82,17 @@ Example of the call:
 * method: GET, POST, PUT, DELETE
 * body
 * headers: Key-value list of headers
+
+#### MySQLAction
+Executes a MySQL statement, like a SELECT statement.
+##### Variables
+* hostname: hostname to connect to
+* port (Optional)
+* username
+* password
+* database
+* timezone
+* command
 
 #### TimedWait
 ##### Variables

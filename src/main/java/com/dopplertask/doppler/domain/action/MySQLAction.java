@@ -33,6 +33,9 @@ public class MySQLAction extends Action {
     private String password;
 
     @Column
+    private String port;
+
+    @Column
     private String database;
 
     @Column
@@ -50,6 +53,7 @@ public class MySQLAction extends Action {
         String localHostname = VariableExtractorUtil.extract(getHostname(), execution);
         String localUsername = VariableExtractorUtil.extract(getUsername(), execution);
         String localPassword = VariableExtractorUtil.extract(getPassword(), execution);
+        String localPort = VariableExtractorUtil.extract(getPort(), execution);
         String localDatabase = VariableExtractorUtil.extract(getDatabase(), execution);
         String localCommand = VariableExtractorUtil.extract(getCommand(), execution);
         String localTimezone = VariableExtractorUtil.extract(getTimezone(), execution);
@@ -59,6 +63,14 @@ public class MySQLAction extends Action {
         dataSource.setPassword(localPassword);
         dataSource.setServerName(localHostname);
         dataSource.setDatabaseName(localDatabase);
+        if(localPort != null && !localPort.isEmpty()) {
+            try {
+                dataSource.setPort(Integer.parseInt(localPort));
+            }
+            catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
         if (!localTimezone.isEmpty()) {
             try {
                 dataSource.setServerTimezone(localTimezone);
@@ -166,6 +178,14 @@ public class MySQLAction extends Action {
 
     public void setTimezone(String timezone) {
         this.timezone = timezone;
+    }
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
     }
 }
 
