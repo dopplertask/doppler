@@ -1,3 +1,3 @@
-#!/bin/bash
+#!/bin/sh
 set -x
-./gradlew clean build bootRun
+java -jar /opt/spring-boot/doppler-0.1.0.jar
