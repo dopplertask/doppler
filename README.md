@@ -102,6 +102,13 @@ Executes a MySQL statement, like a SELECT statement.
 ##### Variables
 * linkedTaskId: Id of another task
 
+## Docker
+To run the built docker image:
+```docker run -p 8090:8090 -p 61617:61617 dopplertask/doppler-engine ```
+
+To rebuild the docker image:
+```docker build -t dopplertask/doppler-engine .```
+
 ## Authors
 
 * **Feras Wilson** 

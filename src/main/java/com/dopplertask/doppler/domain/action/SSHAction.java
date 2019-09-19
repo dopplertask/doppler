@@ -10,6 +10,7 @@ import com.dopplertask.doppler.service.VariableExtractorUtil;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 @Entity
@@ -27,7 +28,8 @@ public class SSHAction extends Action {
     @Column
     private String password;
 
-    @Column
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String command;
 
     @Override
