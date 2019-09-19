@@ -27,6 +27,7 @@ COPY --from=jlink-package /root/build/libs/doppler-0.1.0.jar /opt/spring-boot/
 COPY --from=jlink-package /root/start.sh /opt/spring-boot/
 
 EXPOSE 8090
+EXPOSE 61617
 WORKDIR  /opt/spring-boot/
 ENTRYPOINT ["./start.sh"]
 

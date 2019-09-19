@@ -16,6 +16,7 @@ import java.sql.Statement;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 @Entity
@@ -41,7 +42,8 @@ public class MySQLAction extends Action {
     @Column
     private String timezone;
 
-    @Column
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String command;
 
     public MySQLAction() {
