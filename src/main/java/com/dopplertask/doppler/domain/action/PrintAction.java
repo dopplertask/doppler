@@ -43,6 +43,10 @@ public class PrintAction extends Action {
         return actionResult;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
     public void setMessage(String message) {
         this.message = message;
     }

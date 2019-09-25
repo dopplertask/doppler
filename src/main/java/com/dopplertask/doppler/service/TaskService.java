@@ -3,6 +3,7 @@ package com.dopplertask.doppler.service;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.action.Action;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -56,4 +57,6 @@ public interface TaskService {
 
 
     List<TaskExecution> getExecutions();
+
+    Task getTask(long id);
 }

@@ -9,6 +9,7 @@ import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.TaskExecutionLog;
 import com.dopplertask.doppler.domain.TaskExecutionStatus;
 import com.dopplertask.doppler.domain.action.Action;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,8 +88,6 @@ public class TaskServiceImpl implements TaskService {
             executionStarted.setOutput("Task execution started [taskId=" + task.getId() + ", executionId=" + execution.getId() + "]");
             execution.addLog(executionStarted);
 
-            //executionService.saveExecution(execution);
-
             broadcastResults(executionStarted);
 
             LOG.info("Task execution started [taskId={}, executionId={}]", task.getId(), execution.getId());
@@ -96,7 +95,13 @@ public class TaskServiceImpl implements TaskService {
             // Start processing task
             for (Action currentAction : task.getActionList()) {
 
-                ActionResult actionResult = currentAction.run(this, execution);
+                ActionResult actionResult = null;
+                try {
+                    actionResult = currentAction.run(this, execution);
+                } catch (Exception e) {
+                    LOG.error("Exception occured: " + e);
+                }
+
                 TaskExecutionLog log = new TaskExecutionLog();
                 log.setTaskExecution(execution);
 
@@ -163,6 +168,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public Long createTask(String name, List<Action> actions) {
 
         Task task = new Task();
@@ -179,6 +185,12 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<TaskExecution> getExecutions() {
         return taskExecutionDao.findAllByTaskNotNull();
+    }
+
+    @Override
+    public Task getTask(long id) {
+        Optional<Task> task = taskDao.findById(id);
+        return task.isPresent() ? task.get() : null;
     }
 
     @Transactional

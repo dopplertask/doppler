@@ -112,9 +112,15 @@ public class SSHManager {
             channel.connect();
             int readByte = commandOutput.read();
 
-            while (readByte != 0xffffffff) {
-                outputBuffer.append((char) readByte);
-                readByte = commandOutput.read();
+            while (commandOutput.available() > 0) {
+                while (readByte != 0xffffffff) {
+                    outputBuffer.append((char) readByte);
+                    readByte = commandOutput.read();
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception ee) {
+                }
             }
 
             channel.disconnect();

@@ -65,11 +65,10 @@ public class MySQLAction extends Action {
         dataSource.setPassword(localPassword);
         dataSource.setServerName(localHostname);
         dataSource.setDatabaseName(localDatabase);
-        if(localPort != null && !localPort.isEmpty()) {
+        if (localPort != null && !localPort.isEmpty()) {
             try {
                 dataSource.setPort(Integer.parseInt(localPort));
-            }
-            catch (NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
         }
