@@ -2,12 +2,8 @@ package com.dopplertask.doppler.service;
 
 import com.dopplertask.doppler.dao.TaskDao;
 import com.dopplertask.doppler.dao.TaskExecutionDao;
-import com.dopplertask.doppler.domain.ActionResult;
-import com.dopplertask.doppler.domain.StatusCode;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
-import com.dopplertask.doppler.domain.TaskExecutionLog;
-import com.dopplertask.doppler.domain.TaskExecutionStatus;
 import com.dopplertask.doppler.domain.action.Action;
 
 import org.slf4j.Logger;
@@ -60,106 +56,18 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @JmsListener(destination = "automation_destination", containerFactory = "jmsFactory")
-    @Transactional
     public void handleAutomationRequest(TaskExecutionRequest automationRequest) {
         runRequest(automationRequest);
     }
 
-    @Transactional
     @Override
     public TaskExecution runRequest(TaskExecutionRequest automationRequest) {
-        Optional<Task> taskRequest = taskDao.findById(automationRequest.getAutomationId());
-        Optional<TaskExecution> executionReq = taskExecutionDao.findById(automationRequest.getExecutionId());
-        if (taskRequest.isPresent() && executionReq.isPresent()) {
-            Task task = taskRequest.get();
-            TaskExecution execution = executionReq.get();
+        TaskExecution execution = executionService.startExecution(automationRequest);
 
-            // Assign task to execution
-            execution.setTask(task);
-
-            // Populate variables
-            execution.getParameters().putAll(automationRequest.getParameters());
-
-            execution.setStartdate(new Date());
-            execution.setStatus(TaskExecutionStatus.STARTED);
-
-            TaskExecutionLog executionStarted = new TaskExecutionLog();
-            executionStarted.setTaskExecution(execution);
-            executionStarted.setOutput("Task execution started [taskId=" + task.getId() + ", executionId=" + execution.getId() + "]");
-            execution.addLog(executionStarted);
-
-            broadcastResults(executionStarted);
-
-            LOG.info("Task execution started [taskId={}, executionId={}]", task.getId(), execution.getId());
-
-            // Start processing task
-            for (Action currentAction : task.getActionList()) {
-
-                ActionResult actionResult = null;
-                try {
-                    actionResult = currentAction.run(this, execution);
-                } catch (Exception e) {
-                    LOG.error("Exception occured: " + e);
-                }
-
-                TaskExecutionLog log = new TaskExecutionLog();
-                log.setTaskExecution(execution);
-
-                LOG.info("Ran current action: {} with status code: {} and with result: {}", currentAction.getClass().getSimpleName(), actionResult.getStatusCode(), actionResult.getOutput());
-
-                log.setOutput(actionResult.getOutput());
-                log.setOutputType(actionResult.getOutputType());
-
-                // If action did not go well
-                if (actionResult.getStatusCode() == StatusCode.FAILURE) {
-                    log.setOutput(actionResult.getErrorMsg());
-                    log.setOutputType(actionResult.getOutputType());
-                    execution.setSuccess(false);
-                    execution.setStatus(TaskExecutionStatus.FAILED);
-                    execution.addLog(log);
-                    broadcastResults(log);
-                    break;
-                }
-
-                // Add log to the execution
-                execution.addLog(log);
-                //executionService.saveExecution(execution);
-                broadcastResults(log);
-
-            }
-
-            TaskExecutionLog executionCompleted = new TaskExecutionLog();
-            executionCompleted.setTaskExecution(execution);
-            executionCompleted.setOutput("Task execution completed [taskId=" + task.getId() + ", executionId=" + execution.getId() + "]");
-            execution.addLog(executionCompleted);
-            broadcastResults(executionCompleted);
-
-
-            LOG.info("Task execution completed [taskId={}, executionId={}]", task.getId(), execution.getId());
-
-            execution.setEnddate(new Date());
-            execution.setStatus(TaskExecutionStatus.FINISHED);
-            return execution;
-
-        } else {
-            LOG.warn("Task could not be found [taskId={}]", automationRequest.getAutomationId());
-
-            TaskExecution taskExecution = new TaskExecution();
-            taskExecution.setId(0L);
-            TaskExecutionLog noTaskLog = new TaskExecutionLog();
-            noTaskLog.setOutput("Task could not be found [taskId=" + automationRequest.getAutomationId() + "]");
-            broadcastResults(noTaskLog);
-            return null;
+        if (execution != null) {
+            return executionService.processActions(execution.getTask().getId(), execution.getId(), this);
         }
-    }
-
-    private void broadcastResults(TaskExecutionLog taskExecutionLog) {
-        BroadcastResult result = new BroadcastResult(taskExecutionLog.getOutput(), taskExecutionLog.getOutputType());
-
-        jmsTemplate.convertAndSend("taskexecution_destination", result, message -> {
-            message.setLongProperty("executionId", taskExecutionLog.getTaskExecution().getId());
-            return message;
-        });
+        return null;
     }
 
     @Override
@@ -193,7 +101,6 @@ public class TaskServiceImpl implements TaskService {
         return task.isPresent() ? task.get() : null;
     }
 
-    @Transactional
     @Override
     public TaskExecution runRequest(TaskRequest request) {
         TaskExecution execution = new TaskExecution();
