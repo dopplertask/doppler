@@ -1,10 +1,12 @@
 package com.dopplertask.doppler.dto;
 
+import com.dopplertask.doppler.domain.action.Action;
+
 import java.util.List;
 
 public class TaskCreationDTO {
     private String name;
-    private List<ActionDTO> actions;
+    private List<Action> actions;
 
     public String getName() {
         return name;
@@ -14,11 +16,12 @@ public class TaskCreationDTO {
         this.name = name;
     }
 
-    public List<ActionDTO> getActions() {
+
+    public List<Action> getActions() {
         return actions;
     }
 
-    public void setActions(List<ActionDTO> actions) {
+    public void setActions(List<Action> actions) {
         this.actions = actions;
     }
 }

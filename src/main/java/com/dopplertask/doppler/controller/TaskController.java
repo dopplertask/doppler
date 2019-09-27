@@ -4,7 +4,6 @@ import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.TaskExecutionLog;
 import com.dopplertask.doppler.domain.action.Action;
-import com.dopplertask.doppler.dto.ActionDTO;
 import com.dopplertask.doppler.dto.SimpleIdResponseDto;
 import com.dopplertask.doppler.dto.TaskCreationDTO;
 import com.dopplertask.doppler.dto.TaskExecutionDTO;
@@ -14,22 +13,21 @@ import com.dopplertask.doppler.dto.TaskRequestDTO;
 import com.dopplertask.doppler.dto.TaskResponseDTO;
 import com.dopplertask.doppler.service.TaskRequest;
 import com.dopplertask.doppler.service.TaskService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class TaskController {
@@ -69,7 +67,7 @@ public class TaskController {
     @RequestMapping(path = "/task", method = RequestMethod.POST)
     public ResponseEntity<SimpleIdResponseDto> createTask(@RequestBody TaskCreationDTO taskCreationDTO) {
 
-        List<Action> actions = createActions(taskCreationDTO);
+        List<Action> actions = taskCreationDTO.getActions();
 
         Long id = taskService.createTask(taskCreationDTO.getName(), actions);
 
@@ -79,7 +77,7 @@ public class TaskController {
         return new ResponseEntity<>(responseTaskId, HttpStatus.OK);
     }
 
-    private List<Action> createActions(@RequestBody TaskCreationDTO taskCreationDTO) {
+ /*   private List<Action> createActions(@RequestBody TaskCreationDTO taskCreationDTO) {
         List<Action> actions = new ArrayList<>();
         for (ActionDTO Action : taskCreationDTO.getActions()) {
             // Determine what actions the user wants to add
@@ -88,7 +86,7 @@ public class TaskController {
                 Action clsInstance = (Action) cls.getDeclaredConstructor().newInstance();
 
 
-                for (Map.Entry<String, String> entry : Action.getFields().entrySet()) {
+                for (Map.Entry<String, Object> entry : Action.getFields().entrySet()) {
 
                     try {
                         Field field = cls.getDeclaredField(entry.getKey());
@@ -96,12 +94,13 @@ public class TaskController {
                         try {
                             // Try to set it as a long
                             if (field.getType().getName().contains("Integer")) {
-                                field.set(clsInstance, Integer.parseInt(entry.getValue()));
+                                field.set(clsInstance, Integer.parseInt(String.valueOf(entry.getValue())));
                             } else {
-                                field.set(clsInstance, Long.parseLong(entry.getValue()));
+                                field.set(clsInstance, Long.parseLong(String.valueOf(entry.getValue())));
                             }
                         } catch (NumberFormatException e) {
-                            field.set(clsInstance, entry.getValue());
+
+                            field.set(clsInstance, field.getType().cast(entry.getValue()));
                         }
                         logger.debug("Variable set in action type [key={}]", entry.getKey());
                     } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -118,7 +117,7 @@ public class TaskController {
             }
         }
         return actions;
-    }
+    }*/
 
 
     @GetMapping("/task")
@@ -136,6 +135,22 @@ public class TaskController {
         }
 
         return new ResponseEntity<>(taskResponseDTOList, HttpStatus.OK);
+    }
+
+    @GetMapping("/task/{id}")
+    public ResponseEntity<TaskResponseDTO> getTask(@PathVariable("id") long id) {
+        Task task = taskService.getTask(id);
+        if (task != null) {
+            TaskResponseDTO taskDto = new TaskResponseDTO();
+            taskDto.setId(task.getId());
+            taskDto.setName(task.getName());
+            taskDto.setCreated(task.getCreated());
+            taskDto.setActions(task.getActionList());
+
+            return new ResponseEntity<>(taskDto, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/executions")

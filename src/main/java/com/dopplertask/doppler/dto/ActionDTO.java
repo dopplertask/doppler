@@ -4,14 +4,14 @@ import java.util.Map;
 
 public class ActionDTO {
 
-    private Map<String, String> fields;
+    private Map<String, Object> fields;
     private String actionType;
 
-    public Map<String, String> getFields() {
+    public Map<String, Object> getFields() {
         return fields;
     }
 
-    public void setFields(Map<String, String> fields) {
+    public void setFields(Map<String, Object> fields) {
         this.fields = fields;
     }
 

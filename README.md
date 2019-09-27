@@ -6,6 +6,9 @@ On top of all of this life-simplifying project, we  are striving to make an clim
 ## Build status
 [![Build Status](https://travis-ci.org/dopplertask/doppler.svg?branch=master)](https://travis-ci.org/dopplertask/doppler)
 
+## Simple install
+Using snap:
+```snap install dopplertask```
 ## Prerequisites
 
 Install JDK 11 and gradle.
@@ -24,10 +27,8 @@ Below is an example of a Dopplerfile:
   "name": "Test Task",
   "actions": [
     {
-      "actionType": "PrintAction",
-      "fields": {
-        "message": "This is an example task."
-      }
+      "@type": "PrintAction",
+      "message": "This is an example task."
     }
   ]
 }

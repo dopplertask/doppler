@@ -17,7 +17,7 @@ public class VariableExtractorUtil {
             context.put("execution", execution);
 
             // Easy access to lastLog
-            if(execution != null && execution.getLogs() != null && execution.getLogs().size() > 0) {
+            if (execution != null && execution.getLogs() != null && execution.getLogs().size() > 0) {
                 context.put("lastLog", execution.getLogs().get(execution.getLogs().size() - 1));
             }
 
