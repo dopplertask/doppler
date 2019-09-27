@@ -3,7 +3,7 @@ package com.dopplertask.doppler.domain;
 public class ActionResult {
     private StatusCode statusCode;
     private String errorMsg;
-    private String output;
+    private String output = "";
     private OutputType outputType = OutputType.STRING;
 
     public ActionResult() {

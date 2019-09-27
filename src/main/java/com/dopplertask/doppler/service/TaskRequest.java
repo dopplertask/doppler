@@ -3,23 +3,25 @@ package com.dopplertask.doppler.service;
 import java.util.Map;
 
 public class TaskRequest {
-    private Long automationId;
+    private String taskName;
+    private String checksum;
     private Map<String, String> parameters;
+    private int depth = 0;
 
-    public TaskRequest(Long automationId, Map<String, String> parameters) {
-        this.automationId = automationId;
+    public TaskRequest(String taskName, Map<String, String> parameters) {
+        this.taskName = taskName;
         this.parameters = parameters;
     }
 
     public TaskRequest() {
     }
 
-    public Long getAutomationId() {
-        return automationId;
+    public String getTaskName() {
+        return taskName;
     }
 
-    public void setAutomationId(Long automationId) {
-        this.automationId = automationId;
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 
     public Map<String, String> getParameters() {
@@ -33,8 +35,24 @@ public class TaskRequest {
     @Override
     public String toString() {
         return "TaskRequest{" +
-                "automationId=" + automationId +
+                "taskName=" + taskName +
                 ", parameters=" + parameters +
                 '}';
+    }
+
+    public String getChecksum() {
+        return checksum;
+    }
+
+    public void setChecksum(String checksum) {
+        this.checksum = checksum;
+    }
+
+    public void setDepth(int depth) {
+        this.depth = depth;
+    }
+
+    public int getDepth() {
+        return depth;
     }
 }

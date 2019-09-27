@@ -52,13 +52,14 @@ public class TaskServiceTest {
         // Setup data
         Task task = new Task();
         task.setId(1928L);
+        task.setName("doppler-test");
 
         TaskExecution taskExecution = new TaskExecution();
         taskExecution.setId(283471L);
 
         // Prepare behavior
         Optional<Task> taskOptional = Optional.of(task);
-        when(taskDao.findById(eq(1928L))).thenReturn(taskOptional);
+        when(taskDao.findFirstByNameOrderByCreatedDesc(eq("doppler-test"))).thenReturn(taskOptional);
 
         Optional<TaskExecution> executionOptional = Optional.of(taskExecution);
         when(taskExecutionDao.findById(eq(283471L))).thenReturn(executionOptional);
@@ -66,7 +67,7 @@ public class TaskServiceTest {
         // Run test
         TaskExecutionRequest request = new TaskExecutionRequest();
         request.setExecutionId(283471L);
-        request.setAutomationId(1928L);
+        request.setTaskName("doppler-test");
         request.setParameters(new HashMap<>());
 
         doAnswer(invocation -> {
@@ -76,7 +77,7 @@ public class TaskServiceTest {
             taskExecutionRet.addLog(new TaskExecutionLog());
 
             return taskExecutionRet;
-        }).when(executionService).startExecution(eq(request));
+        }).when(executionService).startExecution(eq(request), eq(taskService));
 
         doAnswer(invocation -> {
             TaskExecution taskExecutionRet = new TaskExecution();
@@ -110,6 +111,7 @@ public class TaskServiceTest {
 
         Task task = new Task();
         task.setId(1928L);
+        task.setName("doppler-test");
         task.getActionList().add(action);
 
         TaskExecution taskExecution = new TaskExecution();
@@ -117,7 +119,7 @@ public class TaskServiceTest {
 
         // Prepare behavior
         Optional<Task> taskOptional = Optional.of(task);
-        when(taskDao.findById(eq(1928L))).thenReturn(taskOptional);
+        when(taskDao.findFirstByNameOrderByCreatedDesc(eq("doppler-test"))).thenReturn(taskOptional);
 
         Optional<TaskExecution> executionOptional = Optional.of(taskExecution);
         when(taskExecutionDao.findById(eq(283472L))).thenReturn(executionOptional);
@@ -126,7 +128,7 @@ public class TaskServiceTest {
         // Run test
         TaskExecutionRequest request = new TaskExecutionRequest();
         request.setExecutionId(283472L);
-        request.setAutomationId(1928L);
+        request.setTaskName("doppler-test");
         request.setParameters(new HashMap<>());
 
         doAnswer(invocation -> {
@@ -136,7 +138,7 @@ public class TaskServiceTest {
             taskExecutionRet.addLog(new TaskExecutionLog());
 
             return taskExecutionRet;
-        }).when(executionService).startExecution(eq(request));
+        }).when(executionService).startExecution(eq(request), eq(taskService));
 
         doAnswer(invocation -> {
             TaskExecution taskExecutionRet = new TaskExecution();
@@ -164,69 +166,4 @@ public class TaskServiceTest {
 
     }
 
-    @Test
-    @Ignore
-    public void runTaskWithLinkedTaskShouldReturnOk() {
-        // Setup data
-        Task linkedTask = new Task();
-        linkedTask.setId(120L);
-        linkedTask.getActionList().add(new PrintAction("Printing from a linked task"));
-
-        TaskExecution linkedTaskExecution = new TaskExecution();
-        linkedTaskExecution.setId(12001L);
-
-        LinkedTaskAction action = new LinkedTaskAction();
-        action.setLinkedTaskId(120L);
-
-        Task task = new Task();
-        task.setId(1928L);
-        task.getActionList().add(action);
-
-        TaskExecution taskExecution = new TaskExecution();
-        taskExecution.setId(283472L);
-
-        // Prepare behavior
-        Optional<Task> linkedTaskOptional = Optional.of(linkedTask);
-        when(taskDao.findById(eq(120L))).thenReturn(linkedTaskOptional);
-
-        Optional<Task> taskOptional = Optional.of(task);
-        when(taskDao.findById(eq(1928L))).thenReturn(taskOptional);
-
-        Optional<TaskExecution> executionOptional = Optional.of(taskExecution);
-        when(taskExecutionDao.findById(eq(283472L))).thenReturn(executionOptional);
-
-        Optional<TaskExecution> linkedTaskExecutionOptional = Optional.of(linkedTaskExecution);
-        when(taskExecutionDao.findById(eq(12001L))).thenReturn(linkedTaskExecutionOptional);
-
-        when(taskExecutionDao.save(any())).thenAnswer(invocation -> {
-            TaskExecution te = ((TaskExecution) invocation.getArguments()[0]);
-
-            // Some different id for the task execution of the linked automation.
-            if (te.getId() == null) {
-                te.setId(linkedTaskExecution.getId());
-            }
-            return te;
-        });
-
-        // Run test
-        TaskExecutionRequest request = new TaskExecutionRequest();
-        request.setExecutionId(283472L);
-        request.setAutomationId(1928L);
-        request.setParameters(new HashMap<>());
-        TaskExecution taskExecutionReturned = taskService.runRequest(request);
-
-        // Setup assert params
-        Optional<Long> executionIdOptional = Optional.ofNullable(taskExecutionReturned.getId());
-        long executionId = executionIdOptional.orElse(-1L);
-
-        Optional<Long> taskIdOptional = Optional.ofNullable(taskExecutionReturned.getTask().getId());
-        long taskId = taskIdOptional.orElse(-1L);
-
-        Assert.assertNotNull(taskExecutionReturned);
-        Assert.assertEquals(283472L, executionId);
-        Assert.assertEquals(1928L, taskId);
-        Assert.assertEquals(3, taskExecutionReturned.getLogs().size());
-        Assert.assertEquals("Successfully executed linked task [id=120]", taskExecutionReturned.getLogs().get(1).getOutput());
-
-    }
 }

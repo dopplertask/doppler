@@ -5,7 +5,7 @@ import com.dopplertask.doppler.dao.TaskExecutionDao;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.action.Action;
-
+import com.dopplertask.doppler.domain.action.LinkedTaskAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,9 +46,10 @@ public class TaskServiceImpl implements TaskService {
         taskExecutionDao.save(execution);
 
         TaskExecutionRequest taskExecutionRequest = new TaskExecutionRequest();
-        taskExecutionRequest.setAutomationId(request.getAutomationId());
+        taskExecutionRequest.setTaskName(request.getTaskName());
         taskExecutionRequest.setParameters(request.getParameters());
         taskExecutionRequest.setExecutionId(execution.getId());
+        taskExecutionRequest.setChecksum(request.getChecksum());
 
         jmsTemplate.convertAndSend("automation_destination", taskExecutionRequest);
 
@@ -61,8 +63,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskExecution runRequest(TaskExecutionRequest automationRequest) {
-        TaskExecution execution = executionService.startExecution(automationRequest);
+    public TaskExecution runRequest(TaskExecutionRequest taskExecutionRequest) {
+        TaskExecution execution = executionService.startExecution(taskExecutionRequest, this);
 
         if (execution != null) {
             return executionService.processActions(execution.getTask().getId(), execution.getId(), this);
@@ -77,15 +79,55 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    public Long createTask(String name, List<Action> actions) {
+    public Long createTask(String name, List<Action> actions, String checksum) {
+
+        if (name.contains(" ")) {
+            throw new WhiteSpaceInNameException("Could not create task. Task name contains whitespace.");
+        }
+
+        // If we try to add the same task again, we just return the current id.
+        Optional<Task> existingTask = taskDao.findByChecksum(checksum);
+        if (existingTask.isPresent()) {
+            return existingTask.get().getId();
+        }
 
         Task task = new Task();
+
         task.setName(name);
-        actions.forEach(action -> action.setTask(task));
+        actions.forEach(action -> {
+            action.setTask(task);
+
+            // Find task or download it if necessary and assign checksum
+            if (action instanceof LinkedTaskAction) {
+                if (((LinkedTaskAction) action).getName() != null && !((LinkedTaskAction) action).getName().isEmpty()) {
+                    Optional<Task> linkedTask = executionService.findOrDownloadByName(((LinkedTaskAction) action).getName(), this);
+
+                    if (linkedTask.isPresent()) {
+                        ((LinkedTaskAction) action).setChecksum(linkedTask.get().getChecksum());
+                    } else {
+                        throw new LinkedTaskNotFoundException("Linked Task could not be found locally or in the public hub [name=" + ((LinkedTaskAction) action).getName() + "]");
+                    }
+                } else {
+                    throw new LinkedTaskNotFoundException("Linked Task does not have any task name associated");
+                }
+            }
+        });
+
         task.setActionList(actions);
         task.setCreated(new Date());
+        task.setChecksum(checksum);
+
         taskDao.save(task);
 
+        TaskRequest taskRequest = new TaskRequest();
+        taskRequest.setTaskName(task.getName());
+        taskRequest.setParameters(new HashMap<>());
+
+        // Run the execution
+        TaskExecution execution = runRequest(taskRequest);
+        if (!execution.isSuccess()) {
+            throw new BuildNotSuccessfulException("Could not build task, execution was not successful.");
+        }
 
         return task.getId();
     }
@@ -104,13 +146,15 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskExecution runRequest(TaskRequest request) {
         TaskExecution execution = new TaskExecution();
+        execution.setDepth(request.getDepth());
         // Create execution record
         taskExecutionDao.save(execution);
 
         TaskExecutionRequest taskExecutionRequest = new TaskExecutionRequest();
-        taskExecutionRequest.setAutomationId(request.getAutomationId());
+        taskExecutionRequest.setTaskName(request.getTaskName());
         taskExecutionRequest.setParameters(request.getParameters());
         taskExecutionRequest.setExecutionId(execution.getId());
+        taskExecutionRequest.setDepth(request.getDepth());
 
         return this.runRequest(taskExecutionRequest);
     }
