@@ -103,6 +103,29 @@ Executes a MySQL statement, like a SELECT statement.
 ##### Variables
 * linkedTaskId: Id of another task
 
+#### BrowseWebAction
+Starts a browser and executes a list of UI Actions.
+##### Variables
+* url: URL to naviate to.
+* actionList: A list of actions to perform. 
+
+A UI Action contains the following fields:
+
+* fieldName: Name of the field to control. Not required when using the actions WAIT OR ACCEPT_ALERT.
+* findByType: Determines how to find the field. Possible values: ID, NAME, XPATH, CSS. Not required when using the actions WAIT OR ACCEPT_ALERT.
+* action: Action to perform. 
+
+| Action        |Description                   |
+| ------------- |------------------------------|
+|PRESS          |Clicks on the requested field.|
+|WRITE          |Writes in the requested field. Useful if the field is an input text or textarea.|
+|SELECT         |Selects an item from the requested select list / dropdown based on name. |
+|WAIT           |Waits a certain amount of time. Amount of time is expressed in milliseconds.|
+|ACCEPT_ALERT   |Closes an alert / confirm box.|
+
+* value: Required only if used with the actions WRITE, SELECT and WAIT.
+
+
 ## Docker
 To run the built docker image:
 ```docker run -p 8090:8090 -p 61617:61617 dopplertask/doppler-engine ```
