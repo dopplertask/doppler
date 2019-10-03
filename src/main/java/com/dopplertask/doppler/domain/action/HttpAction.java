@@ -6,15 +6,6 @@ import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -24,6 +15,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Table(name = "HttpAction")

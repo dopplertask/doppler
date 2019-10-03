@@ -4,8 +4,6 @@ import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.action.Action;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 /**
@@ -34,8 +32,7 @@ public interface TaskService {
      * @param automationRequest containing the information about what to execute.
      * @return execution containing the results.
      */
-    @Transactional
-    TaskExecution runRequest(TaskExecutionRequest automationRequest);
+    TaskExecution runRequest(TaskExecutionRequest taskExecutionRequest);
 
     /**
      * Creates execution and runs task.
@@ -43,7 +40,6 @@ public interface TaskService {
      * @param request containing the information about what to execute.
      * @return execution containing the results.
      */
-    @Transactional
     TaskExecution runRequest(TaskRequest request);
 
     /**
@@ -53,7 +49,7 @@ public interface TaskService {
      */
     List<Task> getAllTasks();
 
-    Long createTask(String name, List<Action> actions);
+    Long createTask(String name, List<Action> actions, String checksum);
 
 
     List<TaskExecution> getExecutions();

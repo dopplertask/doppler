@@ -1,7 +1,6 @@
 package com.dopplertask.doppler.service;
 
 import com.dopplertask.doppler.domain.TaskExecution;
-
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 

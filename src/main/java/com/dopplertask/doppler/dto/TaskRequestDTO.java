@@ -4,15 +4,15 @@ import java.util.Map;
 
 public class TaskRequestDTO {
 
-    private Long automationId;
+    private String taskName;
     private Map<String, String> parameters;
 
-    public Long getAutomationId() {
-        return automationId;
+    public String getTaskName() {
+        return taskName;
     }
 
-    public void setAutomationId(Long automationId) {
-        this.automationId = automationId;
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 
     public Map<String, String> getParameters() {

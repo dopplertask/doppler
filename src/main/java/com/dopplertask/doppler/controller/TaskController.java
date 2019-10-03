@@ -13,32 +13,43 @@ import com.dopplertask.doppler.dto.TaskRequestDTO;
 import com.dopplertask.doppler.dto.TaskResponseDTO;
 import com.dopplertask.doppler.service.TaskRequest;
 import com.dopplertask.doppler.service.TaskService;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 public class TaskController {
 
-    Logger logger = LoggerFactory.getLogger(TaskController.class);
     @Autowired
     private TaskService taskService;
 
-    @RequestMapping(path = "/schedule/task", method = RequestMethod.POST)
+    private static String bytesToHex(byte[] hash) {
+        StringBuffer hexString = new StringBuffer();
+        for (int i = 0; i < hash.length; i++) {
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if (hex.length() == 1) hexString.append('0');
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+
+    @PostMapping(path = "/schedule/task")
     public ResponseEntity<SimpleIdResponseDto> scheduleTask(@RequestBody TaskRequestDTO taskRequestDTO) {
-        TaskRequest request = new TaskRequest(taskRequestDTO.getAutomationId(), taskRequestDTO.getParameters());
+        TaskRequest request = new TaskRequest(taskRequestDTO.getTaskName(), taskRequestDTO.getParameters());
         TaskExecution taskExecution = taskService.delegate(request);
 
         if (taskExecution != null) {
@@ -50,10 +61,9 @@ public class TaskController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-
-    @RequestMapping(path = "/schedule/directtask", method = RequestMethod.POST)
+    @PostMapping(path = "/schedule/directtask")
     public ResponseEntity<TaskExecutionLogResponseDTO> runTask(@RequestBody TaskRequestDTO taskRequestDTO) {
-        TaskRequest request = new TaskRequest(taskRequestDTO.getAutomationId(), taskRequestDTO.getParameters());
+        TaskRequest request = new TaskRequest(taskRequestDTO.getTaskName(), taskRequestDTO.getParameters());
         TaskExecution execution = taskService.runRequest(request);
 
         TaskExecutionLogResponseDTO responseDTO = new TaskExecutionLogResponseDTO();
@@ -64,61 +74,31 @@ public class TaskController {
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/task", method = RequestMethod.POST)
-    public ResponseEntity<SimpleIdResponseDto> createTask(@RequestBody TaskCreationDTO taskCreationDTO) {
+    @PostMapping(path = "/task")
+    public ResponseEntity<SimpleIdResponseDto> createTask(@RequestBody String body) throws IOException, NoSuchAlgorithmException {
+
+        // Translate JSON to object
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        TaskCreationDTO taskCreationDTO = mapper.readValue(body, TaskCreationDTO.class);
+
+        // Generate compact JSON
+        String compactJSON = mapper.writeValueAsString(taskCreationDTO);
+
+        // Create checksum
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] encodedhash = digest.digest(compactJSON.getBytes(StandardCharsets.UTF_8));
+        String sha3_256hex = bytesToHex(encodedhash);
 
         List<Action> actions = taskCreationDTO.getActions();
-
-        Long id = taskService.createTask(taskCreationDTO.getName(), actions);
+        
+        Long id = taskService.createTask(taskCreationDTO.getName(), actions, sha3_256hex);
 
         SimpleIdResponseDto responseTaskId = new SimpleIdResponseDto();
         responseTaskId.setId(String.valueOf(id));
 
         return new ResponseEntity<>(responseTaskId, HttpStatus.OK);
     }
-
- /*   private List<Action> createActions(@RequestBody TaskCreationDTO taskCreationDTO) {
-        List<Action> actions = new ArrayList<>();
-        for (ActionDTO Action : taskCreationDTO.getActions()) {
-            // Determine what actions the user wants to add
-            try {
-                Class<?> cls = Class.forName("com.dopplertask.doppler.domain.action." + Action.getActionType());
-                Action clsInstance = (Action) cls.getDeclaredConstructor().newInstance();
-
-
-                for (Map.Entry<String, Object> entry : Action.getFields().entrySet()) {
-
-                    try {
-                        Field field = cls.getDeclaredField(entry.getKey());
-                        field.setAccessible(true);
-                        try {
-                            // Try to set it as a long
-                            if (field.getType().getName().contains("Integer")) {
-                                field.set(clsInstance, Integer.parseInt(String.valueOf(entry.getValue())));
-                            } else {
-                                field.set(clsInstance, Long.parseLong(String.valueOf(entry.getValue())));
-                            }
-                        } catch (NumberFormatException e) {
-
-                            field.set(clsInstance, field.getType().cast(entry.getValue()));
-                        }
-                        logger.debug("Variable set in action type [key={}]", entry.getKey());
-                    } catch (NoSuchFieldException | IllegalAccessException e) {
-                        logger.warn("Could not set variable for action [key={}, action={}]", entry.getKey(), Action.getActionType());
-                    }
-
-                }
-
-                actions.add(clsInstance);
-
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-                logger.warn("Action type {} could not be found", Action.getActionType());
-                throw new RuntimeException("Action type " + Action.getActionType() + " could not be found");
-            }
-        }
-        return actions;
-    }*/
-
 
     @GetMapping("/task")
     public ResponseEntity<List<TaskResponseDTO>> getTasks() {

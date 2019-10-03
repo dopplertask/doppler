@@ -45,7 +45,7 @@ To run a task, send the JSON with the task id and parameters to the REST API:
 
 ```
 {
-  "automationId": 13,
+  "taskName": "doppler-example",
   "parameters": {
   }
 }
@@ -101,12 +101,13 @@ Executes a MySQL statement, like a SELECT statement.
 
 #### LinkedTaskAction
 ##### Variables
-* linkedTaskId: Id of another task
+* taskName: name of another task
 
 #### BrowseWebAction
 Starts a browser and executes a list of UI Actions.
 ##### Variables
 * url: URL to naviate to.
+* headless: If set to false, it will show the web browser window. Default is true.
 * actionList: A list of actions to perform. 
 
 A UI Action contains the following fields:

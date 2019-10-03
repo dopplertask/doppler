@@ -7,17 +7,16 @@ import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 import com.mysql.cj.jdbc.MysqlDataSource;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 @Entity
 @Table(name = "MySQLAction")

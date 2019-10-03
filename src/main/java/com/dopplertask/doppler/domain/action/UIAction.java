@@ -1,5 +1,7 @@
 package com.dopplertask.doppler.domain.action;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -21,6 +23,7 @@ public class UIAction {
 
     @ManyToOne
     @JoinColumn(nullable = false)
+    @JsonIgnore
     private BrowseWebAction browseWebAction;
 
     @Column

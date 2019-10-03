@@ -1,21 +1,19 @@
 package com.dopplertask.doppler.domain.action;
 
 import com.dopplertask.doppler.domain.ActionResult;
+import com.dopplertask.doppler.domain.OutputType;
 import com.dopplertask.doppler.domain.StatusCode;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -23,6 +21,8 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "BrowseWebAction")
@@ -30,10 +30,15 @@ import javax.persistence.Table;
 public class BrowseWebAction extends Action {
 
     private static final String CHROME_DRIVER = "webdriver.chrome.driver";
+
     @Column
     private String url;
+
     @OneToMany(mappedBy = "browseWebAction", cascade = CascadeType.PERSIST)
     private List<UIAction> actionList = new ArrayList<>();
+
+    @Column(columnDefinition = "BOOLEAN")
+    private boolean headless = true;
 
     public BrowseWebAction() {
     }
@@ -59,16 +64,24 @@ public class BrowseWebAction extends Action {
             System.setProperty(CHROME_DRIVER, "chromedriver");
         }
 
-        WebDriver webDriver = new ChromeDriver();
+        ChromeOptions chromeOptions = new ChromeOptions();
+        if (headless) {
+            chromeOptions.addArguments("--headless");
+        }
+
+        WebDriver webDriver = new ChromeDriver(chromeOptions);
         WebDriverWait wait = new WebDriverWait(webDriver, 10);
 
         // Open page
         webDriver.get(urlVariable);
 
+        // Go through all actions
         for (UIAction uiAction : actionList) {
+            String uiActionValueVariable = VariableExtractorUtil.extract(uiAction.getValue() != null ? uiAction.getValue() : "", execution);
             if (uiAction.getAction() == UIActionType.WAIT) {
                 try {
-                    Thread.sleep(Long.parseLong(uiAction.getValue()));
+                    Thread.sleep(Long.parseLong(uiActionValueVariable));
+                    actionResult.setOutput(actionResult.getOutput() + "Slept a specific amount of time [time=" + uiActionValueVariable + "]\n");
                 } catch (Exception e) {
                     actionResult.setErrorMsg("Exception occured during sleeping in UI Action");
                     actionResult.setStatusCode(StatusCode.FAILURE);
@@ -76,6 +89,7 @@ public class BrowseWebAction extends Action {
             } else if (uiAction.getAction() == UIActionType.ACCEPT_ALERT) {
                 try {
                     webDriver.switchTo().alert().accept();
+                    actionResult.setOutput(actionResult.getOutput() + "Accepted alert\n");
                 } catch (Exception e) {
                     actionResult.setErrorMsg("Exception occured during accepting alert in UI Action");
                     actionResult.setStatusCode(StatusCode.FAILURE);
@@ -83,13 +97,20 @@ public class BrowseWebAction extends Action {
             } else {
                 // Normal UI Actions
                 WebElement element = findWebElement(uiAction, wait, actionResult);
-                executeUIAction(uiAction, element);
+                if(actionResult.getStatusCode() == StatusCode.FAILURE) {
+                    webDriver.quit();
+                    return actionResult;
+                }
+
+                executeUIAction(uiAction.getAction(), uiAction.getFieldName(), uiActionValueVariable, element, actionResult);
+
             }
         }
 
         webDriver.quit();
 
-        actionResult.setOutput("WebDriver executed successfully");
+        actionResult.setOutput(actionResult.getOutput() + "WebDriver executed successfully");
+        actionResult.setOutputType(OutputType.STRING);
         actionResult.setStatusCode(StatusCode.SUCCESS);
 
         return actionResult;
@@ -123,17 +144,23 @@ public class BrowseWebAction extends Action {
         return element;
     }
 
-    private void executeUIAction(UIAction uiAction, WebElement element) {
+    private void executeUIAction(UIActionType uiActionType, String fieldName, String uiActionValueVariable, WebElement element, ActionResult actionResult) {
         if (element != null) {
-            switch (uiAction.getAction()) {
+            switch (uiActionType) {
                 case PRESS:
                     element.click();
+                    actionResult.setOutput(actionResult.getOutput() + "Element has been clicked [element=" + fieldName + "]\n");
                     break;
                 case WRITE:
-                    element.sendKeys(uiAction.getValue());
+                    element.sendKeys(uiActionValueVariable);
+                    actionResult.setOutput(actionResult.getOutput() + "Wrote text to an element [element=" + fieldName + ", text=" + uiActionValueVariable + "]\n");
                     break;
                 case SELECT:
-                    ((Select) element).selectByVisibleText(uiAction.getValue());
+                    ((Select) element).selectByVisibleText(uiActionValueVariable);
+                    actionResult.setOutput(actionResult.getOutput() + "Selected item from dropdown [element=" + fieldName + ", text=" + uiActionValueVariable + "]\n");
+                    break;
+                default:
+                    // Do nothing
             }
         }
     }
@@ -153,6 +180,14 @@ public class BrowseWebAction extends Action {
     public void setActionList(List<UIAction> actionList) {
         this.actionList = actionList;
         actionList.forEach(uiAction -> uiAction.setBrowseWebAction(this));
+    }
+
+    public boolean isHeadless() {
+        return headless;
+    }
+
+    public void setHeadless(boolean headless) {
+        this.headless = headless;
     }
 }
 
