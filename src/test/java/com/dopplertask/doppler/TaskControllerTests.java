@@ -21,6 +21,7 @@ import com.dopplertask.doppler.dao.TaskExecutionLogDao;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.TaskExecutionLog;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -77,7 +78,7 @@ public class TaskControllerTests {
                 "        }\n" +
                 "    ]\n" +
                 "}\n";
-        MvcResult result = this.mockMvc.perform(post("/task").content(createJson)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.id").isString()).andReturn();
+        MvcResult result = this.mockMvc.perform(post("/task").content(createJson)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.checksum").isString()).andReturn();
 
 
         String requestTaskRunStr = "{\n" +
@@ -99,7 +100,7 @@ public class TaskControllerTests {
                 "        }\n" +
                 "    ]\n" +
                 "}\n";
-        MvcResult result = this.mockMvc.perform(post("/task").content(createJson)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.id").isString()).andReturn();
+        MvcResult result = this.mockMvc.perform(post("/task").content(createJson)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.checksum").isString()).andReturn();
 
 
         String requestTaskRunStr = "{\n" +
