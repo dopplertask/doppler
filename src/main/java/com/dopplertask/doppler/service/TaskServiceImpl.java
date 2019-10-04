@@ -6,6 +6,7 @@ import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.domain.action.LinkedTaskAction;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -155,6 +156,7 @@ public class TaskServiceImpl implements TaskService {
         taskExecutionRequest.setParameters(request.getParameters());
         taskExecutionRequest.setExecutionId(execution.getId());
         taskExecutionRequest.setDepth(request.getDepth());
+        taskExecutionRequest.setChecksum(request.getChecksum());
 
         return this.runRequest(taskExecutionRequest);
     }

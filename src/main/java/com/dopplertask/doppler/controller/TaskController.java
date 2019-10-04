@@ -4,6 +4,7 @@ import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.TaskExecutionLog;
 import com.dopplertask.doppler.domain.action.Action;
+import com.dopplertask.doppler.dto.SimpleChecksumResponseDto;
 import com.dopplertask.doppler.dto.SimpleIdResponseDto;
 import com.dopplertask.doppler.dto.TaskCreationDTO;
 import com.dopplertask.doppler.dto.TaskExecutionDTO;
@@ -15,6 +16,7 @@ import com.dopplertask.doppler.service.TaskRequest;
 import com.dopplertask.doppler.service.TaskService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,6 +52,7 @@ public class TaskController {
     @PostMapping(path = "/schedule/task")
     public ResponseEntity<SimpleIdResponseDto> scheduleTask(@RequestBody TaskRequestDTO taskRequestDTO) {
         TaskRequest request = new TaskRequest(taskRequestDTO.getTaskName(), taskRequestDTO.getParameters());
+        request.setChecksum(taskRequestDTO.getTaskName());
         TaskExecution taskExecution = taskService.delegate(request);
 
         if (taskExecution != null) {
@@ -64,18 +67,24 @@ public class TaskController {
     @PostMapping(path = "/schedule/directtask")
     public ResponseEntity<TaskExecutionLogResponseDTO> runTask(@RequestBody TaskRequestDTO taskRequestDTO) {
         TaskRequest request = new TaskRequest(taskRequestDTO.getTaskName(), taskRequestDTO.getParameters());
+        request.setChecksum(taskRequestDTO.getTaskName());
         TaskExecution execution = taskService.runRequest(request);
 
         TaskExecutionLogResponseDTO responseDTO = new TaskExecutionLogResponseDTO();
-        for (TaskExecutionLog log : execution.getLogs()) {
-            responseDTO.getOutput().add(log.getOutput());
+        if (execution != null) {
+            for (TaskExecutionLog log : execution.getLogs()) {
+                responseDTO.getOutput().add(log.getOutput());
+            }
+
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         }
 
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
     }
 
     @PostMapping(path = "/task")
-    public ResponseEntity<SimpleIdResponseDto> createTask(@RequestBody String body) throws IOException, NoSuchAlgorithmException {
+    public ResponseEntity<SimpleChecksumResponseDto> createTask(@RequestBody String body) throws IOException, NoSuchAlgorithmException {
 
         // Translate JSON to object
         ObjectMapper mapper = new ObjectMapper();
@@ -94,10 +103,13 @@ public class TaskController {
         
         Long id = taskService.createTask(taskCreationDTO.getName(), actions, sha3_256hex);
 
-        SimpleIdResponseDto responseTaskId = new SimpleIdResponseDto();
-        responseTaskId.setId(String.valueOf(id));
+        if (id != null) {
+            SimpleChecksumResponseDto checksumResponseDto = new SimpleChecksumResponseDto();
+            checksumResponseDto.setChecksum(sha3_256hex);
+            return new ResponseEntity<>(checksumResponseDto, HttpStatus.OK);
+        }
 
-        return new ResponseEntity<>(responseTaskId, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/task")

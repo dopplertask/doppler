@@ -12,6 +12,7 @@ import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.dto.TaskCreationDTO;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.Date;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -49,9 +49,34 @@ public class ExecutionServiceImpl implements ExecutionService {
     @Autowired
     private TaskExecutionDao taskExecutionDao;
 
+    private static String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder();
+        for (int i = 0; i < hash.length; i++) {
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+
     @Transactional
     public TaskExecution startExecution(TaskExecutionRequest taskExecutionRequest, TaskService taskService) {
-        Optional<Task> taskRequest = taskExecutionRequest.getChecksum() == null || taskExecutionRequest.getChecksum().isEmpty() ? findOrDownloadByName(taskExecutionRequest.getTaskName(), taskService) : findOrDownloadByChecksum(taskExecutionRequest.getChecksum(), taskService);
+
+        // Look up by checksum first
+        Optional<Task> taskRequest = Optional.empty();
+        if (taskExecutionRequest.getChecksum() != null && !taskExecutionRequest.getChecksum().isEmpty()) {
+            taskRequest = findOrDownloadByChecksum(taskExecutionRequest.getChecksum(), taskService);
+
+            // Search in the local database by taskName
+            if (!taskRequest.isPresent() && taskExecutionRequest.getTaskName() != null && !taskExecutionRequest.getTaskName().isEmpty()) {
+                taskRequest = taskDao.findFirstByNameOrderByCreatedDesc(taskExecutionRequest.getTaskName());
+            }
+        } else if (taskExecutionRequest.getTaskName() != null && !taskExecutionRequest.getTaskName().isEmpty()) {
+            taskRequest = findOrDownloadByName(taskExecutionRequest.getTaskName(), taskService);
+        }
+
         Optional<TaskExecution> executionReq = taskExecutionDao.findById(taskExecutionRequest.getExecutionId());
         if (taskRequest.isPresent() && executionReq.isPresent()) {
             Task task = taskRequest.get();
@@ -87,6 +112,7 @@ public class ExecutionServiceImpl implements ExecutionService {
             taskExecution.setId(0L);
             TaskExecutionLog noTaskLog = new TaskExecutionLog();
             noTaskLog.setOutput("Task could not be found [taskId=" + taskExecutionRequest.getTaskName() + "]");
+            noTaskLog.setTaskExecution(taskExecution);
             broadcastResults(noTaskLog);
             return null;
         }
@@ -123,9 +149,9 @@ public class ExecutionServiceImpl implements ExecutionService {
                     // Create checksum
                     MessageDigest digest = MessageDigest.getInstance("SHA-256");
                     byte[] encodedhash = digest.digest(response.body().getBytes(StandardCharsets.UTF_8));
-                    String sha3_256hex = bytesToHex(encodedhash);
+                    String sha256 = bytesToHex(encodedhash);
 
-                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getActions(), sha3_256hex);
+                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getActions(), sha256);
 
                     return taskDao.findById(onlineTaskId);
                 }
@@ -139,17 +165,16 @@ public class ExecutionServiceImpl implements ExecutionService {
     }
 
     private Optional<Task> findOrDownloadByChecksum(String checksum, TaskService taskService) {
-        Optional<Task> task = taskDao.findByChecksum(checksum);
+        Optional<Task> task = taskDao.findFirstByChecksumStartingWith(checksum);
 
+        System.out.println("checksum.length(): " + checksum.length());
         if (task.isPresent()) {
             LOG.info("Found task with checksum: {}", checksum);
             return task;
-        } else {
+        } else if (!checksum.isEmpty() && checksum.length() == 255) {
             // Try to download it
             LOG.info("Trying to download task with checksum: {}", checksum);
 
-            //TODO: Persist with checksum
-            // Persist with checksum
             HttpRequest.Builder builder = HttpRequest.newBuilder()
                     .uri(URI.create(DOPPLERTASK_WORKFLOW_DOWNLOAD + "?checksum=" + checksum))
                     .timeout(Duration.ofMinutes(1));
@@ -170,9 +195,9 @@ public class ExecutionServiceImpl implements ExecutionService {
                     // Create checksum
                     MessageDigest digest = MessageDigest.getInstance("SHA-256");
                     byte[] encodedhash = digest.digest(response.body().getBytes(StandardCharsets.UTF_8));
-                    String sha3_256hex = bytesToHex(encodedhash);
+                    String sha256 = bytesToHex(encodedhash);
 
-                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getActions(), sha3_256hex);
+                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getActions(), sha256);
 
                     return taskDao.findById(onlineTaskId);
                 }
@@ -182,17 +207,7 @@ public class ExecutionServiceImpl implements ExecutionService {
 
             return Optional.empty();
         }
-    }
-
-
-    private static String bytesToHex(byte[] hash) {
-        StringBuffer hexString = new StringBuffer();
-        for (int i = 0; i < hash.length; i++) {
-            String hex = Integer.toHexString(0xff & hash[i]);
-            if (hex.length() == 1) hexString.append('0');
-            hexString.append(hex);
-        }
-        return hexString.toString();
+        return Optional.empty();
     }
 
     @Override
