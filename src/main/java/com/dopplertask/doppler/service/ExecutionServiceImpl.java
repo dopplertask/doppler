@@ -37,7 +37,7 @@ public class ExecutionServiceImpl implements ExecutionService {
 
 
     private static final Logger LOG = LoggerFactory.getLogger(ExecutionServiceImpl.class);
-    private static final String DOPPLERTASK_WORKFLOW_DOWNLOAD = "http://www.dopplertask.com/getworkflow.php";
+    private static final String DOPPLERTASK_WORKFLOW_DOWNLOAD = "https://www.dopplertask.com/getworkflow.php";
 
     @Autowired
     private JmsTemplate jmsTemplate;
