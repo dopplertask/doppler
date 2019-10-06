@@ -71,7 +71,7 @@ public class ExecutionServiceImpl implements ExecutionService {
 
             // Search in the local database by taskName
             if (!taskRequest.isPresent() && taskExecutionRequest.getTaskName() != null && !taskExecutionRequest.getTaskName().isEmpty()) {
-                taskRequest = taskDao.findFirstByNameOrderByCreatedDesc(taskExecutionRequest.getTaskName());
+                taskRequest = findOrDownloadByName(taskExecutionRequest.getTaskName(), taskService);
             }
         } else if (taskExecutionRequest.getTaskName() != null && !taskExecutionRequest.getTaskName().isEmpty()) {
             taskRequest = findOrDownloadByName(taskExecutionRequest.getTaskName(), taskService);
