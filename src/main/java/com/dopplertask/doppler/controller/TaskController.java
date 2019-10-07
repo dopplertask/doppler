@@ -12,6 +12,7 @@ import com.dopplertask.doppler.dto.TaskExecutionListDTO;
 import com.dopplertask.doppler.dto.TaskExecutionLogResponseDTO;
 import com.dopplertask.doppler.dto.TaskRequestDTO;
 import com.dopplertask.doppler.dto.TaskResponseDTO;
+import com.dopplertask.doppler.service.ExecutionService;
 import com.dopplertask.doppler.service.TaskRequest;
 import com.dopplertask.doppler.service.TaskService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -32,6 +34,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class TaskController {
@@ -39,11 +42,16 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
+    @Autowired
+    private ExecutionService executionService;
+
     private static String bytesToHex(byte[] hash) {
         StringBuffer hexString = new StringBuffer();
         for (int i = 0; i < hash.length; i++) {
             String hex = Integer.toHexString(0xff & hash[i]);
-            if (hex.length() == 1) hexString.append('0');
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
             hexString.append(hex);
         }
         return hexString.toString();
@@ -100,7 +108,7 @@ public class TaskController {
         String sha3_256hex = bytesToHex(encodedhash);
 
         List<Action> actions = taskCreationDTO.getActions();
-        
+
         Long id = taskService.createTask(taskCreationDTO.getName(), actions, sha3_256hex);
 
         if (id != null) {
@@ -134,15 +142,27 @@ public class TaskController {
         Task task = taskService.getTask(id);
         if (task != null) {
             TaskResponseDTO taskDto = new TaskResponseDTO();
-            taskDto.setId(task.getId());
             taskDto.setName(task.getName());
-            taskDto.setCreated(task.getCreated());
             taskDto.setActions(task.getActionList());
 
             return new ResponseEntity<>(taskDto, HttpStatus.OK);
         }
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/task/download")
+    public ResponseEntity<SimpleChecksumResponseDto> pullTask(@RequestParam("taskName") String taskName) {
+        Optional<Task> task = executionService.pullTask(taskName, taskService);
+        if (task.isPresent()) {
+            SimpleChecksumResponseDto checksumDto = new SimpleChecksumResponseDto();
+            checksumDto.setChecksum(task.get().getChecksum());
+
+            return new ResponseEntity<>(checksumDto, HttpStatus.OK);
+        }
+        SimpleChecksumResponseDto checksumResponseDto = new SimpleChecksumResponseDto();
+        checksumResponseDto.setChecksum("Did not find task.");
+        return new ResponseEntity<>(checksumResponseDto, HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/executions")

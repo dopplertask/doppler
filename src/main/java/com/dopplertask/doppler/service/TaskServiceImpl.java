@@ -81,6 +81,12 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     public Long createTask(String name, List<Action> actions, String checksum) {
+        return createTask(name, actions, checksum, true);
+    }
+
+    @Override
+    @Transactional
+    public Long createTask(String name, List<Action> actions, String checksum, boolean buildTask) {
 
         if (name.contains(" ")) {
             throw new WhiteSpaceInNameException("Could not create task. Task name contains whitespace.");
@@ -120,14 +126,16 @@ public class TaskServiceImpl implements TaskService {
 
         taskDao.save(task);
 
-        TaskRequest taskRequest = new TaskRequest();
-        taskRequest.setTaskName(task.getName());
-        taskRequest.setParameters(new HashMap<>());
-
         // Run the execution
-        TaskExecution execution = runRequest(taskRequest);
-        if (!execution.isSuccess()) {
-            throw new BuildNotSuccessfulException("Could not build task, execution was not successful.");
+        if (buildTask) {
+            TaskRequest taskRequest = new TaskRequest();
+            taskRequest.setTaskName(task.getName());
+            taskRequest.setParameters(new HashMap<>());
+
+            TaskExecution execution = runRequest(taskRequest);
+            if (!execution.isSuccess()) {
+                throw new BuildNotSuccessfulException("Could not build task, execution was not successful.");
+            }
         }
 
         return task.getId();
