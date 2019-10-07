@@ -165,6 +165,49 @@ public class ExecutionServiceImpl implements ExecutionService {
 
     }
 
+    @Override
+    public Optional<Task> pullTask(String taskName, TaskService taskService) {
+        // Try to download it
+        LOG.info("Pulling task with name: {}", taskName);
+
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+                .uri(URI.create(DOPPLERTASK_WORKFLOW_DOWNLOAD + "?name=" + taskName))
+                .timeout(Duration.ofMinutes(1));
+        builder = builder.GET();
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = builder.build();
+        try {
+            // Get JSON from Hub
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200 && response.body() != null && !response.body().isEmpty() && taskService != null) {
+                // Translate JSON to object
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+                TaskCreationDTO taskCreationDTO = mapper.readValue(response.body(), TaskCreationDTO.class);
+
+                // Create checksum
+                MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                byte[] encodedhash = digest.digest(response.body().getBytes(StandardCharsets.UTF_8));
+                String sha256 = bytesToHex(encodedhash);
+
+                // Check current database for existing task with checksum.
+                Optional<Task> existingTask = taskDao.findFirstByChecksumStartingWith(sha256);
+                if (!existingTask.isPresent()) {
+                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getActions(), sha256, false);
+                    return taskDao.findById(onlineTaskId);
+                } else {
+                    return existingTask;
+                }
+            }
+        } catch (IOException | InterruptedException | NoSuchAlgorithmException e) {
+            LOG.error("Exception: {}", e);
+        }
+
+
+        return taskDao.findFirstByNameOrderByCreatedDesc(taskName);
+    }
+
     private Optional<Task> findOrDownloadByChecksum(String checksum, TaskService taskService) {
         Optional<Task> task = taskDao.findFirstByChecksumStartingWith(checksum);
 

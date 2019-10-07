@@ -51,6 +51,7 @@ public interface TaskService {
 
     Long createTask(String name, List<Action> actions, String checksum);
 
+    Long createTask(String name, List<Action> actions, String checksum, boolean buildTask);
 
     List<TaskExecution> getExecutions();
 
