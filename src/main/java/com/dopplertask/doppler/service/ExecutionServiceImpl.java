@@ -151,6 +151,7 @@ public class ExecutionServiceImpl implements ExecutionService {
                     byte[] encodedhash = digest.digest(response.body().getBytes(StandardCharsets.UTF_8));
                     String sha256 = bytesToHex(encodedhash);
 
+                    //TODO: check that there is no other checksum with the same value in the DB
                     Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getActions(), sha256);
 
                     return taskDao.findById(onlineTaskId);
@@ -167,7 +168,6 @@ public class ExecutionServiceImpl implements ExecutionService {
     private Optional<Task> findOrDownloadByChecksum(String checksum, TaskService taskService) {
         Optional<Task> task = taskDao.findFirstByChecksumStartingWith(checksum);
 
-        System.out.println("checksum.length(): " + checksum.length());
         if (task.isPresent()) {
             LOG.info("Found task with checksum: {}", checksum);
             return task;
