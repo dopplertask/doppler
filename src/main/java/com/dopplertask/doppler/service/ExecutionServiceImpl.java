@@ -166,6 +166,23 @@ public class ExecutionServiceImpl implements ExecutionService {
     }
 
     @Override
+    public Optional<TaskExecution> getExecution(long id) {
+        return taskExecutionDao.findById(id);
+    }
+
+    @Override
+    @Transactional
+    public void deleteExecution(long id) {
+        Optional<TaskExecution> execution = taskExecutionDao.findById(id);
+        if (execution.isPresent()) {
+            taskExecutionDao.delete(execution.get());
+            return;
+        }
+
+        throw new ExecutionNotFoundException("Execution could not be found.");
+    }
+
+    @Override
     public Optional<Task> pullTask(String taskName, TaskService taskService) {
         // Try to download it
         LOG.info("Pulling task with name: {}", taskName);

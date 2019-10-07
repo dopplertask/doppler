@@ -36,4 +36,7 @@ public interface ExecutionService {
 
     Optional<Task> findOrDownloadByName(String taskName, TaskService taskService);
 
+    Optional<TaskExecution> getExecution(long id);
+
+    void deleteExecution(long id);
 }
