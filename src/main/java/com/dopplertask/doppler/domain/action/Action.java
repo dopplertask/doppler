@@ -37,7 +37,8 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
         @JsonSubTypes.Type(value = ReadFileAction.class, name = "ReadFileAction"),
         @JsonSubTypes.Type(value = SecureCopyAction.class, name = "SecureCopyAction"),
         @JsonSubTypes.Type(value = SSHAction.class, name = "SSHAction"),
-        @JsonSubTypes.Type(value = TimedWait.class, name = "TimedWaitAction")
+        @JsonSubTypes.Type(value = TimedWait.class, name = "TimedWaitAction"),
+        @JsonSubTypes.Type(value = ExecuteCommandAction.class, name = "ExecuteCommandAction")
 })
 public class Action {
 
