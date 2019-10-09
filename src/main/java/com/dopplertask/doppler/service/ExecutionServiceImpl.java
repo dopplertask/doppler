@@ -3,7 +3,6 @@ package com.dopplertask.doppler.service;
 import com.dopplertask.doppler.dao.TaskDao;
 import com.dopplertask.doppler.dao.TaskExecutionDao;
 import com.dopplertask.doppler.domain.ActionResult;
-import com.dopplertask.doppler.domain.OutputType;
 import com.dopplertask.doppler.domain.StatusCode;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
@@ -94,7 +93,6 @@ public class ExecutionServiceImpl implements ExecutionService {
             TaskExecutionLog executionStarted = new TaskExecutionLog();
             executionStarted.setTaskExecution(execution);
             executionStarted.setOutput("Task execution started [taskId=" + task.getId() + ", executionId=" + execution.getId() + "]");
-            executionStarted.setOutputType(OutputType.MESSAGE_COMMAND);
             execution.addLog(executionStarted);
 
 
@@ -116,8 +114,7 @@ public class ExecutionServiceImpl implements ExecutionService {
                 TaskExecutionLog noTaskLog = new TaskExecutionLog();
                 noTaskLog.setOutput("Task could not be found [taskId=" + taskExecutionRequest.getTaskName() + "]");
                 noTaskLog.setTaskExecution(taskExecution);
-                noTaskLog.setOutputType(OutputType.MESSAGE_COMMAND);
-                broadcastResults(noTaskLog);
+                broadcastResults(noTaskLog, true);
             }
             return null;
         }
@@ -320,9 +317,8 @@ public class ExecutionServiceImpl implements ExecutionService {
             TaskExecutionLog executionCompleted = new TaskExecutionLog();
             executionCompleted.setTaskExecution(execution);
             executionCompleted.setOutput("Task execution completed [taskId=" + task.getId() + ", executionId=" + execution.getId() + "]");
-            executionCompleted.setOutputType(OutputType.MESSAGE_COMMAND);
             execution.addLog(executionCompleted);
-            broadcastResults(executionCompleted);
+            broadcastResults(executionCompleted, true);
 
             LOG.info("Task execution completed [taskId={}, executionId={}]", task.getId(), execution.getId());
 
@@ -336,10 +332,15 @@ public class ExecutionServiceImpl implements ExecutionService {
     }
 
     private void broadcastResults(TaskExecutionLog taskExecutionLog) {
+        broadcastResults(taskExecutionLog, false);
+    }
+
+    private void broadcastResults(TaskExecutionLog taskExecutionLog, boolean lastMessage) {
         BroadcastResult result = new BroadcastResult(taskExecutionLog.getOutput(), taskExecutionLog.getOutputType());
 
         jmsTemplate.convertAndSend("taskexecution_destination", result, message -> {
             message.setLongProperty("executionId", taskExecutionLog.getTaskExecution().getId());
+            message.setBooleanProperty("lastMessage", lastMessage);
             return message;
         });
     }
