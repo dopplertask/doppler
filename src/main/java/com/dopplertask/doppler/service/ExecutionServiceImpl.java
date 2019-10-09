@@ -12,7 +12,6 @@ import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.dto.TaskCreationDTO;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,12 +107,15 @@ public class ExecutionServiceImpl implements ExecutionService {
         } else {
             LOG.warn("Task could not be found [taskId={}]", taskExecutionRequest.getTaskName());
 
-            TaskExecution taskExecution = new TaskExecution();
-            taskExecution.setId(0L);
-            TaskExecutionLog noTaskLog = new TaskExecutionLog();
-            noTaskLog.setOutput("Task could not be found [taskId=" + taskExecutionRequest.getTaskName() + "]");
-            noTaskLog.setTaskExecution(taskExecution);
-            broadcastResults(noTaskLog);
+            if (executionReq.isPresent()) {
+                TaskExecution taskExecution = executionReq.get();
+                taskExecution.setId(executionReq.get().getId());
+                taskExecution.setSuccess(false);
+                TaskExecutionLog noTaskLog = new TaskExecutionLog();
+                noTaskLog.setOutput("Task could not be found [taskId=" + taskExecutionRequest.getTaskName() + "]");
+                noTaskLog.setTaskExecution(taskExecution);
+                broadcastResults(noTaskLog);
+            }
             return null;
         }
     }
