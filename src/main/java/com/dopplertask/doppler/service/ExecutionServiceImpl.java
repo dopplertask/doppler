@@ -12,6 +12,7 @@ import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.dto.TaskCreationDTO;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -289,6 +290,8 @@ public class ExecutionServiceImpl implements ExecutionService {
                     actionResult = currentAction.run(taskService, execution);
                 } catch (Exception e) {
                     LOG.error("Exception occured: {}", e);
+                    actionResult.setErrorMsg(e.toString());
+                    actionResult.setStatusCode(StatusCode.FAILURE);
                 }
 
                 TaskExecutionLog log = new TaskExecutionLog();
@@ -316,7 +319,7 @@ public class ExecutionServiceImpl implements ExecutionService {
 
             TaskExecutionLog executionCompleted = new TaskExecutionLog();
             executionCompleted.setTaskExecution(execution);
-            executionCompleted.setOutput("Task execution completed [taskId=" + task.getId() + ", executionId=" + execution.getId() + "]");
+            executionCompleted.setOutput("Task execution completed [taskId=" + task.getId() + ", executionId=" + execution.getId() + ", success=" + execution.isSuccess() + "]");
             execution.addLog(executionCompleted);
             broadcastResults(executionCompleted, true);
 
