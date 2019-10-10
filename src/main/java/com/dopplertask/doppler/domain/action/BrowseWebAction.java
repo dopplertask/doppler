@@ -85,6 +85,7 @@ public class BrowseWebAction extends Action {
                 } catch (Exception e) {
                     actionResult.setErrorMsg("Exception occured during sleeping in UI Action");
                     actionResult.setStatusCode(StatusCode.FAILURE);
+                    return actionResult;
                 }
             } else if (uiAction.getAction() == UIActionType.ACCEPT_ALERT) {
                 try {
@@ -93,6 +94,7 @@ public class BrowseWebAction extends Action {
                 } catch (Exception e) {
                     actionResult.setErrorMsg("Exception occured during accepting alert in UI Action");
                     actionResult.setStatusCode(StatusCode.FAILURE);
+                    return actionResult;
                 }
             } else {
                 // Normal UI Actions
