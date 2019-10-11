@@ -4,6 +4,8 @@ import com.dopplertask.doppler.dao.TaskDao;
 import com.dopplertask.doppler.dao.TaskExecutionDao;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
+import com.dopplertask.doppler.domain.action.SetVariable;
+import com.dopplertask.doppler.domain.action.SetVariableAction;
 import com.dopplertask.doppler.service.ExecutionServiceImpl;
 import com.dopplertask.doppler.service.TaskExecutionRequest;
 import com.dopplertask.doppler.service.TaskServiceImpl;
@@ -17,6 +19,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.eq;
@@ -90,6 +93,40 @@ public class ExecutionServiceTest {
         Assert.assertEquals(10L, resultExecution.getId().longValue());
         Assert.assertEquals(exampleTask, resultExecution.getTask());
     }
+
+    @Test
+    public void testProcessActionsShouldReturnExecutionWithNewParams() {
+        // Prepare Task
+        Task exampleTask = new Task();
+        exampleTask.setId(20L);
+        exampleTask.setName("ExampleTask");
+        SetVariableAction setVariableAction = new SetVariableAction();
+        SetVariable setVariable = new SetVariable();
+        setVariable.setName("testVar");
+        setVariable.setValue("testValue One two three $execution.getId()");
+        setVariableAction.setSetVariableList(List.of(setVariable));
+        exampleTask.getActionList().add(setVariableAction);
+        Optional<Task> exampleTaskOptional = Optional.of(exampleTask);
+
+        // Prepare Execution
+        TaskExecution execution = new TaskExecution();
+        execution.setId(10L);
+        execution.setTask(exampleTask);
+        Optional<TaskExecution> executionOptional = Optional.of(execution);
+
+        // Assign values
+        when(taskDao.findById(eq(20L))).thenReturn(exampleTaskOptional);
+        when(taskExecutionDao.findById(eq(10L))).thenReturn(executionOptional);
+
+        TaskExecution resultExecution = executionService.processActions(exampleTask.getId(), execution.getId(), null);
+
+        // Check that we have everything correct
+        Assert.assertEquals(10L, resultExecution.getId().longValue());
+        Assert.assertEquals(exampleTask, resultExecution.getTask());
+        Assert.assertEquals(1, resultExecution.getParameters().size());
+        Assert.assertEquals("testValue One two three 10", resultExecution.getParameters().get("testVar"));
+    }
+
 
     @Test
     public void testStartExecutionByChecksumAndTaskNameShouldReturnExecution() {

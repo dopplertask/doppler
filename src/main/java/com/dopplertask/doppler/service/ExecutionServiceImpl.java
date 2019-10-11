@@ -286,13 +286,27 @@ public class ExecutionServiceImpl implements ExecutionService {
             for (Action currentAction : task.getActionList()) {
 
                 ActionResult actionResult = new ActionResult();
-                try {
-                    actionResult = currentAction.run(taskService, execution);
-                } catch (Exception e) {
-                    LOG.error("Exception occured: {}", e);
-                    actionResult.setErrorMsg(e.toString());
-                    actionResult.setStatusCode(StatusCode.FAILURE);
-                }
+                int tries = 0;
+                do {
+                    try {
+                        actionResult = currentAction.run(taskService, execution);
+
+                        // Handle failOn
+                        if (currentAction.getFailOn() != null && !currentAction.getFailOn().isEmpty()) {
+                            String failOn = VariableExtractorUtil.extract(currentAction.getFailOn(), execution);
+                            if (failOn != null && !failOn.isEmpty()) {
+                                actionResult.setErrorMsg("Failed on: " + failOn);
+                                actionResult.setStatusCode(StatusCode.FAILURE);
+                            }
+                        }
+                    } catch (Exception e) {
+                        LOG.error("Exception occured: {}", e);
+                        actionResult.setErrorMsg(e.toString());
+                        actionResult.setStatusCode(StatusCode.FAILURE);
+                    }
+
+                    tries++;
+                } while (actionResult.getStatusCode() == StatusCode.FAILURE && currentAction.getRetries() >= tries && !currentAction.isContinueOnFailure());
 
                 TaskExecutionLog log = new TaskExecutionLog();
                 log.setTaskExecution(execution);
