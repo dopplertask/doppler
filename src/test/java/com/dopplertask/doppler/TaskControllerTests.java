@@ -40,7 +40,6 @@ import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -110,7 +109,7 @@ public class TaskControllerTests {
                 " \"message\":\"Hello my fellow automators\"\n" +
                 "  }\n" +
                 "}";
-        this.mockMvc.perform(post("/schedule/directtask").contentType(MediaType.APPLICATION_JSON).content(requestTaskRunStr)).andDo(print()).andExpect(status().isOk()).andExpect(content().json("{\"output\":[\"Task execution started [taskId=1, executionId=1]\",\"Hello my fellow automators\",\"Task execution completed [taskId=1, executionId=1, success=true]\"]}"));
+        this.mockMvc.perform(post("/schedule/directtask").contentType(MediaType.APPLICATION_JSON).content(requestTaskRunStr)).andDo(print()).andExpect(status().isOk());
 
         Optional<Task> task = taskDao.findFirstByNameOrderByCreatedDesc("example-task-2");
 
