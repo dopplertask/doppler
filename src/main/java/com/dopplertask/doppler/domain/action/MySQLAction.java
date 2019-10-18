@@ -7,16 +7,17 @@ import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 import com.mysql.cj.jdbc.MysqlDataSource;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.Lob;
-import javax.persistence.Table;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.Lob;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "MySQLAction")
@@ -50,14 +51,14 @@ public class MySQLAction extends Action {
 
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution) {
-        String localHostname = VariableExtractorUtil.extract(getHostname(), execution);
-        String localUsername = VariableExtractorUtil.extract(getUsername(), execution);
-        String localPassword = VariableExtractorUtil.extract(getPassword(), execution);
-        String localPort = VariableExtractorUtil.extract(getPort(), execution);
-        String localDatabase = VariableExtractorUtil.extract(getDatabase(), execution);
-        String localCommand = VariableExtractorUtil.extract(getCommand(), execution);
-        String localTimezone = VariableExtractorUtil.extract(getTimezone(), execution);
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
+        String localHostname = variableExtractorUtil.extract(getHostname(), execution);
+        String localUsername = variableExtractorUtil.extract(getUsername(), execution);
+        String localPassword = variableExtractorUtil.extract(getPassword(), execution);
+        String localPort = variableExtractorUtil.extract(getPort(), execution);
+        String localDatabase = variableExtractorUtil.extract(getDatabase(), execution);
+        String localCommand = variableExtractorUtil.extract(getCommand(), execution);
+        String localTimezone = variableExtractorUtil.extract(getTimezone(), execution);
 
         MysqlDataSource dataSource = new MysqlDataSource();
         dataSource.setUser(localUsername);

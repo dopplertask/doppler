@@ -6,6 +6,15 @@ import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -15,14 +24,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 
 @Entity
 @Table(name = "HttpAction")
@@ -50,12 +51,12 @@ public class HttpAction extends Action {
     }
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution) {
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
 
         // Extract variables
-        String urlVariable = VariableExtractorUtil.extract(url, execution);
-        String methodVariable = VariableExtractorUtil.extract(method, execution);
-        String bodyVariable = VariableExtractorUtil.extract(body, execution);
+        String urlVariable = variableExtractorUtil.extract(url, execution);
+        String methodVariable = variableExtractorUtil.extract(method, execution);
+        String bodyVariable = variableExtractorUtil.extract(body, execution);
 
         ActionResult actionResult = new ActionResult();
 
@@ -83,7 +84,7 @@ public class HttpAction extends Action {
 
 
         for (Map.Entry<String, String> entry : headers.entrySet()) {
-            builder = builder.header(entry.getKey(), VariableExtractorUtil.extract(entry.getValue(), execution));
+            builder = builder.header(entry.getKey(), variableExtractorUtil.extract(entry.getValue(), execution));
         }
 
         HttpClient client = HttpClient.newHttpClient();

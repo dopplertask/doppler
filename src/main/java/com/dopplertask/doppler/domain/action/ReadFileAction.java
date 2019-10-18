@@ -29,8 +29,8 @@ public class ReadFileAction extends Action {
     }
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution) {
-        String filenameVariable = VariableExtractorUtil.extract(filename, execution);
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
+        String filenameVariable = variableExtractorUtil.extract(filename, execution);
 
         try {
             // Support shell ~ for home directory

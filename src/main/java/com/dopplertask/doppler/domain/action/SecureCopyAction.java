@@ -37,12 +37,12 @@ public class SecureCopyAction extends Action {
     private String destinationFilename;
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution) {
-        String connectionIP = VariableExtractorUtil.extract(getHostname(), execution);
-        String localUsername = VariableExtractorUtil.extract(getUsername(), execution);
-        String localPassword = VariableExtractorUtil.extract(getPassword(), execution);
-        String localSourceFilename = VariableExtractorUtil.extract(getSourceFilename(), execution);
-        String localDestinationFilename = VariableExtractorUtil.extract(getDestinationFilename(), execution);
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
+        String connectionIP = variableExtractorUtil.extract(getHostname(), execution);
+        String localUsername = variableExtractorUtil.extract(getUsername(), execution);
+        String localPassword = variableExtractorUtil.extract(getPassword(), execution);
+        String localSourceFilename = variableExtractorUtil.extract(getSourceFilename(), execution);
+        String localDestinationFilename = variableExtractorUtil.extract(getDestinationFilename(), execution);
 
         SSHManager instance = new SSHManager(localUsername, localPassword, connectionIP, "");
         String errorMessage = instance.connect();

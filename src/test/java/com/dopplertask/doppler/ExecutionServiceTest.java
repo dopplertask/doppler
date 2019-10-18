@@ -9,6 +9,7 @@ import com.dopplertask.doppler.domain.action.SetVariableAction;
 import com.dopplertask.doppler.service.ExecutionServiceImpl;
 import com.dopplertask.doppler.service.TaskExecutionRequest;
 import com.dopplertask.doppler.service.TaskServiceImpl;
+import com.dopplertask.doppler.service.VariableExtractorUtil;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,6 +40,9 @@ public class ExecutionServiceTest {
 
     @Mock
     private TaskExecutionDao taskExecutionDao;
+
+    @Mock
+    private VariableExtractorUtil variableExtractorUtil;
 
     @Mock
     private JmsTemplate jmsTemplate;
@@ -117,7 +121,7 @@ public class ExecutionServiceTest {
         // Assign values
         when(taskDao.findById(eq(20L))).thenReturn(exampleTaskOptional);
         when(taskExecutionDao.findById(eq(10L))).thenReturn(executionOptional);
-
+        when(variableExtractorUtil.extract(eq("testValue One two three $executionId"), eq(execution))).thenReturn("testValue One two three 10");
         TaskExecution resultExecution = executionService.processActions(exampleTask.getId(), execution.getId(), null);
 
         // Check that we have everything correct

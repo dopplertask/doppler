@@ -4,6 +4,7 @@ import com.dopplertask.doppler.domain.ActionResult;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.service.TaskService;
+import com.dopplertask.doppler.service.VariableExtractorUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -88,9 +89,10 @@ public class Action {
      *
      * @param taskService which handles task execution.
      * @param execution   of the current task.
+     * @param variableExtractorUtil utility to evaluate velocity code.
      * @return an action result which represents the outcome of the executed action.
      */
-    public ActionResult run(TaskService taskService, TaskExecution execution) {
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
         return new ActionResult();
     }
 

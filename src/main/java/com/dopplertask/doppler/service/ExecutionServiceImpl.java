@@ -45,6 +45,8 @@ public class ExecutionServiceImpl implements ExecutionService {
     @Autowired
     private TaskDao taskDao;
 
+    @Autowired
+    private VariableExtractorUtil variableExtractorUtil;
 
     @Autowired
     private TaskExecutionDao taskExecutionDao;
@@ -289,11 +291,11 @@ public class ExecutionServiceImpl implements ExecutionService {
                 int tries = 0;
                 do {
                     try {
-                        actionResult = currentAction.run(taskService, execution);
+                        actionResult = currentAction.run(taskService, execution, variableExtractorUtil);
 
                         // Handle failOn
                         if (currentAction.getFailOn() != null && !currentAction.getFailOn().isEmpty()) {
-                            String failOn = VariableExtractorUtil.extract(currentAction.getFailOn(), execution);
+                            String failOn = variableExtractorUtil.extract(currentAction.getFailOn(), execution);
                             if (failOn != null && !failOn.isEmpty()) {
                                 actionResult.setErrorMsg("Failed on: " + failOn);
                                 actionResult.setStatusCode(StatusCode.FAILURE);

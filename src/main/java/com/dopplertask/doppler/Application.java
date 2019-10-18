@@ -1,6 +1,7 @@
 package com.dopplertask.doppler;
 
 import org.apache.activemq.broker.BrokerService;
+import org.apache.velocity.app.VelocityEngine;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
@@ -50,5 +51,12 @@ public class Application {
         converter.setTargetType(MessageType.TEXT);
         converter.setTypeIdPropertyName("_type");
         return converter;
+    }
+
+    @Bean
+    public VelocityEngine velocityEngine() {
+        VelocityEngine velocityEngine = new VelocityEngine();
+        velocityEngine.init();
+        return velocityEngine;
     }
 }
