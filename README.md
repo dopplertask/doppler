@@ -1,7 +1,7 @@
 # doppler
-Doppler is a revolutionary open-source software that allows you to automate tasks easily. Whether it’s a bunch of bash scripts or just starting your car remotely, you can automate it. You can build, run, reuse and share automations with anyone around the globe.
+Doppler is a revolutionary open-source software that allows you to easily automate tasks. Whether it’s a bunch of bash scripts or just starting your car remotely, you can automate it. Build, run, reuse and share automations with anyone around the globe.
 
-On top of all of this life-simplifying project, we  are striving to make an climate friendly software that is fast, easy and consumes as little resources as possible.
+On top of all of this life-simplifying project, we are striving to make an climate friendly software that is fast, easy and consumes as little resources as possible.
 
 ## Build status
 [![Build Status](https://travis-ci.org/dopplertask/doppler.svg?branch=master)](https://travis-ci.org/dopplertask/doppler)
