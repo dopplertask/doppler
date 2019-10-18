@@ -103,7 +103,7 @@ public class ExecutionServiceTest {
         SetVariableAction setVariableAction = new SetVariableAction();
         SetVariable setVariable = new SetVariable();
         setVariable.setName("testVar");
-        setVariable.setValue("testValue One two three $execution.getId()");
+        setVariable.setValue("testValue One two three $executionId");
         setVariableAction.setSetVariableList(List.of(setVariable));
         exampleTask.getActionList().add(setVariableAction);
         Optional<Task> exampleTaskOptional = Optional.of(exampleTask);

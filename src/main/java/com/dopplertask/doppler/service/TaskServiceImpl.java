@@ -6,6 +6,7 @@ import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.domain.action.LinkedTaskAction;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -124,18 +124,6 @@ public class TaskServiceImpl implements TaskService {
         task.setChecksum(checksum);
 
         taskDao.save(task);
-
-        // Run the execution
-        if (buildTask) {
-            TaskRequest taskRequest = new TaskRequest();
-            taskRequest.setTaskName(task.getName());
-            taskRequest.setParameters(new HashMap<>());
-
-            TaskExecution execution = runRequest(taskRequest);
-            if (!execution.isSuccess()) {
-                throw new BuildNotSuccessfulException("Could not build task, execution was not successful.");
-            }
-        }
 
         return task.getId();
     }
