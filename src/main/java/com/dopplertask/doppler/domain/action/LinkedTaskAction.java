@@ -5,6 +5,7 @@ import com.dopplertask.doppler.domain.StatusCode;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.service.TaskRequest;
 import com.dopplertask.doppler.service.TaskService;
+import com.dopplertask.doppler.service.VariableExtractorUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.Column;
@@ -26,7 +27,7 @@ public class LinkedTaskAction extends Action {
     private String checksum;
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution) {
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
         if (execution.getDepth() < MAX_LINKED_TASK_DEPTH) {
             TaskRequest taskRequest = new TaskRequest();
 

@@ -7,14 +7,15 @@ import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "ReadFileAction")
@@ -28,10 +29,15 @@ public class ReadFileAction extends Action {
     }
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution) {
-        String filenameVariable = VariableExtractorUtil.extract(filename, execution);
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
+        String filenameVariable = variableExtractorUtil.extract(filename, execution);
 
         try {
+            // Support shell ~ for home directory
+            if (filenameVariable.contains("~/") && filenameVariable.startsWith("~")) {
+                filenameVariable = filenameVariable.replace("~/", System.getProperty("user.home") + "/");
+            }
+
             String fileContents = Files.readString(Paths.get(filenameVariable), StandardCharsets.UTF_8);
 
             ActionResult actionResult = new ActionResult();

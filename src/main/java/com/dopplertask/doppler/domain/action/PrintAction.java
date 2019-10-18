@@ -28,8 +28,8 @@ public class PrintAction extends Action {
 
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution) {
-        String messageVariable = VariableExtractorUtil.extract(message, execution);
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
+        String messageVariable = variableExtractorUtil.extract(message, execution);
 
         ActionResult actionResult = new ActionResult();
 

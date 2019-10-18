@@ -6,6 +6,7 @@ import com.dopplertask.doppler.domain.StatusCode;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -15,14 +16,15 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "BrowseWebAction")
@@ -49,8 +51,8 @@ public class BrowseWebAction extends Action {
 
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution) {
-        String urlVariable = VariableExtractorUtil.extract(url, execution);
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
+        String urlVariable = variableExtractorUtil.extract(url, execution);
 
         ActionResult actionResult = new ActionResult();
 
@@ -77,7 +79,7 @@ public class BrowseWebAction extends Action {
 
         // Go through all actions
         for (UIAction uiAction : actionList) {
-            String uiActionValueVariable = VariableExtractorUtil.extract(uiAction.getValue() != null ? uiAction.getValue() : "", execution);
+            String uiActionValueVariable = variableExtractorUtil.extract(uiAction.getValue() != null ? uiAction.getValue() : "", execution);
             if (uiAction.getAction() == UIActionType.WAIT) {
                 try {
                     Thread.sleep(Long.parseLong(uiActionValueVariable));

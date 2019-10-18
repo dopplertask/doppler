@@ -28,8 +28,8 @@ public class TimedWait extends Action {
 
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution) {
-        String amountOfSeconds = VariableExtractorUtil.extract("" + seconds, execution);
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
+        String amountOfSeconds = variableExtractorUtil.extract("" + seconds, execution);
 
         ActionResult actionResult = new ActionResult();
 

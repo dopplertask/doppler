@@ -26,14 +26,14 @@ public class SetVariableAction extends Action {
     private List<SetVariable> setVariableList;
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution) {
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
 
         ActionResult actionResult = new ActionResult();
         StringBuilder builder = new StringBuilder();
 
         setVariableList.forEach(setVariable -> {
             if (setVariable.getValue() != null) {
-                String evaluatedValue = VariableExtractorUtil.extract(setVariable.getValue(), execution);
+                String evaluatedValue = variableExtractorUtil.extract(setVariable.getValue(), execution);
                 execution.getParameters().put(setVariable.getName(), evaluatedValue);
 
                 builder.append("Setting variable [key=" + setVariable.getName() + ", value=" + evaluatedValue + "]\n");

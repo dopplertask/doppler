@@ -33,11 +33,11 @@ public class SSHAction extends Action {
     private String command;
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution) {
-        String connectionIP = VariableExtractorUtil.extract(getHostname(), execution);
-        String userName = VariableExtractorUtil.extract(getUsername(), execution);
-        String password = VariableExtractorUtil.extract(getPassword(), execution);
-        String command = VariableExtractorUtil.extract(getCommand(), execution);
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
+        String connectionIP = variableExtractorUtil.extract(getHostname(), execution);
+        String userName = variableExtractorUtil.extract(getUsername(), execution);
+        String password = variableExtractorUtil.extract(getPassword(), execution);
+        String command = variableExtractorUtil.extract(getCommand(), execution);
 
         SSHManager instance = new SSHManager(userName, password, connectionIP, "");
         String errorMessage = instance.connect();

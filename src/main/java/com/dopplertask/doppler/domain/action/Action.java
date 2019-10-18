@@ -4,6 +4,7 @@ import com.dopplertask.doppler.domain.ActionResult;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.service.TaskService;
+import com.dopplertask.doppler.service.VariableExtractorUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -58,6 +59,15 @@ public class Action {
     @JsonIgnore
     private Integer orderPosition;
 
+    @Column(nullable = false, columnDefinition = "TINYINT(1)")
+    private boolean continueOnFailure = false;
+
+    @Column(length = 4096)
+    private String failOn;
+
+    private Integer retries = 0;
+
+
     public Long getId() {
         return id;
     }
@@ -79,9 +89,10 @@ public class Action {
      *
      * @param taskService which handles task execution.
      * @param execution   of the current task.
+     * @param variableExtractorUtil utility to evaluate velocity code.
      * @return an action result which represents the outcome of the executed action.
      */
-    public ActionResult run(TaskService taskService, TaskExecution execution) {
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
         return new ActionResult();
     }
 
@@ -91,5 +102,29 @@ public class Action {
 
     public void setOrderPosition(Integer orderPosition) {
         this.orderPosition = orderPosition;
+    }
+
+    public boolean isContinueOnFailure() {
+        return continueOnFailure;
+    }
+
+    public void setContinueOnFailure(boolean continueOnFailure) {
+        this.continueOnFailure = continueOnFailure;
+    }
+
+    public Integer getRetries() {
+        return retries;
+    }
+
+    public void setRetries(Integer retries) {
+        this.retries = retries;
+    }
+
+    public String getFailOn() {
+        return failOn;
+    }
+
+    public void setFailOn(String failOn) {
+        this.failOn = failOn;
     }
 }

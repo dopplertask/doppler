@@ -45,6 +45,8 @@ public class ExecutionServiceImpl implements ExecutionService {
     @Autowired
     private TaskDao taskDao;
 
+    @Autowired
+    private VariableExtractorUtil variableExtractorUtil;
 
     @Autowired
     private TaskExecutionDao taskExecutionDao;
@@ -286,24 +288,38 @@ public class ExecutionServiceImpl implements ExecutionService {
             for (Action currentAction : task.getActionList()) {
 
                 ActionResult actionResult = new ActionResult();
-                try {
-                    actionResult = currentAction.run(taskService, execution);
-                } catch (Exception e) {
-                    LOG.error("Exception occured: {}", e);
-                    actionResult.setErrorMsg(e.toString());
-                    actionResult.setStatusCode(StatusCode.FAILURE);
-                }
+                int tries = 0;
+                do {
+                    try {
+                        actionResult = currentAction.run(taskService, execution, variableExtractorUtil);
+
+                        // Handle failOn
+                        if (currentAction.getFailOn() != null && !currentAction.getFailOn().isEmpty()) {
+                            String failOn = variableExtractorUtil.extract(currentAction.getFailOn(), execution);
+                            if (failOn != null && !failOn.isEmpty()) {
+                                actionResult.setErrorMsg("Failed on: " + failOn);
+                                actionResult.setStatusCode(StatusCode.FAILURE);
+                            }
+                        }
+                    } catch (Exception e) {
+                        LOG.error("Exception occurred: {}", e);
+                        actionResult.setErrorMsg(e.toString());
+                        actionResult.setStatusCode(StatusCode.FAILURE);
+                    }
+
+                    tries++;
+                } while (actionResult.getStatusCode() == StatusCode.FAILURE && currentAction.getRetries() >= tries && !currentAction.isContinueOnFailure());
 
                 TaskExecutionLog log = new TaskExecutionLog();
                 log.setTaskExecution(execution);
 
-                LOG.info("Ran current action: {} with status code: {} and with result: {}", currentAction.getClass().getSimpleName(), actionResult.getStatusCode(), actionResult.getOutput());
+                LOG.info("Ran current action: {} with status code: {} and with result: {}", currentAction.getClass().getSimpleName(), actionResult.getStatusCode(), actionResult.getOutput() != null && !actionResult.getOutput().isEmpty() ? actionResult.getOutput() : actionResult.getErrorMsg());
 
                 log.setOutput(actionResult.getOutput());
                 log.setOutputType(actionResult.getOutputType());
 
                 // If action did not go well
-                if (actionResult.getStatusCode() == StatusCode.FAILURE) {
+                if (actionResult.getStatusCode() == StatusCode.FAILURE && !currentAction.isContinueOnFailure()) {
                     log.setOutput(actionResult.getErrorMsg());
                     log.setOutputType(actionResult.getOutputType());
                     execution.setSuccess(false);

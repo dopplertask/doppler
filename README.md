@@ -126,6 +126,28 @@ A UI Action contains the following fields:
 
 * value: Required only if used with the actions WRITE, SELECT and WAIT.
 
+#### ReadFileAction
+Reads a file from disk.
+##### Variables
+* filename: name of a file. Using ~ in the beginning of the filename will point to the home directory eg. ~/Downloads/testfile.txt 
+
+#### SetVariableAction
+Sets or modifies a variable for the current execution.
+##### Variables
+* setVariableList: A list of key-value pairs of variables.
+
+#### ExecuteCommandAction
+Executes a command on the current machine.
+##### Variables
+* command: Command to execute.
+
+
+### Retry
+All actions have retry mechanisms to allow you to retry an action.
+#### Variables
+* retries: Amount of retries.
+* failOn: Any input will cause the current action to be marked as failure.
+* continueOnFailure: Lets the action continue on failure, ignoring any retry.
 
 ## Docker
 To run the built docker image:
