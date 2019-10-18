@@ -302,7 +302,7 @@ public class ExecutionServiceImpl implements ExecutionService {
                             }
                         }
                     } catch (Exception e) {
-                        LOG.error("Exception occured: {}", e);
+                        LOG.error("Exception occurred: {}", e);
                         actionResult.setErrorMsg(e.toString());
                         actionResult.setStatusCode(StatusCode.FAILURE);
                     }
@@ -313,13 +313,13 @@ public class ExecutionServiceImpl implements ExecutionService {
                 TaskExecutionLog log = new TaskExecutionLog();
                 log.setTaskExecution(execution);
 
-                LOG.info("Ran current action: {} with status code: {} and with result: {}", currentAction.getClass().getSimpleName(), actionResult.getStatusCode(), actionResult.getOutput());
+                LOG.info("Ran current action: {} with status code: {} and with result: {}", currentAction.getClass().getSimpleName(), actionResult.getStatusCode(), actionResult.getOutput() != null && !actionResult.getOutput().isEmpty() ? actionResult.getOutput() : actionResult.getErrorMsg());
 
                 log.setOutput(actionResult.getOutput());
                 log.setOutputType(actionResult.getOutputType());
 
                 // If action did not go well
-                if (actionResult.getStatusCode() == StatusCode.FAILURE) {
+                if (actionResult.getStatusCode() == StatusCode.FAILURE && !currentAction.isContinueOnFailure()) {
                     log.setOutput(actionResult.getErrorMsg());
                     log.setOutputType(actionResult.getOutputType());
                     execution.setSuccess(false);
