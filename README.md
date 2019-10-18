@@ -141,6 +141,14 @@ Executes a command on the current machine.
 ##### Variables
 * command: Command to execute.
 
+
+### Retry
+All actions have retry mechanisms to allow you to retry an action.
+#### Variables
+* retries: Amount of retries.
+* failOn: Any input will cause the current action to be marked as failure.
+* continueOnFailure: Lets the action continue on failure, ignoring any retry.
+
 ## Docker
 To run the built docker image:
 ```docker run -p 8090:8090 -p 61617:61617 dopplertask/doppler-engine ```
