@@ -22,7 +22,7 @@ import javax.persistence.Table;
 @DiscriminatorValue("setvariable_action")
 public class SetVariableAction extends Action {
 
-    @OneToMany(mappedBy = "setVariableAction", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "setVariableAction", cascade = CascadeType.ALL)
     private List<SetVariable> setVariableList;
 
     @Override

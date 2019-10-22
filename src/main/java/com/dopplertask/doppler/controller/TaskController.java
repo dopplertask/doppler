@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -227,5 +228,19 @@ public class TaskController {
         }
 
         return new ResponseEntity<>(new SimpleMessageResponseDTO("Successfully logged in"), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/task/{taskNameOrChecksum}")
+    public ResponseEntity<SimpleMessageResponseDTO> deleteTask(@PathVariable String taskNameOrChecksum) {
+
+        Task task = taskService.deleteTask(taskNameOrChecksum);
+
+        if (task != null) {
+            SimpleMessageResponseDTO messageDto = new SimpleMessageResponseDTO("Task has been deleted " + task.getChecksum());
+
+            return new ResponseEntity<>(messageDto, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(new SimpleMessageResponseDTO("Could not delete task"), HttpStatus.BAD_REQUEST);
     }
 }

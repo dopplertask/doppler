@@ -36,7 +36,7 @@ public class BrowseWebAction extends Action {
     @Column
     private String url;
 
-    @OneToMany(mappedBy = "browseWebAction", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "browseWebAction", cascade = CascadeType.ALL)
     private List<UIAction> actionList = new ArrayList<>();
 
     @Column(columnDefinition = "BOOLEAN")

@@ -239,6 +239,28 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
+    public Task deleteTask(String taskNameOrChecksum) {
+        // Find task by checksum if input is longer than 1 characters.
+        if (taskNameOrChecksum.length() > 1) {
+            Optional<Task> taskByChecksum = taskDao.findFirstByChecksumStartingWith(taskNameOrChecksum);
+            if (taskByChecksum.isPresent()) {
+                taskDao.delete(taskByChecksum.get());
+                return taskByChecksum.get();
+            }
+        }
+
+        // Find task by name
+        Optional<Task> taskByName = taskDao.findFirstByNameOrderByCreatedDesc(taskNameOrChecksum);
+        if (taskByName.isPresent()) {
+            taskDao.delete(taskByName.get());
+            return taskByName.get();
+        }
+
+        throw new TaskNotFoundException("Task could not be found.");
+    }
+
+    @Override
     public TaskExecution runRequest(TaskRequest request) {
         TaskExecution execution = new TaskExecution();
         execution.setDepth(request.getDepth());
