@@ -4,8 +4,6 @@ import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.action.Action;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 /**
@@ -60,8 +58,15 @@ public interface TaskService {
 
     Task getTask(long id);
 
-    @Transactional
     boolean loginUser(String username, String password);
 
     boolean pushTask(String taskName);
+
+    /**
+     * Deletes a task by checksum or name. It searches first for checksum.
+     *
+     * @param taskNameOrChecksum
+     * @return
+     */
+    Task deleteTask(String taskNameOrChecksum);
 }
