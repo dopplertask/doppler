@@ -31,6 +31,9 @@ public class Task {
     @Column
     private String name;
 
+    @Column
+    private String description;
+
     @OneToMany(mappedBy = "task", cascade = CascadeType.PERSIST)
     @OrderBy("orderPosition ASC")
     private List<Action> actionList = new ArrayList<>();
@@ -81,5 +84,13 @@ public class Task {
 
     public void setChecksum(String checksum) {
         this.checksum = checksum;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

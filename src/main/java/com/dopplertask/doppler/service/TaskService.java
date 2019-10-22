@@ -4,6 +4,8 @@ import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.action.Action;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 /**
@@ -49,11 +51,17 @@ public interface TaskService {
      */
     List<Task> getAllTasks();
 
-    Long createTask(String name, List<Action> actions, String checksum);
+    Long createTask(String name, List<Action> actions, String description, String checksum);
 
-    Long createTask(String name, List<Action> actions, String checksum, boolean buildTask);
+
+    Long createTask(String name, List<Action> actions, String description, String checksum, boolean buildTask);
 
     List<TaskExecution> getExecutions();
 
     Task getTask(long id);
+
+    @Transactional
+    boolean loginUser(String username, String password);
+
+    boolean pushTask(String taskName);
 }
