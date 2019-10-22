@@ -4,18 +4,20 @@ import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.TaskExecutionLog;
 import com.dopplertask.doppler.domain.action.Action;
+import com.dopplertask.doppler.dto.LoginParameters;
 import com.dopplertask.doppler.dto.SimpleChecksumResponseDto;
 import com.dopplertask.doppler.dto.SimpleIdResponseDto;
+import com.dopplertask.doppler.dto.SimpleMessageResponseDTO;
 import com.dopplertask.doppler.dto.TaskCreationDTO;
 import com.dopplertask.doppler.dto.TaskExecutionDTO;
 import com.dopplertask.doppler.dto.TaskExecutionListDTO;
 import com.dopplertask.doppler.dto.TaskExecutionLogResponseDTO;
+import com.dopplertask.doppler.dto.TaskNameDTO;
 import com.dopplertask.doppler.dto.TaskRequestDTO;
-import com.dopplertask.doppler.dto.TaskResponseDTO;
+import com.dopplertask.doppler.dto.TaskResponseSingleDTO;
 import com.dopplertask.doppler.service.ExecutionService;
 import com.dopplertask.doppler.service.TaskRequest;
 import com.dopplertask.doppler.service.TaskService;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,12 +93,22 @@ public class TaskController {
 
     }
 
+    @PostMapping(path = "/task/push")
+    public ResponseEntity<TaskNameDTO> pushTask(@RequestBody TaskNameDTO taskNameDTO) {
+        boolean pushed = taskService.pushTask(taskNameDTO.getTaskName());
+
+        if (pushed) {
+            return new ResponseEntity<>(taskNameDTO, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
     @PostMapping(path = "/task")
     public ResponseEntity<SimpleChecksumResponseDto> createTask(@RequestBody String body) throws IOException, NoSuchAlgorithmException {
 
         // Translate JSON to object
         ObjectMapper mapper = new ObjectMapper();
-        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         TaskCreationDTO taskCreationDTO = mapper.readValue(body, TaskCreationDTO.class);
 
         // Generate compact JSON
@@ -109,7 +121,7 @@ public class TaskController {
 
         List<Action> actions = taskCreationDTO.getActions();
 
-        Long id = taskService.createTask(taskCreationDTO.getName(), actions, sha3_256hex);
+        Long id = taskService.createTask(taskCreationDTO.getName(), actions, taskCreationDTO.getDescription(), sha3_256hex);
 
         if (id != null) {
             SimpleChecksumResponseDto checksumResponseDto = new SimpleChecksumResponseDto();
@@ -121,13 +133,13 @@ public class TaskController {
     }
 
     @GetMapping("/task")
-    public ResponseEntity<List<TaskResponseDTO>> getTasks() {
+    public ResponseEntity<List<TaskResponseSingleDTO>> getTasks() {
         List<Task> tasks = taskService.getAllTasks();
-        List<TaskResponseDTO> taskResponseDTOList = new ArrayList<>();
+        List<TaskResponseSingleDTO> taskResponseDTOList = new ArrayList<>();
 
         for (Task task : tasks) {
-            TaskResponseDTO taskDto = new TaskResponseDTO();
-            taskDto.setId(task.getId());
+            TaskResponseSingleDTO taskDto = new TaskResponseSingleDTO();
+            taskDto.setChecksum(task.getChecksum());
             taskDto.setName(task.getName());
             taskDto.setCreated(task.getCreated());
 
@@ -137,13 +149,33 @@ public class TaskController {
         return new ResponseEntity<>(taskResponseDTOList, HttpStatus.OK);
     }
 
+    @GetMapping("/task/detail")
+    public ResponseEntity<List<TaskResponseSingleDTO>> getDetailedTasks() {
+        List<Task> tasks = taskService.getAllTasks();
+        List<TaskResponseSingleDTO> taskResponseDTOList = new ArrayList<>();
+
+        for (Task task : tasks) {
+            TaskResponseSingleDTO taskDto = new TaskResponseSingleDTO();
+            taskDto.setChecksum(task.getChecksum());
+            taskDto.setName(task.getName());
+            taskDto.setCreated(task.getCreated());
+            taskDto.setActions(task.getActionList());
+
+            taskResponseDTOList.add(taskDto);
+        }
+
+        return new ResponseEntity<>(taskResponseDTOList, HttpStatus.OK);
+    }
+
     @GetMapping("/task/{id}")
-    public ResponseEntity<TaskResponseDTO> getTask(@PathVariable("id") long id) {
+    public ResponseEntity<TaskResponseSingleDTO> getTask(@PathVariable("id") long id) {
         Task task = taskService.getTask(id);
         if (task != null) {
-            TaskResponseDTO taskDto = new TaskResponseDTO();
+            TaskResponseSingleDTO taskDto = new TaskResponseSingleDTO();
             taskDto.setName(task.getName());
+            taskDto.setDescription(task.getDescription());
             taskDto.setActions(task.getActionList());
+            taskDto.setChecksum(task.getChecksum());
 
             return new ResponseEntity<>(taskDto, HttpStatus.OK);
         }
@@ -185,4 +217,15 @@ public class TaskController {
         return new ResponseEntity<>(executionListDTO, HttpStatus.OK);
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<SimpleMessageResponseDTO> login(@RequestBody LoginParameters loginParameters) {
+
+        boolean loggedIn = taskService.loginUser(loginParameters.getUsername(), loginParameters.getPassword());
+
+        if (!loggedIn) {
+            return new ResponseEntity<>(new SimpleMessageResponseDTO("Could not login. Check your credentials."), HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(new SimpleMessageResponseDTO("Successfully logged in"), HttpStatus.OK);
+    }
 }

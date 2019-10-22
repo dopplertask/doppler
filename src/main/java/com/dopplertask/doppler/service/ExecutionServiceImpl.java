@@ -157,7 +157,7 @@ public class ExecutionServiceImpl implements ExecutionService {
                     String sha256 = bytesToHex(encodedhash);
 
                     //TODO: check that there is no other checksum with the same value in the DB
-                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getActions(), sha256);
+                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), sha256);
 
                     return taskDao.findById(onlineTaskId);
                 }
@@ -216,7 +216,7 @@ public class ExecutionServiceImpl implements ExecutionService {
                 // Check current database for existing task with checksum.
                 Optional<Task> existingTask = taskDao.findFirstByChecksumStartingWith(sha256);
                 if (!existingTask.isPresent()) {
-                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getActions(), sha256, false);
+                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), sha256, false);
                     return taskDao.findById(onlineTaskId);
                 } else {
                     return existingTask;
@@ -262,7 +262,7 @@ public class ExecutionServiceImpl implements ExecutionService {
                     byte[] encodedhash = digest.digest(response.body().getBytes(StandardCharsets.UTF_8));
                     String sha256 = bytesToHex(encodedhash);
 
-                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getActions(), sha256);
+                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), sha256);
 
                     return taskDao.findById(onlineTaskId);
                 }

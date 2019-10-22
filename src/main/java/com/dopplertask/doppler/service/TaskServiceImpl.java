@@ -6,7 +6,10 @@ import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.domain.action.LinkedTaskAction;
+import com.dopplertask.doppler.dto.TaskCreationDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +18,16 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.Duration;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +36,8 @@ import java.util.Optional;
 public class TaskServiceImpl implements TaskService {
 
     private static final Logger LOG = LoggerFactory.getLogger(TaskServiceImpl.class);
+    private static final String DOPPLERTASK_WORKFLOW_UPLOAD = "https://www.dopplertask.com/submitworkflow.php";
+    private static final String DOPPLERTASK_LOGIN = "https://www.dopplertask.com/logincheck.php";
 
     @Autowired
     private JmsTemplate jmsTemplate;
@@ -73,19 +88,22 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public List<Task> getAllTasks() {
-        return taskDao.findAll();
+        List<Task> tasks = taskDao.findAll();
+        tasks.forEach(task -> Hibernate.initialize(task.getActionList()));
+        return tasks;
     }
 
     @Override
     @Transactional
-    public Long createTask(String name, List<Action> actions, String checksum) {
-        return createTask(name, actions, checksum, true);
+    public Long createTask(String name, List<Action> actions, String description, String checksum) {
+        return createTask(name, actions, description, checksum, true);
     }
 
     @Override
     @Transactional
-    public Long createTask(String name, List<Action> actions, String checksum, boolean buildTask) {
+    public Long createTask(String name, List<Action> actions, String description, String checksum, boolean buildTask) {
 
         if (name.contains(" ")) {
             throw new WhiteSpaceInNameException("Could not create task. Task name contains whitespace.");
@@ -122,7 +140,9 @@ public class TaskServiceImpl implements TaskService {
         task.setActionList(actions);
         task.setCreated(new Date());
         task.setChecksum(checksum);
+        task.setDescription(description);
 
+        // Save the new task
         taskDao.save(task);
 
         return task.getId();
@@ -134,9 +154,88 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public Task getTask(long id) {
-        Optional<Task> task = taskDao.findById(id);
-        return task.isPresent() ? task.get() : null;
+        Optional<Task> taskOptional = taskDao.findById(id);
+        if (taskOptional.isPresent()) {
+            Task task = taskOptional.get();
+            Hibernate.initialize(task.getActionList());
+            return task;
+        }
+        return null;
+    }
+
+    @Override
+    @Transactional
+    public boolean loginUser(String username, String password) {
+        try {
+
+            String base64credentials = Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
+            HttpRequest.Builder builder = HttpRequest.newBuilder()
+                    .uri(URI.create(DOPPLERTASK_LOGIN))
+                    .timeout(Duration.ofMinutes(1)).setHeader("Authorization", "Basic " + base64credentials);
+            builder = builder.GET();
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = builder.build();
+            // Get JSON from Hub
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200 && response.body().equals("{\"message\": \"Logged in\"}")) {
+                // Update the credentials file
+                PrintWriter writer = new PrintWriter(System.getProperty("user.home") + "/.dopplercreds", "UTF-8");
+                writer.print(base64credentials);
+                writer.close();
+
+                return true;
+            }
+
+        } catch (IOException | InterruptedException e) {
+            return false;
+        }
+
+        return false;
+    }
+
+    @Override
+    @Transactional
+    public boolean pushTask(String taskName) {
+        Optional<Task> taskOptional = taskDao.findFirstByNameOrderByCreatedDesc(taskName);
+        if (taskOptional.isPresent()) {
+            Task task = taskOptional.get();
+
+            TaskCreationDTO dto = new TaskCreationDTO(task.getName(), task.getActionList(), task.getDescription());
+
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                String compactJSON = mapper.writeValueAsString(dto);
+
+                // Read credentials
+                String credentials = Files.readString(Paths.get(System.getProperty("user.home") + "/.dopplercreds")).replace("\n", "");
+
+                HttpRequest.Builder builder = HttpRequest.newBuilder()
+                        .uri(URI.create(DOPPLERTASK_WORKFLOW_UPLOAD))
+                        // TODO: Make this authentication based on input from the CLI.
+                        .timeout(Duration.ofMinutes(1)).setHeader("Authorization", "Basic " + credentials);
+                builder = builder.POST(HttpRequest.BodyPublishers.ofString(compactJSON));
+                HttpClient client = HttpClient.newHttpClient();
+                HttpRequest request = builder.build();
+                // Get JSON from Hub
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+                if (response.statusCode() == 200 && response.body().equals("{\"message\": \"Successfully uploaded workflow.\"}")) {
+                    // Successful upload
+                    return true;
+                } else if (response.body().equals("{\"message\": \"Could not authenticate user.\"}")) {
+                    throw new AuthenticationException("Task could not be uploaded. You've provided wrong credentials.");
+                } else if (response.body().equals("{\"message\": \"A workflow with the same checksum exists. Aborting.\"}")) {
+                    throw new TaskAlreadyUploadedException("This task is already uploaded.");
+                }
+
+            } catch (IOException | InterruptedException e) {
+                throw new UploadNotSuccessfulException("Task could not be uploaded. Check that you've logged in, or that you have an internet connection.");
+            }
+        }
+        throw new TaskNotFoundException("Task could not be found");
     }
 
     @Override

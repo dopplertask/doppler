@@ -71,6 +71,7 @@ public class TaskControllerTests {
     public void testBuildAndRunShouldReturnOK() throws Exception {
         String createJson = "{\n" +
                 "    \"name\":\"accept-alert\",\n" +
+                "\"description\":\"Testing\"," +
                 "    \"actions\":[\n" +
                 "        {\n" +
                 "            \"@type\":\"PrintAction\",\n" +
@@ -93,6 +94,7 @@ public class TaskControllerTests {
     public void testBuildAndRunWithParametersShouldReturnOK() throws Exception {
         String createJson = "{\n" +
                 "    \"name\":\"example-task-2\",\n" +
+                "\"description\":\"Testing\"," +
                 "    \"actions\":[\n" +
                 "        {\n" +
                 "            \"@type\":\"PrintAction\",\n" +
@@ -134,6 +136,7 @@ public class TaskControllerTests {
 
         String createJson = "{\n" +
                 "    \"name\":\"example-task-3\",\n" +
+                "\"description\":\"Testing\"," +
                 "    \"actions\":[\n" +
                 "        {\n" +
                 "            \"@type\":\"BrowseWebAction\",\n" +

@@ -1,6 +1,6 @@
 package com.dopplertask.doppler.controller;
 
-import com.dopplertask.doppler.dto.TaskResponseDTO;
+import com.dopplertask.doppler.dto.TaskResponseSingleDTO;
 import com.dopplertask.doppler.service.ExecutionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +17,9 @@ public class ExecutionController {
     private ExecutionService executionService;
 
     @DeleteMapping("/execution/{id}")
-    public ResponseEntity<TaskResponseDTO> deleteExecution(@PathVariable("id") long id) {
+    public ResponseEntity<TaskResponseSingleDTO> deleteExecution(@PathVariable("id") long id) {
         executionService.deleteExecution(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
 }
