@@ -48,4 +48,12 @@ public class TimedWait extends Action {
 
         return actionResult;
     }
+
+    public Long getSeconds() {
+        return seconds;
+    }
+
+    public void setSeconds(Long seconds) {
+        this.seconds = seconds;
+    }
 }

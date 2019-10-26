@@ -52,7 +52,6 @@ public class TaskServiceImpl implements TaskService {
     private ExecutionService executionService;
 
     @Override
-    @Transactional
     public TaskExecution delegate(TaskRequest request) {
         LOG.info("Delegating action");
 
