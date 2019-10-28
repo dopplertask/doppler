@@ -59,11 +59,11 @@ public class BrowseWebAction extends Action {
         String os = System.getProperty("os.name");
 
         if (os.contains("Windows")) {
-            System.setProperty(CHROME_DRIVER, "chromedriver.exe");
+            System.setProperty(CHROME_DRIVER, "bin/chromedriver.exe");
         } else if (os.contains("Mac")) {
-            System.setProperty(CHROME_DRIVER, "chromedriver-mac");
+            System.setProperty(CHROME_DRIVER, "bin/chromedriver-mac");
         } else {
-            System.setProperty(CHROME_DRIVER, "chromedriver");
+            System.setProperty(CHROME_DRIVER, "bin/chromedriver");
         }
 
         ChromeOptions chromeOptions = new ChromeOptions();
