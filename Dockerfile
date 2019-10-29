@@ -12,7 +12,7 @@ RUN jlink \
 
 ADD . /root
 
-RUN cd ~ && ./gradlew clean build -x test && chmod +x /root/start.sh
+RUN cd ~/backend && ./gradlew build -x test && chmod +x /root/start.sh && chmod +x /root/setup.sh
 
 # Second image
 FROM alpine:3.9
@@ -22,12 +22,13 @@ MAINTAINER Feras Wilson, http://www.dopplertask.com
 ENV JAVA_HOME=/opt/jdk-11-mini-runtime
 ENV PATH="$PATH:$JAVA_HOME/bin"
 
+RUN cd ~ && ./setup.sh
+
 COPY --from=jlink-package /opt/jdk-11-mini-runtime /opt/jdk-11-mini-runtime
-COPY --from=jlink-package /root/build/libs/doppler-0.1.0.jar /opt/spring-boot/
+COPY --from=jlink-package /root/backend/build/libs/doppler-0.2.0.jar /opt/spring-boot/
 COPY --from=jlink-package /root/start.sh /opt/spring-boot/
 
 EXPOSE 8090
 EXPOSE 61617
 WORKDIR  /opt/spring-boot/
-ENTRYPOINT ["./start.sh"]
-
+CMD ["/opt/spring-boot/start.sh"]
