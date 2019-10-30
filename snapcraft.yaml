@@ -28,7 +28,7 @@ parts:
 
 apps:
   doppler-api:
-    command: java -jar $SNAP/backend/jar/doppler-0.3.1.jar
+    command: java -jar $SNAP/jar/doppler-0.3.1.jar
     daemon: simple
     plugs:
       - network-bind
