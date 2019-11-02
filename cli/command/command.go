@@ -58,6 +58,12 @@ type renameTaskOptions struct {
 	targetTaskName string
 }
 
+type loginOptions struct {
+	*commonOptions
+	username string
+	password string
+}
+
 // NewCommand creates a root command with `run, build`
 func NewCommand() (rootCmd *cobra.Command) {
 
@@ -77,7 +83,8 @@ func NewCommand() (rootCmd *cobra.Command) {
 		defineTasksCmd(&opts),
 		defineDeleteTaskCmd(&opts),
 		defineDeleteExecutionCmd(&opts),
-		defineRenameTaskCmd(&opts))
+		defineRenameTaskCmd(&opts),
+		defineLoginCmd(&opts))
 
 	return
 }
@@ -348,6 +355,33 @@ func defineRenameTaskCmd(copts *commonOptions) *cobra.Command {
 				fmt.Println("Rename task failed, error: ", err)
 			} else {
 				fmt.Println("Rename task success: ", resp.TaskName, resp.TaskID, resp.Checksum, resp.Actions)
+
+			}
+		},
+	}
+
+	return cmd
+}
+
+func defineLoginCmd(copts *commonOptions) *cobra.Command {
+
+	var opts loginOptions
+
+	cmd := &cobra.Command{
+		Use:   "login [username] [password]",
+		Short: "login",
+		Long:  `login with username and password`,
+		Args:  cobra.ExactArgs(2),
+		Run: func(cmd *cobra.Command, args []string) {
+			opts.commonOptions = copts
+			opts.username = args[0]
+			opts.password = args[1]
+
+			resp, err := login(&opts)
+			if err != nil {
+				fmt.Println("Login failed, error: ", err)
+			} else {
+				fmt.Println("Login success: ", resp.Message)
 
 			}
 		},

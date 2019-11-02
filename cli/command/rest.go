@@ -290,3 +290,32 @@ func renameTask(renameTaskOpts *renameTaskOptions) (resp *taskResponse, err erro
 
 	return
 }
+
+// Request Example
+// http://localhost:8090/login POST
+// Body: {"username" : "xxx", "password" : "xxx"}
+func login(loginOpts *loginOptions) (resp *simpleMessageResponse, err error) {
+
+	url := loginOpts.commonOptions.dopplerURL + "/login"
+
+	postBody := map[string]interface{}{
+		"username": loginOpts.username,
+		"password": loginOpts.password,
+	}
+	response, err := resty.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(postBody).
+		SetContentLength(true).
+		SetResult(&simpleMessageResponse{}).
+		SetError(&errorResponse{}).
+		Post(url)
+
+	if response.IsError() {
+		err = errors.New(response.Error().(*errorResponse).Message)
+		return
+	}
+
+	resp = response.Result().(*simpleMessageResponse)
+
+	return
+}
