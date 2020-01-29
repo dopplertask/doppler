@@ -109,7 +109,7 @@ func defineRunCmd(copts *commonOptions) *cobra.Command {
 			} else {
 				if opts.scheduledTask != true {
 					subOpts := &subscribeOptions{
-						uri:         "localhost:61617",
+						uri:         "localhost:61613",
 						queueName:   "/queue/taskexecution_destination",
 						executionID: resp.ID,
 					}

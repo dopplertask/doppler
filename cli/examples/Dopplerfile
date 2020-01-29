@@ -1,0 +1,26 @@
+{
+  "name": "TestTask",
+  "description": "Testing",
+  "actions": [
+    {
+      "@type": "PrintAction",
+      "message": "This is an example task."
+    },
+    {
+      "@type": "TimedWait",
+      "seconds": "7"
+    },
+    {
+      "@type": "PrintAction",
+      "message": "Printing after timed wait"
+    },
+    {
+      "@type": "TimedWait",
+      "seconds": "2"
+    },
+    {
+      "@type": "PrintAction",
+      "message": "Thanks for using this test task"
+    }
+  ]
+}

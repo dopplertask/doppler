@@ -30,7 +30,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.*;
 
 @Service
 public class ExecutionServiceImpl implements ExecutionService {
@@ -39,17 +42,20 @@ public class ExecutionServiceImpl implements ExecutionService {
     private static final Logger LOG = LoggerFactory.getLogger(ExecutionServiceImpl.class);
     private static final String DOPPLERTASK_WORKFLOW_DOWNLOAD = "https://www.dopplertask.com/getworkflow.php";
 
-    @Autowired
     private JmsTemplate jmsTemplate;
-
-    @Autowired
     private TaskDao taskDao;
-
-    @Autowired
     private VariableExtractorUtil variableExtractorUtil;
+    private TaskExecutionDao taskExecutionDao;
+    private Executor executor;
 
     @Autowired
-    private TaskExecutionDao taskExecutionDao;
+    public ExecutionServiceImpl(JmsTemplate jmsTemplate, TaskDao taskDao, VariableExtractorUtil variableExtractorUtil, TaskExecutionDao taskExecutionDao) {
+        this.jmsTemplate = jmsTemplate;
+        this.taskDao = taskDao;
+        this.variableExtractorUtil = variableExtractorUtil;
+        this.taskExecutionDao = taskExecutionDao;
+        this.executor = Executors.newSingleThreadExecutor();
+    }
 
     private static String bytesToHex(byte[] hash) {
         StringBuilder hexString = new StringBuilder();
@@ -330,6 +336,8 @@ public class ExecutionServiceImpl implements ExecutionService {
 
                 // Add log to the execution
                 execution.addLog(log);
+
+                // Send message to MQ
                 broadcastResults(log);
             }
 
@@ -357,11 +365,11 @@ public class ExecutionServiceImpl implements ExecutionService {
     private void broadcastResults(TaskExecutionLog taskExecutionLog, boolean lastMessage) {
         BroadcastResult result = new BroadcastResult(taskExecutionLog.getOutput(), taskExecutionLog.getOutputType());
 
-        jmsTemplate.convertAndSend("taskexecution_destination", result, message -> {
+        executor.execute(() -> jmsTemplate.convertAndSend("taskexecution_destination", result, message -> {
             message.setLongProperty("executionId", taskExecutionLog.getTaskExecution().getId());
             message.setBooleanProperty("lastMessage", lastMessage);
             return message;
-        });
+        }));
     }
 
 }

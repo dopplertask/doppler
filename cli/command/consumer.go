@@ -52,13 +52,15 @@ func consumeData(opts *subscribeOptions) (err error) {
 			fmt.Println(result.Output)
 		}
 
-		if msg.Header.Get("lastMessage") == "true" {
-			break
-		}
 
 		err = conn.Ack(msg)
 		if err != nil {
 			return
+		}
+
+		// Exit the loop if it is the last message
+		if msg.Header.Get("lastMessage") == "true" {
+			break
 		}
 	}
 
