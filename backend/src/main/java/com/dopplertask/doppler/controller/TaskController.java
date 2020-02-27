@@ -3,7 +3,6 @@ package com.dopplertask.doppler.controller;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.TaskExecutionLog;
-import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.dto.LoginParameters;
 import com.dopplertask.doppler.dto.SimpleChecksumResponseDto;
 import com.dopplertask.doppler.dto.SimpleIdResponseDto;
@@ -19,7 +18,6 @@ import com.dopplertask.doppler.service.ExecutionService;
 import com.dopplertask.doppler.service.TaskRequest;
 import com.dopplertask.doppler.service.TaskService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,11 +40,13 @@ import java.util.Optional;
 @RestController
 public class TaskController {
 
-    @Autowired
-    private TaskService taskService;
+    private final TaskService taskService;
+    private final ExecutionService executionService;
 
-    @Autowired
-    private ExecutionService executionService;
+    public TaskController(@Autowired TaskService taskService, @Autowired ExecutionService executionService) {
+        this.taskService = taskService;
+        this.executionService = executionService;
+    }
 
     private static String bytesToHex(byte[] hash) {
         StringBuffer hexString = new StringBuffer();
@@ -120,9 +120,7 @@ public class TaskController {
         byte[] encodedhash = digest.digest(compactJSON.getBytes(StandardCharsets.UTF_8));
         String sha3_256hex = bytesToHex(encodedhash);
 
-        List<Action> actions = taskCreationDTO.getActions();
-
-        Long id = taskService.createTask(taskCreationDTO.getName(), actions, taskCreationDTO.getDescription(), sha3_256hex);
+        Long id = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), sha3_256hex);
 
         if (id != null) {
             SimpleChecksumResponseDto checksumResponseDto = new SimpleChecksumResponseDto();

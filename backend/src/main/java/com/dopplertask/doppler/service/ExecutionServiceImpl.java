@@ -8,11 +8,11 @@ import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.TaskExecutionLog;
 import com.dopplertask.doppler.domain.TaskExecutionStatus;
+import com.dopplertask.doppler.domain.TaskParameter;
 import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.dto.TaskCreationDTO;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +29,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 @Service
 public class ExecutionServiceImpl implements ExecutionService {
@@ -85,10 +87,12 @@ public class ExecutionServiceImpl implements ExecutionService {
             taskRequest = findOrDownloadByName(taskExecutionRequest.getTaskName(), taskService);
         }
 
+
         Optional<TaskExecution> executionReq = taskExecutionDao.findById(taskExecutionRequest.getExecutionId());
         if (taskRequest.isPresent() && executionReq.isPresent()) {
             Task task = taskRequest.get();
             TaskExecution execution = executionReq.get();
+
 
             // Assign task to execution
             execution.setTask(task);
@@ -97,6 +101,29 @@ public class ExecutionServiceImpl implements ExecutionService {
             execution.getParameters().putAll(taskExecutionRequest.getParameters());
 
             execution.setStartdate(new Date());
+
+            // Check that all required parameters are present
+            List<String> missingParameters = new ArrayList<>();
+            for (TaskParameter taskParameter : task.getTaskParameterList()) {
+                if (taskParameter.isRequired() && taskExecutionRequest.getParameters().get(taskParameter.getName()) == null) {
+                    missingParameters.add(taskParameter.getName());
+                }
+            }
+
+            if (!missingParameters.isEmpty()) {
+                execution.setStatus(TaskExecutionStatus.FAILED);
+
+                TaskExecutionLog executionFailed = new TaskExecutionLog();
+                executionFailed.setTaskExecution(execution);
+                executionFailed.setOutput("Task execution failed, missing parameters: " + Arrays.toString(missingParameters.toArray()) + " [taskId=" + task.getId() + ", executionId=" + execution.getId() + "]");
+                execution.addLog(executionFailed);
+                execution.setSuccess(false);
+                LOG.info("Task execution failed, missing parameters: {} [taskId={}, executionId={}]", Arrays.toString(missingParameters.toArray()), task.getId(), execution.getId());
+                broadcastResults(executionFailed, true);
+
+                return execution;
+            }
+
             execution.setStatus(TaskExecutionStatus.STARTED);
 
             TaskExecutionLog executionStarted = new TaskExecutionLog();
@@ -163,7 +190,7 @@ public class ExecutionServiceImpl implements ExecutionService {
                     String sha256 = bytesToHex(encodedhash);
 
                     //TODO: check that there is no other checksum with the same value in the DB
-                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), sha256);
+                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), sha256);
 
                     return taskDao.findById(onlineTaskId);
                 }
@@ -222,7 +249,7 @@ public class ExecutionServiceImpl implements ExecutionService {
                 // Check current database for existing task with checksum.
                 Optional<Task> existingTask = taskDao.findFirstByChecksumStartingWith(sha256);
                 if (!existingTask.isPresent()) {
-                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), sha256, false);
+                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), sha256, false);
                     return taskDao.findById(onlineTaskId);
                 } else {
                     return existingTask;
@@ -268,7 +295,7 @@ public class ExecutionServiceImpl implements ExecutionService {
                     byte[] encodedhash = digest.digest(response.body().getBytes(StandardCharsets.UTF_8));
                     String sha256 = bytesToHex(encodedhash);
 
-                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), sha256);
+                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), sha256);
 
                     return taskDao.findById(onlineTaskId);
                 }

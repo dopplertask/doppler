@@ -5,6 +5,7 @@ import com.dopplertask.doppler.dao.TaskExecutionDao;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.TaskExecutionLog;
+import com.dopplertask.doppler.domain.TaskExecutionStatus;
 import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.domain.action.PrintAction;
 import com.dopplertask.doppler.service.ExecutionService;
@@ -71,6 +72,7 @@ public class TaskServiceTest {
             TaskExecution taskExecutionRet = new TaskExecution();
             taskExecutionRet.setTask(task);
             taskExecutionRet.setId(taskExecution.getId());
+            taskExecutionRet.setStatus(TaskExecutionStatus.STARTED);
             taskExecutionRet.addLog(new TaskExecutionLog());
 
             return taskExecutionRet;
@@ -132,6 +134,7 @@ public class TaskServiceTest {
             TaskExecution taskExecutionRet = new TaskExecution();
             taskExecutionRet.setTask(task);
             taskExecutionRet.setId(taskExecution.getId());
+            taskExecutionRet.setStatus(TaskExecutionStatus.STARTED);
             taskExecutionRet.addLog(new TaskExecutionLog());
 
             return taskExecutionRet;

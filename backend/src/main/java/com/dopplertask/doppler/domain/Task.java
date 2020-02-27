@@ -36,6 +36,9 @@ public class Task {
     private String description;
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
+    private List<TaskParameter> taskParameterList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
     @OrderBy("orderPosition ASC")
     private List<Action> actionList = new ArrayList<>();
 
@@ -105,5 +108,13 @@ public class Task {
 
     public void setExecutions(List<TaskExecution> executions) {
         this.executions = executions;
+    }
+
+    public List<TaskParameter> getTaskParameterList() {
+        return taskParameterList;
+    }
+
+    public void setTaskParameterList(List<TaskParameter> taskParameterList) {
+        this.taskParameterList = taskParameterList;
     }
 }

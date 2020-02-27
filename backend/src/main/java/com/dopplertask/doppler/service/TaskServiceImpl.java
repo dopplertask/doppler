@@ -4,6 +4,8 @@ import com.dopplertask.doppler.dao.TaskDao;
 import com.dopplertask.doppler.dao.TaskExecutionDao;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
+import com.dopplertask.doppler.domain.TaskExecutionStatus;
+import com.dopplertask.doppler.domain.TaskParameter;
 import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.domain.action.LinkedTaskAction;
 import com.dopplertask.doppler.dto.TaskCreationDTO;
@@ -80,8 +82,13 @@ public class TaskServiceImpl implements TaskService {
     public TaskExecution runRequest(TaskExecutionRequest taskExecutionRequest) {
         TaskExecution execution = executionService.startExecution(taskExecutionRequest, this);
 
-        if (execution != null) {
-            return executionService.processActions(execution.getTask().getId(), execution.getId(), this);
+        if(execution != null) {
+            if(execution.getStatus() == TaskExecutionStatus.FAILED) {
+                return execution;
+            }
+            else {
+                return executionService.processActions(execution.getTask().getId(), execution.getId(), this);
+            }
         }
         return null;
     }
@@ -96,13 +103,13 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    public Long createTask(String name, List<Action> actions, String description, String checksum) {
-        return createTask(name, actions, description, checksum, true);
+    public Long createTask(String name, List<TaskParameter> taskParameters, List<Action> actions, String description, String checksum) {
+        return createTask(name, taskParameters, actions, description, checksum, true);
     }
 
     @Override
     @Transactional
-    public Long createTask(String name, List<Action> actions, String description, String checksum, boolean buildTask) {
+    public Long createTask(String name, List<TaskParameter> taskParameters, List<Action> actions, String description, String checksum, boolean buildTask) {
 
         if (name.contains(" ")) {
             throw new WhiteSpaceInNameException("Could not create task. Task name contains whitespace.");
@@ -136,6 +143,10 @@ public class TaskServiceImpl implements TaskService {
             }
         });
 
+        if(taskParameters != null) {
+            taskParameters.forEach(taskParameter -> taskParameter.setTask(task));
+            task.setTaskParameterList(taskParameters);
+        }
         task.setActionList(actions);
         task.setCreated(new Date());
         task.setChecksum(checksum);
@@ -202,7 +213,7 @@ public class TaskServiceImpl implements TaskService {
         if (taskOptional.isPresent()) {
             Task task = taskOptional.get();
 
-            TaskCreationDTO dto = new TaskCreationDTO(task.getName(), task.getActionList(), task.getDescription());
+            TaskCreationDTO dto = new TaskCreationDTO(task.getName(), task.getTaskParameterList(), task.getActionList(), task.getDescription());
 
             ObjectMapper mapper = new ObjectMapper();
             try {
