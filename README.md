@@ -141,6 +141,11 @@ Executes a command on the current machine.
 ##### Variables
 * command: Command to execute.
 
+#### ScriptAction
+Run Javascript or Velocity script
+##### Variables
+* type: JAVASCRIPT or VELOCITY
+* script: Code to execute
 
 ### Retry
 All actions have retry mechanisms to allow you to retry an action.

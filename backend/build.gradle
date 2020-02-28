@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.5.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.2.5.RELEASE")
     }
 }
 
@@ -26,41 +26,41 @@ sourceCompatibility = 11.0
 targetCompatibility = 11.0
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web:2.1.8.RELEASE")
-    compile("org.springframework.boot:spring-boot-starter-data-jpa:2.1.8.RELEASE")
+    compile("org.springframework.boot:spring-boot-starter-web:2.2.5.RELEASE")
+    compile("org.springframework.boot:spring-boot-starter-data-jpa:2.2.5.RELEASE")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-activemq
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-activemq', version: '2.1.8.RELEASE'
-    compile("org.apache.activemq:activemq-stomp:5.15.10")
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-activemq', version: '2.2.5.RELEASE'
+    compile("org.apache.activemq:activemq-stomp:5.15.11")
 
     // https://mvnrepository.com/artifact/org.apache.velocity.tools/velocity-tools-generic
     compile group: 'org.apache.velocity.tools', name: 'velocity-tools-generic', version: '3.0'
 
     // https://mvnrepository.com/artifact/org.apache.activemq/activemq-broker
-    compile group: 'org.apache.activemq', name: 'activemq-broker', version: '5.15.8'
+    compile group: 'org.apache.activemq', name: 'activemq-broker', version: '5.15.11'
 
     // https://mvnrepository.com/artifact/mysql/mysql-connector-java
     compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.15'
 // https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
     compile group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.4.0-b180830.0438'
     // https://mvnrepository.com/artifact/org.javassist/javassist
-    compile group: 'org.javassist', name: 'javassist', version: '3.24.1-GA'
+    compile group: 'org.javassist', name: 'javassist', version: '3.26.0-GA'
 
     compile group: 'com.jcraft', name: 'jsch', version: '0.1.55'
 
 // https://mvnrepository.com/artifact/com.h2database/h2
     runtime group: 'com.h2database', name: 'h2', version: '1.4.199'
 
-    compile group: 'org.mockito', name: 'mockito-core', version: '2.22.0'
+    compile group: 'org.mockito', name: 'mockito-core', version: '3.3.0'
 
     // https://mvnrepository.com/artifact/org.jbehave/jbehave-core
-    compile group: 'org.jbehave', name: 'jbehave-core', version: '4.5.1'
+    compile group: 'org.jbehave', name: 'jbehave-core', version: '4.6.1'
 // https://mvnrepository.com/artifact/org.jbehave.web/jbehave-web-selenium
     // https://mvnrepository.com/artifact/org.jbehave.web/jbehave-web-selenium
     compile group: 'org.jbehave.web', name: 'jbehave-web-selenium', version: '4.0-beta-1'
 // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
     compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.141.59'
 
-    testCompile('org.springframework.boot:spring-boot-starter-test:2.1.8.RELEASE')
+    testCompile('org.springframework.boot:spring-boot-starter-test:2.2.5.RELEASE')
     testCompile('com.jayway.jsonpath:json-path:2.4.0')
 }
 

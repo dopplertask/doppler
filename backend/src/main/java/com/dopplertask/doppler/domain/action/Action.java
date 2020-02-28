@@ -41,7 +41,8 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
         @JsonSubTypes.Type(value = SSHAction.class, name = "SSHAction"),
         @JsonSubTypes.Type(value = TimedWait.class, name = "TimedWait"),
         @JsonSubTypes.Type(value = ExecuteCommandAction.class, name = "ExecuteCommandAction"),
-        @JsonSubTypes.Type(value = SetVariableAction.class, name = "SetVariableAction")
+        @JsonSubTypes.Type(value = SetVariableAction.class, name = "SetVariableAction"),
+        @JsonSubTypes.Type(value = ScriptAction.class, name = "ScriptAction")
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Action {
@@ -89,8 +90,8 @@ public class Action {
     /**
      * Executes an action.
      *
-     * @param taskService which handles task execution.
-     * @param execution   of the current task.
+     * @param taskService           which handles task execution.
+     * @param execution             of the current task.
      * @param variableExtractorUtil utility to evaluate velocity code.
      * @return an action result which represents the outcome of the executed action.
      */
