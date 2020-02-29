@@ -63,7 +63,7 @@ Example of the call:
 To require certain parameters to be provided the following can be added:
 ```
 "parameters": [
-    {"name": "testVar", "decription": "This is just a test var", "required": true, "defaultValue": "testasdasdasas"}
+    {"name": "testVar", "description": "This is just a test var", "required": true, "defaultValue": "testasdasdasas"}
   ],
 ```
 
