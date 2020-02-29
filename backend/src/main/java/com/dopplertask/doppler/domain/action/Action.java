@@ -16,6 +16,7 @@ import com.dopplertask.doppler.domain.action.connection.SSHAction;
 import com.dopplertask.doppler.domain.action.connection.SecureCopyAction;
 import com.dopplertask.doppler.domain.action.io.ReadFileAction;
 import com.dopplertask.doppler.domain.action.ui.BrowseWebAction;
+import com.dopplertask.doppler.domain.action.ui.MouseAction;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -56,7 +57,8 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
         @JsonSubTypes.Type(value = ExecuteCommandAction.class, name = "ExecuteCommandAction"),
         @JsonSubTypes.Type(value = SetVariableAction.class, name = "SetVariableAction"),
         @JsonSubTypes.Type(value = ScriptAction.class, name = "ScriptAction"),
-        @JsonSubTypes.Type(value = IfAction.class, name = "IfAction")
+        @JsonSubTypes.Type(value = IfAction.class, name = "IfAction"),
+        @JsonSubTypes.Type(value = MouseAction.class, name = "MouseAction")
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Action {

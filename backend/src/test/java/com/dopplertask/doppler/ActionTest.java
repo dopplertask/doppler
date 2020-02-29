@@ -3,6 +3,8 @@ package com.dopplertask.doppler;
 import com.dopplertask.doppler.domain.ActionResult;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.action.common.IfAction;
+import com.dopplertask.doppler.domain.action.ui.MouseAction;
+import com.dopplertask.doppler.domain.action.ui.MouseActionType;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 import org.apache.velocity.app.VelocityEngine;
 import org.junit.Assert;
@@ -49,5 +51,7 @@ public class ActionTest {
         Assert.assertEquals("If evaluated to false. Next actions path: falsePath", actionResult.getOutput());
         Assert.assertEquals("falsePath", taskExecution.getActivePath());
     }
+
+
 
 }

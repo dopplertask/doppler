@@ -149,6 +149,14 @@ A UI Action contains the following fields:
 
 * value: Required only if used with the actions WRITE, SELECT and WAIT.
 
+#### MouseAction
+Provides the following actions: click, move, press and release the mouse button.
+##### Variables
+* action: CLICK, MOVE, PRESS and RELEASE
+* positionX: X position of the mouse. (MOVE action only)
+* positionY: Y position of the mouse. (MOVE action only)
+* button: (Default LEFT) LEFT, RIGHT
+
 #### ReadFileAction
 Reads a file from disk.
 ##### Variables
