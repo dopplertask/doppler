@@ -1,7 +1,8 @@
-package com.dopplertask.doppler.domain.action;
+package com.dopplertask.doppler.domain.action.common;
 
 import com.dopplertask.doppler.domain.ActionResult;
 import com.dopplertask.doppler.domain.TaskExecution;
+import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 

@@ -1,4 +1,4 @@
-package com.dopplertask.doppler.domain.action;
+package com.dopplertask.doppler.domain.action.ui;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

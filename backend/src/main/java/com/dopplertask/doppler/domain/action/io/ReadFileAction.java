@@ -1,9 +1,10 @@
-package com.dopplertask.doppler.domain.action;
+package com.dopplertask.doppler.domain.action.io;
 
 import com.dopplertask.doppler.domain.ActionResult;
 import com.dopplertask.doppler.domain.OutputType;
 import com.dopplertask.doppler.domain.StatusCode;
 import com.dopplertask.doppler.domain.TaskExecution;
+import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 

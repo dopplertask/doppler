@@ -7,7 +7,7 @@ import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.TaskExecutionLog;
 import com.dopplertask.doppler.domain.TaskExecutionStatus;
 import com.dopplertask.doppler.domain.action.Action;
-import com.dopplertask.doppler.domain.action.PrintAction;
+import com.dopplertask.doppler.domain.action.common.PrintAction;
 import com.dopplertask.doppler.service.ExecutionService;
 import com.dopplertask.doppler.service.TaskExecutionRequest;
 import com.dopplertask.doppler.service.TaskServiceImpl;

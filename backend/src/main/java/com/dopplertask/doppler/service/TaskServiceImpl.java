@@ -7,7 +7,7 @@ import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.TaskExecutionStatus;
 import com.dopplertask.doppler.domain.TaskParameter;
 import com.dopplertask.doppler.domain.action.Action;
-import com.dopplertask.doppler.domain.action.LinkedTaskAction;
+import com.dopplertask.doppler.domain.action.common.LinkedTaskAction;
 import com.dopplertask.doppler.dto.TaskCreationDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

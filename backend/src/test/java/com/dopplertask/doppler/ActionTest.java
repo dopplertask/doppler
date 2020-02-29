@@ -2,7 +2,7 @@ package com.dopplertask.doppler;
 
 import com.dopplertask.doppler.domain.ActionResult;
 import com.dopplertask.doppler.domain.TaskExecution;
-import com.dopplertask.doppler.domain.action.IfAction;
+import com.dopplertask.doppler.domain.action.common.IfAction;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 import org.apache.velocity.app.VelocityEngine;
 import org.junit.Assert;
