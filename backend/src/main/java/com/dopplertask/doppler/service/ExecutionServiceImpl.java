@@ -105,8 +105,11 @@ public class ExecutionServiceImpl implements ExecutionService {
             // Check that all required parameters are present
             List<String> missingParameters = new ArrayList<>();
             for (TaskParameter taskParameter : task.getTaskParameterList()) {
-                if (taskParameter.isRequired() && taskExecutionRequest.getParameters().get(taskParameter.getName()) == null) {
+                if (taskParameter.isRequired() && execution.getParameters().get(taskParameter.getName()) == null) {
                     missingParameters.add(taskParameter.getName());
+                } else if (execution.getParameters().get(taskParameter.getName()) == null && taskParameter.getDefaultValue() != null) {
+                    // Add default value to parameter if it exists
+                    execution.getParameters().put(taskParameter.getName(), taskParameter.getDefaultValue());
                 }
             }
 

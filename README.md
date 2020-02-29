@@ -59,6 +59,13 @@ Example of the call:
 
 ```curl -X POST http://localhost:8090/schedule/task -H "Content-Type: application/json" -d @run_task.json```
 
+### Required parameters
+To require certain parameters to be provided the following can be added:
+```
+"parameters": [
+    {"name": "testVar", "decription": "This is just a test var", "required": true, "defaultValue": "testasdasdasas"}
+  ],
+```
 
 ### Actions
 
