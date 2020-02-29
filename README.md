@@ -180,7 +180,6 @@ To rebuild the docker image:
 ## Authors
 
 * **Feras Wilson** 
-* **Jack Kourie** 
 
 ## License
 
