@@ -13,8 +13,11 @@ Using snap:
 
 Install JDK 11 and gradle.
 
-To run as a project:
+To run the backend:
 ```gradle clean build bootRun```
+
+To compile and run the cli:
+```cd cli && go build . && ./cli tasks```
 
 ## Usage
 
@@ -25,6 +28,7 @@ Below is an example of a Dopplerfile:
 ```
 {
   "name": "Test Task",
+  "description": "Testing with restriction",
   "actions": [
     {
       "@type": "PrintAction",
@@ -57,6 +61,12 @@ Example of the call:
 
 
 ### Actions
+
+#### Common variables for all actions
+* continueOnFailure: (Boolean) true or false. Determines if the execution should continue even if the current action fails.
+* failOn: The current action will fail if this evaluates to anything.s
+* retries: (Integer) Amount of retries.
+
 #### PrintAction
 ##### Variables
 * message: A message to be printed
@@ -94,6 +104,12 @@ Executes a MySQL statement, like a SELECT statement.
 * database
 * timezone
 * command
+
+#### IfAction
+##### Variables
+* condition: Velocity condition. Example: $variable == "sometext".
+* pathTrue: Name of the true path.
+* pathFalse: Name of the false path.
 
 #### TimedWait
 ##### Variables

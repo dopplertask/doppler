@@ -320,6 +320,11 @@ public class ExecutionServiceImpl implements ExecutionService {
             // Start processing task
             for (Action currentAction : task.getActionList()) {
 
+                // Skip actions which dont belong to the current active path.
+                if (execution.getActivePath() != null && !execution.getActivePath().equals(currentAction.getPath())) {
+                    continue;
+                }
+
                 ActionResult actionResult = new ActionResult();
                 int tries = 0;
                 do {

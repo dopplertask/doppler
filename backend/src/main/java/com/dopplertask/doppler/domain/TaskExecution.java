@@ -22,6 +22,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "TaskExecution")
@@ -52,6 +53,11 @@ public class TaskExecution {
 
     @Enumerated(EnumType.STRING)
     private TaskExecutionStatus status = TaskExecutionStatus.CREATED;
+
+    /**
+     * This path is used to determine which actions should be executed.
+     */
+    private String activePath;
 
     private boolean success = true;
 
@@ -125,5 +131,13 @@ public class TaskExecution {
 
     public void setDepth(Integer depth) {
         this.depth = depth;
+    }
+
+    public String getActivePath() {
+        return activePath;
+    }
+
+    public void setActivePath(String activePath) {
+        this.activePath = activePath;
     }
 }

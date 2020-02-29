@@ -42,7 +42,8 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
         @JsonSubTypes.Type(value = TimedWait.class, name = "TimedWait"),
         @JsonSubTypes.Type(value = ExecuteCommandAction.class, name = "ExecuteCommandAction"),
         @JsonSubTypes.Type(value = SetVariableAction.class, name = "SetVariableAction"),
-        @JsonSubTypes.Type(value = ScriptAction.class, name = "ScriptAction")
+        @JsonSubTypes.Type(value = ScriptAction.class, name = "ScriptAction"),
+        @JsonSubTypes.Type(value = IfAction.class, name = "IfAction")
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Action {
@@ -69,6 +70,12 @@ public class Action {
     private String failOn;
 
     private Integer retries = 0;
+
+    /**
+     * This path describes the path for this particular action. This is used in the executionimpl to choose the correct actions.
+     */
+    @Column
+    private String path;
 
 
     public Long getId() {
@@ -129,5 +136,13 @@ public class Action {
 
     public void setFailOn(String failOn) {
         this.failOn = failOn;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }
