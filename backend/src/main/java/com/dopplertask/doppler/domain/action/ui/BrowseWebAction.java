@@ -17,6 +17,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,8 +53,8 @@ public class BrowseWebAction extends Action {
 
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
-        String urlVariable = variableExtractorUtil.extract(url, execution);
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
+        String urlVariable = variableExtractorUtil.extract(url, execution, getScriptLanguage());
 
         ActionResult actionResult = new ActionResult();
 
@@ -80,7 +81,7 @@ public class BrowseWebAction extends Action {
 
         // Go through all actions
         for (UIAction uiAction : actionList) {
-            String uiActionValueVariable = variableExtractorUtil.extract(uiAction.getValue() != null ? uiAction.getValue() : "", execution);
+            String uiActionValueVariable = variableExtractorUtil.extract(uiAction.getValue() != null ? uiAction.getValue() : "", execution, getScriptLanguage());
             if (uiAction.getAction() == UIActionType.WAIT) {
                 try {
                     Thread.sleep(Long.parseLong(uiActionValueVariable));

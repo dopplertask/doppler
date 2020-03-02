@@ -11,6 +11,7 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.io.IOException;
 
 @Entity
 @Table(name = "PrintAction")
@@ -29,8 +30,8 @@ public class PrintAction extends Action {
 
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
-        String messageVariable = variableExtractorUtil.extract(message, execution);
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
+        String messageVariable = variableExtractorUtil.extract(message, execution, getScriptLanguage());
 
         ActionResult actionResult = new ActionResult();
 

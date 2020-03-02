@@ -15,6 +15,7 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.io.IOException;
 
 @Entity
 @Table(name = "SecureCopyAction")
@@ -38,12 +39,12 @@ public class SecureCopyAction extends Action {
     private String destinationFilename;
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
-        String connectionIP = variableExtractorUtil.extract(getHostname(), execution);
-        String localUsername = variableExtractorUtil.extract(getUsername(), execution);
-        String localPassword = variableExtractorUtil.extract(getPassword(), execution);
-        String localSourceFilename = variableExtractorUtil.extract(getSourceFilename(), execution);
-        String localDestinationFilename = variableExtractorUtil.extract(getDestinationFilename(), execution);
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
+        String connectionIP = variableExtractorUtil.extract(getHostname(), execution, getScriptLanguage());
+        String localUsername = variableExtractorUtil.extract(getUsername(), execution, getScriptLanguage());
+        String localPassword = variableExtractorUtil.extract(getPassword(), execution, getScriptLanguage());
+        String localSourceFilename = variableExtractorUtil.extract(getSourceFilename(), execution, getScriptLanguage());
+        String localDestinationFilename = variableExtractorUtil.extract(getDestinationFilename(), execution, getScriptLanguage());
 
         SSHManager instance = new SSHManager(localUsername, localPassword, connectionIP, "");
         String errorMessage = instance.connect();

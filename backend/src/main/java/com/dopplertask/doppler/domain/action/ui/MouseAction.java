@@ -15,6 +15,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import java.awt.*;
 import java.awt.event.InputEvent;
+import java.io.IOException;
 
 @Entity
 @Table(name = "MouseAction")
@@ -31,10 +32,10 @@ public class MouseAction extends Action {
     private String button;
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
-        String localPositionX = variableExtractorUtil.extract(positionX, execution);
-        String localPositionY = variableExtractorUtil.extract(positionY, execution);
-        String localButton = variableExtractorUtil.extract(button, execution);
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
+        String localPositionX = variableExtractorUtil.extract(positionX, execution, getScriptLanguage());
+        String localPositionY = variableExtractorUtil.extract(positionY, execution, getScriptLanguage());
+        String localButton = variableExtractorUtil.extract(button, execution, getScriptLanguage());
 
         System.setProperty("java.awt.headless", "false");
 

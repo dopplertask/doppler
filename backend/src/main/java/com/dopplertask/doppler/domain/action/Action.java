@@ -8,6 +8,7 @@ import com.dopplertask.doppler.domain.action.common.IfAction;
 import com.dopplertask.doppler.domain.action.common.LinkedTaskAction;
 import com.dopplertask.doppler.domain.action.common.PrintAction;
 import com.dopplertask.doppler.domain.action.common.ScriptAction;
+import com.dopplertask.doppler.domain.action.common.ScriptLanguage;
 import com.dopplertask.doppler.domain.action.common.SetVariableAction;
 import com.dopplertask.doppler.domain.action.common.TimedWait;
 import com.dopplertask.doppler.domain.action.connection.HttpAction;
@@ -28,6 +29,8 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -35,6 +38,8 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+
+import java.io.IOException;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
@@ -87,6 +92,13 @@ public class Action {
     private Integer retries = 0;
 
     /**
+     * All action values are evaluated with VELOCITY as standard, but can be changed to other languages.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column
+    private ScriptLanguage scriptLanguage = ScriptLanguage.VELOCITY;
+
+    /**
      * This path describes the path for this particular action. This is used in the executionimpl to choose the correct actions.
      */
     @Column
@@ -117,7 +129,7 @@ public class Action {
      * @param variableExtractorUtil utility to evaluate velocity code.
      * @return an action result which represents the outcome of the executed action.
      */
-    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
         return new ActionResult();
     }
 
@@ -159,5 +171,13 @@ public class Action {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public ScriptLanguage getScriptLanguage() {
+        return scriptLanguage;
+    }
+
+    public void setScriptLanguage(ScriptLanguage scriptLanguage) {
+        this.scriptLanguage = scriptLanguage;
     }
 }

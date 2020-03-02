@@ -8,6 +8,7 @@ import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 import com.mysql.cj.jdbc.MysqlDataSource;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -52,14 +53,14 @@ public class MySQLAction extends Action {
 
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
-        String localHostname = variableExtractorUtil.extract(getHostname(), execution);
-        String localUsername = variableExtractorUtil.extract(getUsername(), execution);
-        String localPassword = variableExtractorUtil.extract(getPassword(), execution);
-        String localPort = variableExtractorUtil.extract(getPort(), execution);
-        String localDatabase = variableExtractorUtil.extract(getDatabase(), execution);
-        String localCommand = variableExtractorUtil.extract(getCommand(), execution);
-        String localTimezone = variableExtractorUtil.extract(getTimezone(), execution);
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
+        String localHostname = variableExtractorUtil.extract(getHostname(), execution, getScriptLanguage());
+        String localUsername = variableExtractorUtil.extract(getUsername(), execution, getScriptLanguage());
+        String localPassword = variableExtractorUtil.extract(getPassword(), execution, getScriptLanguage());
+        String localPort = variableExtractorUtil.extract(getPort(), execution, getScriptLanguage());
+        String localDatabase = variableExtractorUtil.extract(getDatabase(), execution, getScriptLanguage());
+        String localCommand = variableExtractorUtil.extract(getCommand(), execution, getScriptLanguage());
+        String localTimezone = variableExtractorUtil.extract(getTimezone(), execution, getScriptLanguage());
 
         MysqlDataSource dataSource = new MysqlDataSource();
         dataSource.setUser(localUsername);

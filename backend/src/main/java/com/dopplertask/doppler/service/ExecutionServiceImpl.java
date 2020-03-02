@@ -336,7 +336,7 @@ public class ExecutionServiceImpl implements ExecutionService {
 
                         // Handle failOn
                         if (currentAction.getFailOn() != null && !currentAction.getFailOn().isEmpty()) {
-                            String failOn = variableExtractorUtil.extract(currentAction.getFailOn(), execution);
+                            String failOn = variableExtractorUtil.extract(currentAction.getFailOn(), execution, currentAction.getScriptLanguage());
                             if (failOn != null && !failOn.isEmpty()) {
                                 actionResult.setErrorMsg("Failed on: " + failOn);
                                 actionResult.setStatusCode(StatusCode.FAILURE);
