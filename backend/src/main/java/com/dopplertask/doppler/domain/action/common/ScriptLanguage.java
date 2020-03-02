@@ -1,5 +1,8 @@
 package com.dopplertask.doppler.domain.action.common;
 
-public enum ScriptType {
+/**
+ * Defines constants for script languages.
+ */
+public enum ScriptLanguage {
     VELOCITY, JAVASCRIPT
 }

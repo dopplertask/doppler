@@ -36,7 +36,7 @@ public class LinkedTaskAction extends Action {
             taskRequest.setChecksum(checksum);
 
             // Increase depth by one
-            taskRequest.setDepth(execution.getDepth()+1);
+            taskRequest.setDepth(execution.getDepth() + 1);
 
             taskRequest.setParameters(execution.getParameters());
             TaskExecution taskExecution = taskService.runRequest(taskRequest);

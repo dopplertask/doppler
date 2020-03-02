@@ -9,6 +9,7 @@ import com.dopplertask.doppler.service.VariableExtractorUtil;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.io.IOException;
 
 @Entity
 @Table(name = "IfAction")
@@ -25,10 +26,10 @@ public class IfAction extends Action {
     }
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
 
         ActionResult actionResult = new ActionResult();
-        String localCondition = variableExtractorUtil.extract("#if(" + condition + ")\n" + pathTrue + "#else\n" + pathFalse + "#end", execution);
+        String localCondition = variableExtractorUtil.extract("#if(" + condition + ")\n" + pathTrue + "#else\n" + pathFalse + "#end", execution, getScriptLanguage());
 
         if (pathTrue != null && pathTrue.equals(localCondition)) {
             actionResult.setOutput("If evaluated to true. Next actions path: " + localCondition);

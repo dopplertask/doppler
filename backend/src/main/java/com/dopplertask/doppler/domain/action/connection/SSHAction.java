@@ -13,6 +13,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
+import java.io.IOException;
 
 @Entity
 @Table(name = "SSHAction")
@@ -34,11 +35,11 @@ public class SSHAction extends Action {
     private String command;
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
-        String connectionIP = variableExtractorUtil.extract(getHostname(), execution);
-        String userName = variableExtractorUtil.extract(getUsername(), execution);
-        String password = variableExtractorUtil.extract(getPassword(), execution);
-        String command = variableExtractorUtil.extract(getCommand(), execution);
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
+        String connectionIP = variableExtractorUtil.extract(getHostname(), execution, getScriptLanguage());
+        String userName = variableExtractorUtil.extract(getUsername(), execution, getScriptLanguage());
+        String password = variableExtractorUtil.extract(getPassword(), execution, getScriptLanguage());
+        String command = variableExtractorUtil.extract(getCommand(), execution, getScriptLanguage());
 
         SSHManager instance = new SSHManager(userName, password, connectionIP, "");
         String errorMessage = instance.connect();

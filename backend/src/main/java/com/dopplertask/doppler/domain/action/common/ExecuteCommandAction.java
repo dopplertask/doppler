@@ -28,8 +28,8 @@ public class ExecuteCommandAction extends Action {
     private String command;
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
-        String commandVar = variableExtractorUtil.extract(command, execution);
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
+        String commandVar = variableExtractorUtil.extract(command, execution, getScriptLanguage());
 
         boolean isWindows = System.getProperty("os.name")
                 .toLowerCase().startsWith("windows");

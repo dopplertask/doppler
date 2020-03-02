@@ -13,6 +13,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.IOException;
+
 @RunWith(SpringRunner.class)
 public class ActionTest {
 
@@ -25,7 +27,7 @@ public class ActionTest {
     }
 
     @Test
-    public void testIfActionShouldReturnTrue() {
+    public void testIfActionShouldReturnTrue() throws IOException {
         IfAction ifAction = new IfAction();
         TaskExecution taskExecution = new TaskExecution();
 
@@ -39,7 +41,7 @@ public class ActionTest {
     }
 
     @Test
-    public void testIfActionShouldReturnFalse() {
+    public void testIfActionShouldReturnFalse() throws IOException {
         IfAction ifAction = new IfAction();
         TaskExecution taskExecution = new TaskExecution();
 

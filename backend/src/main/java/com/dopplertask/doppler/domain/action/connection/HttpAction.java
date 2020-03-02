@@ -52,12 +52,12 @@ public class HttpAction extends Action {
     }
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
 
         // Extract variables
-        String urlVariable = variableExtractorUtil.extract(url, execution);
-        String methodVariable = variableExtractorUtil.extract(method, execution);
-        String bodyVariable = variableExtractorUtil.extract(body, execution);
+        String urlVariable = variableExtractorUtil.extract(url, execution, getScriptLanguage());
+        String methodVariable = variableExtractorUtil.extract(method, execution, getScriptLanguage());
+        String bodyVariable = variableExtractorUtil.extract(body, execution, getScriptLanguage());
 
         ActionResult actionResult = new ActionResult();
 
@@ -85,7 +85,7 @@ public class HttpAction extends Action {
 
 
         for (Map.Entry<String, String> entry : headers.entrySet()) {
-            builder = builder.header(entry.getKey(), variableExtractorUtil.extract(entry.getValue(), execution));
+            builder = builder.header(entry.getKey(), variableExtractorUtil.extract(entry.getValue(), execution, getScriptLanguage()));
         }
 
         HttpClient client = HttpClient.newHttpClient();

@@ -2,6 +2,7 @@ package com.dopplertask.doppler.service;
 
 import com.dopplertask.doppler.domain.ActionResult;
 import com.dopplertask.doppler.domain.TaskExecution;
+import com.dopplertask.doppler.domain.action.common.ScriptLanguage;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -13,13 +14,13 @@ import org.apache.velocity.tools.generic.MathTool;
 import org.apache.velocity.tools.generic.NumberTool;
 import org.apache.velocity.tools.generic.RenderTool;
 import org.apache.velocity.tools.generic.ValueParser;
+import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.Source;
+import org.graalvm.polyglot.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.script.Bindings;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class VariableExtractorUtil {
         this.velocityEngine = velocityEngine;
     }
 
-    public String extract(String fieldValue, TaskExecution execution, ActionResult result) {
+    private String extractVelocity(String fieldValue, TaskExecution execution, ActionResult result) {
         if (fieldValue != null) {
             VelocityContext context = new VelocityContext(getVelocityTools());
             context.put("parameters", execution.getParameters());
@@ -61,44 +62,62 @@ public class VariableExtractorUtil {
         return "";
     }
 
-    public String extract(String fieldValue, TaskExecution execution) {
-        return extract(fieldValue, execution, null);
+    public String extract(String fieldValue, TaskExecution execution, ScriptLanguage scriptLanguage) throws IOException {
+        return extract(fieldValue, execution, null, scriptLanguage);
     }
 
-    public String extractJavascript(String fieldValue, TaskExecution execution) throws ScriptException {
-        return extractJavascript(fieldValue, execution, null);
+    public Value extractAsPolygotValue(String fieldValue, TaskExecution execution, ScriptLanguage scriptLanguage) throws IOException {
+        return extractAsPolygotValue(fieldValue, execution, null, scriptLanguage);
     }
 
-    public String extractJavascript(String fieldValue, TaskExecution execution, ActionResult result) throws ScriptException {
+    private Value extractAsPolygotValue(String fieldValue, TaskExecution execution, ActionResult result, ScriptLanguage scriptLanguage) throws IOException {
+        switch (scriptLanguage) {
+            case VELOCITY:
+                return Value.asValue(extractVelocity(fieldValue, execution, result));
+            case JAVASCRIPT:
+                return extractJavascript(fieldValue, execution, result);
+            default:
+                throw new RuntimeException("Script language is not supported.");
+        }
+    }
+
+    public String extract(String fieldValue, TaskExecution execution, ActionResult result, ScriptLanguage scriptLanguage) throws IOException {
+        switch (scriptLanguage) {
+            case VELOCITY:
+                return extractVelocity(fieldValue, execution, result);
+            case JAVASCRIPT:
+                return extractJavascript(fieldValue, execution, result).toString();
+            default:
+                throw new RuntimeException("Script language is not supported.");
+        }
+    }
+
+    private Value extractJavascript(String fieldValue, TaskExecution execution, ActionResult result) throws IOException {
         if (fieldValue != null) {
-            ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 
-            Bindings bindings = engine.createBindings();
+            Context context = Context.newBuilder().allowAllAccess(true).build();
 
-            bindings.putAll(getVelocityTools());
-            bindings.put("parameters", execution.getParameters());
-            bindings.put("executionId", execution.getId());
-            bindings.put("logs", execution.getLogs());
+            getVelocityTools().forEach((toolName, toolValue) -> context.getBindings("js").putMember(toolName, toolValue));
+
+            context.getBindings("js").putMember("parameters", execution.getParameters());
+            context.getBindings("js").putMember("executionId", execution.getId());
+            context.getBindings("js").putMember("logs", execution.getLogs());
 
             // Useful for retry
             if (result != null) {
-                bindings.put("result", result);
+                context.getBindings("js").putMember("result", result);
             }
 
             // Easy access to lastLog
             if (execution != null && execution.getLogs() != null && !execution.getLogs().isEmpty()) {
-                bindings.put("lastLog", execution.getLogs().get(execution.getLogs().size() - 1));
+                context.getBindings("js").putMember("lastLog", execution.getLogs().get(execution.getLogs().size() - 1));
             }
 
-
-            StringWriter writer = new StringWriter();
-
             // Evaluate the original field
-            return engine.eval(fieldValue, bindings).toString();
-
+            return context.eval(Source.newBuilder("js", fieldValue, "src.js").build());
         }
 
-        return "";
+        return Value.asValue("");
     }
 
     public Map<String, Object> getVelocityTools() {

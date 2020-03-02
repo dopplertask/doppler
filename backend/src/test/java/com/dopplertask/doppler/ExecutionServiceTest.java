@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -99,7 +100,7 @@ public class ExecutionServiceTest {
     }
 
     @Test
-    public void testProcessActionsShouldReturnExecutionWithNewParams() {
+    public void testProcessActionsShouldReturnExecutionWithNewParams() throws IOException {
         // Prepare Task
         Task exampleTask = new Task();
         exampleTask.setId(20L);
@@ -121,7 +122,7 @@ public class ExecutionServiceTest {
         // Assign values
         when(taskDao.findById(eq(20L))).thenReturn(exampleTaskOptional);
         when(taskExecutionDao.findById(eq(10L))).thenReturn(executionOptional);
-        when(variableExtractorUtil.extract(eq("testValue One two three $executionId"), eq(execution))).thenReturn("testValue One two three 10");
+        when(variableExtractorUtil.extract(eq("testValue One two three $executionId"), eq(execution), eq(setVariableAction.getScriptLanguage()))).thenReturn("testValue One two three 10");
         TaskExecution resultExecution = executionService.processActions(exampleTask.getId(), execution.getId(), null);
 
         // Check that we have everything correct

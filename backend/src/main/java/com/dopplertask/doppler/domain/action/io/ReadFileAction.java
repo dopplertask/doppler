@@ -30,8 +30,8 @@ public class ReadFileAction extends Action {
     }
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
-        String filenameVariable = variableExtractorUtil.extract(filename, execution);
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
+        String filenameVariable = variableExtractorUtil.extract(filename, execution, getScriptLanguage());
 
         try {
             // Support shell ~ for home directory

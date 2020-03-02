@@ -11,6 +11,7 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.io.IOException;
 
 @Entity
 @Table(name = "TimedWait")
@@ -29,8 +30,8 @@ public class TimedWait extends Action {
 
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
-        String amountOfSeconds = variableExtractorUtil.extract("" + seconds, execution);
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
+        String amountOfSeconds = variableExtractorUtil.extract("" + seconds, execution, getScriptLanguage());
 
         ActionResult actionResult = new ActionResult();
 

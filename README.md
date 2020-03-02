@@ -70,9 +70,7 @@ To require certain parameters to be provided the following can be added:
 ### Actions
 
 #### Common variables for all actions
-* continueOnFailure: (Boolean) true or false. Determines if the execution should continue even if the current action fails.
-* failOn: The current action will fail if this evaluates to anything.s
-* retries: (Integer) Amount of retries.
+* scriptLanguage: VELOCITY (default), JAVASCRIPT
 
 #### PrintAction
 ##### Variables
@@ -181,9 +179,11 @@ Run Javascript or Velocity script
 ### Retry
 All actions have retry mechanisms to allow you to retry an action.
 #### Variables
-* retries: Amount of retries.
-* failOn: Any input will cause the current action to be marked as failure.
-* continueOnFailure: Lets the action continue on failure, ignoring any retry.
+* continueOnFailure: (Boolean) true or false. Lets the action continue on failure, ignoring any retry.
+* failOn: The current action will fail if this evaluates to anything.
+* retries: (Integer) Amount of retries.
+
+
 
 ## Docker
 To run the built docker image:

@@ -7,6 +7,7 @@ import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
@@ -27,19 +28,19 @@ public class SetVariableAction extends Action {
     private List<SetVariable> setVariableList;
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) {
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
 
         ActionResult actionResult = new ActionResult();
         StringBuilder builder = new StringBuilder();
 
-        setVariableList.forEach(setVariable -> {
+        for(SetVariable setVariable : setVariableList) {
             if (setVariable.getValue() != null) {
-                String evaluatedValue = variableExtractorUtil.extract(setVariable.getValue(), execution);
+                String evaluatedValue = variableExtractorUtil.extract(setVariable.getValue(), execution, getScriptLanguage());
                 execution.getParameters().put(setVariable.getName(), evaluatedValue);
 
                 builder.append("Setting variable [key=" + setVariable.getName() + ", value=" + evaluatedValue + "]\n");
             }
-        });
+        }
 
         actionResult.setOutput(builder.toString());
         return actionResult;
