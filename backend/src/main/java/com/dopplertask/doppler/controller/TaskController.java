@@ -3,6 +3,9 @@ package com.dopplertask.doppler.controller;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.TaskExecutionLog;
+import com.dopplertask.doppler.domain.action.Action;
+import com.dopplertask.doppler.dto.ActionInfoDto;
+import com.dopplertask.doppler.dto.ActionListResponseDto;
 import com.dopplertask.doppler.dto.LoginParameters;
 import com.dopplertask.doppler.dto.SimpleChecksumResponseDto;
 import com.dopplertask.doppler.dto.SimpleIdResponseDto;
@@ -18,6 +21,7 @@ import com.dopplertask.doppler.service.ExecutionService;
 import com.dopplertask.doppler.service.TaskRequest;
 import com.dopplertask.doppler.service.TaskService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,12 +34,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 public class TaskController {
@@ -240,5 +246,22 @@ public class TaskController {
         }
 
         return new ResponseEntity<>(new SimpleMessageResponseDTO("Could not delete task"), HttpStatus.BAD_REQUEST);
+    }
+
+    @GetMapping("/task/actions")
+    public ResponseEntity<ActionListResponseDto> getAllActions() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+
+
+        Reflections reflections = new Reflections("com.dopplertask.doppler.domain.action");
+        Set<Class<? extends Action>> classes = reflections.getSubTypesOf(Action.class);
+
+        ActionListResponseDto actionListResponseDto = new ActionListResponseDto();
+        for (Class<? extends Action> currentClass : classes) {
+            Action instance = currentClass.getDeclaredConstructor().newInstance();
+            actionListResponseDto.getActions().add(new ActionInfoDto(currentClass.getSimpleName(), instance.getActionInfo()));
+        }
+
+
+        return new ResponseEntity<>(actionListResponseDto, HttpStatus.OK);
     }
 }

@@ -39,6 +39,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.io.IOException;
+import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
@@ -178,5 +179,105 @@ public class Action {
 
     public void setScriptLanguage(ScriptLanguage scriptLanguage) {
         this.scriptLanguage = scriptLanguage;
+    }
+
+    @JsonIgnore
+    public List<PropertyInformation> getActionInfo() {
+        return List.of(
+                new PropertyInformation("continueOnFailure", "Continue on failure", PropertyInformation.PropertyInformationType.STRING, "", "true or false. Lets the action continue on failure, ignoring any retry."),
+                new PropertyInformation("scriptLanguage", "Script Language", PropertyInformation.PropertyInformationType.DROPDOWN, "VELOCITY", "VELOCITY (default), JAVASCRIPT.",
+                        List.of(new PropertyInformation("VELOCITY", "Velocity"), new PropertyInformation("JAVASCRIPT", "Javascript"))
+                ),
+                new PropertyInformation("retries","Retries", PropertyInformation.PropertyInformationType.NUMBER, "0","Amount of retries."),
+                new PropertyInformation("failOn","Fail on", PropertyInformation.PropertyInformationType.STRING, "","The current action will fail if this evaluates to anything.")
+        );
+    }
+
+    public static class PropertyInformation {
+        private String name;
+        private String displayName;
+        private PropertyInformationType type;
+        private String defaultValue;
+        private String description;
+        private List<PropertyInformation> options;
+
+        /**
+         * Initialize a property info with name and displayName. Type is set to a String.
+         *
+         * @param name
+         * @param displayName
+         */
+        public PropertyInformation(String name, String displayName) {
+            this(name, displayName, PropertyInformationType.STRING, "", "");
+        }
+
+        public PropertyInformation(String name, String displayName, PropertyInformationType type) {
+            this(name, displayName, type, "", "");
+        }
+
+        public PropertyInformation(String name, String displayName, PropertyInformationType type, String defaultValue, String description) {
+            this(name, displayName, type, defaultValue, description, List.of());
+        }
+
+        public PropertyInformation(String name, String displayName, PropertyInformationType type, String defaultValue, String description, List<PropertyInformation> options) {
+            this.name = name;
+            this.displayName = displayName;
+            this.type = type;
+            this.defaultValue = defaultValue;
+            this.description = description;
+            this.options = options;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        public void setDisplayName(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public PropertyInformationType getType() {
+            return type;
+        }
+
+        public void setType(PropertyInformationType type) {
+            this.type = type;
+        }
+
+        public String getDefaultValue() {
+            return defaultValue;
+        }
+
+        public void setDefaultValue(String defaultValue) {
+            this.defaultValue = defaultValue;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public List<PropertyInformation> getOptions() {
+            return options;
+        }
+
+        public void setOptions(List<PropertyInformation> options) {
+            this.options = options;
+        }
+
+        protected enum PropertyInformationType {
+            STRING, BOOLEAN, NUMBER, DROPDOWN, DROPDOWN_ITEM
+        }
     }
 }

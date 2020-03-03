@@ -15,7 +15,7 @@ apply plugin: 'io.spring.dependency-management'
 
 bootJar {
     archiveBaseName = 'doppler'
-    archiveVersion = '0.4.0'
+    archiveVersion = '0.4.1'
 }
 
 repositories {
@@ -69,6 +69,8 @@ dependencies {
 
 // https://mvnrepository.com/artifact/org.graalvm.js/js-scriptengine
     compile group: 'org.graalvm.js', name: 'js-scriptengine', version: '20.0.0'
+// https://mvnrepository.com/artifact/org.reflections/reflections
+    compile group: 'org.reflections', name: 'reflections', version: '0.9.12'
 
 
     testCompile('org.springframework.boot:spring-boot-starter-test:2.2.5.RELEASE')
