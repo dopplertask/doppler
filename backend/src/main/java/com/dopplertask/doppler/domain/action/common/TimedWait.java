@@ -36,7 +36,7 @@ public class TimedWait extends Action {
         ActionResult actionResult = new ActionResult();
 
         try {
-            Thread.sleep(Integer.parseInt(amountOfSeconds) * 1000);
+            Thread.sleep(Integer.parseInt(amountOfSeconds) * 1000L);
 
             actionResult.setOutput(amountOfSeconds);
             actionResult.setStatusCode(StatusCode.SUCCESS);

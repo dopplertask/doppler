@@ -29,7 +29,17 @@ public class IfAction extends Action {
     public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
 
         ActionResult actionResult = new ActionResult();
-        String localCondition = variableExtractorUtil.extract("#if(" + condition + ")\n" + pathTrue + "#else\n" + pathFalse + "#end", execution, getScriptLanguage());
+        String localCondition;
+        switch (getScriptLanguage()) {
+            case VELOCITY:
+                localCondition = variableExtractorUtil.extract("#if(" + condition + ")\n" + pathTrue + "#else\n" + pathFalse + "#end", execution, getScriptLanguage());
+                break;
+            case JAVASCRIPT:
+                localCondition = variableExtractorUtil.extract("if(" + condition + ") {\n\"" + pathTrue + "\"; } else {\n\"" + pathFalse + "\";}", execution, ScriptLanguage.JAVASCRIPT);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected script engine");
+        }
 
         if (pathTrue != null && pathTrue.equals(localCondition)) {
             actionResult.setOutput("If evaluated to true. Next actions path: " + localCondition);
