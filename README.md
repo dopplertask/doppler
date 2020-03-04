@@ -1,4 +1,7 @@
 # doppler
+
+![DopplerTask - Open-source Workflow Automation](https://raw.githubusercontent.com/dopplertask/doppler/master/docs/images/dopplertask_logo.png)
+
 Doppler is a revolutionary open-source software that allows you to easily automate tasks. Whether it’s a bunch of bash scripts or just starting your car remotely, you can automate it. Build, run, reuse and share automations with anyone around the globe.
 
 On top of all of this life-simplifying project, we are striving to make an climate friendly software that is fast, easy and consumes as little resources as possible.
@@ -44,7 +47,6 @@ This file is used to add tasks to the system. You can do that by sending a reque
 
 #### Run a task
 
-
 To run a task, send the JSON with the task id and parameters to the REST API:
 
 ```
@@ -53,7 +55,7 @@ To run a task, send the JSON with the task id and parameters to the REST API:
   "parameters": {
   }
 }
-``` 
+```
 
 Example of the call:
 
@@ -71,6 +73,7 @@ To require certain parameters to be provided the following can be added:
 
 #### Common variables for all actions
 * scriptLanguage: VELOCITY (default), JAVASCRIPT
+* path: (String) Describes which group this action belongs to. An if-statement has a true and a false path, and each action after an if statement can be connected this way.
 
 #### PrintAction
 ##### Variables
@@ -129,13 +132,13 @@ Starts a browser and executes a list of UI Actions.
 ##### Variables
 * url: URL to naviate to.
 * headless: If set to false, it will show the web browser window. Default is true.
-* actionList: A list of actions to perform. 
+* actionList: A list of actions to perform.
 
 A UI Action contains the following fields:
 
 * fieldName: Name of the field to control. Not required when using the actions WAIT OR ACCEPT_ALERT.
 * findByType: Determines how to find the field. Possible values: ID, NAME, XPATH, CSS. Not required when using the actions WAIT OR ACCEPT_ALERT.
-* action: Action to perform. 
+* action: Action to perform.
 
 | Action        |Description                   |
 | ------------- |------------------------------|
@@ -158,7 +161,7 @@ Provides the following actions: click, move, press and release the mouse button.
 #### ReadFileAction
 Reads a file from disk.
 ##### Variables
-* filename: name of a file. Using ~ in the beginning of the filename will point to the home directory eg. ~/Downloads/testfile.txt 
+* filename: name of a file. Using ~ in the beginning of the filename will point to the home directory eg. ~/Downloads/testfile.txt
 
 #### SetVariableAction
 Sets or modifies a variable for the current execution.
@@ -194,7 +197,7 @@ To rebuild the docker image:
 
 ## Authors
 
-* **Feras Wilson** 
+* **Feras Wilson**
 
 ## License
 
