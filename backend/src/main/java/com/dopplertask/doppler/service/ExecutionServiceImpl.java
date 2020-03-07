@@ -193,7 +193,7 @@ public class ExecutionServiceImpl implements ExecutionService {
                     String sha256 = bytesToHex(encodedhash);
 
                     //TODO: check that there is no other checksum with the same value in the DB
-                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), sha256);
+                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), taskCreationDTO.getConnections(), sha256);
 
                     return taskDao.findById(onlineTaskId);
                 }
@@ -252,7 +252,7 @@ public class ExecutionServiceImpl implements ExecutionService {
                 // Check current database for existing task with checksum.
                 Optional<Task> existingTask = taskDao.findFirstByChecksumStartingWith(sha256);
                 if (!existingTask.isPresent()) {
-                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), sha256, false);
+                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), taskCreationDTO.getConnections(), sha256, false);
                     return taskDao.findById(onlineTaskId);
                 } else {
                     return existingTask;
@@ -298,7 +298,7 @@ public class ExecutionServiceImpl implements ExecutionService {
                     byte[] encodedhash = digest.digest(response.body().getBytes(StandardCharsets.UTF_8));
                     String sha256 = bytesToHex(encodedhash);
 
-                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), sha256);
+                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), taskCreationDTO.getConnections(), sha256);
 
                     return taskDao.findById(onlineTaskId);
                 }
@@ -320,60 +320,75 @@ public class ExecutionServiceImpl implements ExecutionService {
             Task task = taskRequest.get();
             TaskExecution execution = executionReq.get();
 
-            // Start processing task
-            for (Action currentAction : task.getActionList()) {
+            execution.setCurrentAction(task.getStartAction());
 
-                // Skip actions which dont belong to the current active path.
-                if (execution.getActivePath() != null && !execution.getActivePath().equals(currentAction.getPath())) {
-                    continue;
-                }
 
-                ActionResult actionResult = new ActionResult();
-                int tries = 0;
-                do {
-                    try {
-                        actionResult = currentAction.run(taskService, execution, variableExtractorUtil);
-
-                        // Handle failOn
-                        if (currentAction.getFailOn() != null && !currentAction.getFailOn().isEmpty()) {
-                            String failOn = variableExtractorUtil.extract(currentAction.getFailOn(), execution, currentAction.getScriptLanguage());
-                            if (failOn != null && !failOn.isEmpty()) {
-                                actionResult.setErrorMsg("Failed on: " + failOn);
-                                actionResult.setStatusCode(StatusCode.FAILURE);
-                            }
-                        }
-                    } catch (Exception e) {
-                        LOG.error("Exception occurred: {}", e);
-                        actionResult.setErrorMsg(e.toString());
-                        actionResult.setStatusCode(StatusCode.FAILURE);
+            boolean running = true;
+            if (execution.getCurrentAction() != null) {
+                while (running) {
+                    // Start processing task
+                    Action currentAction = execution.getCurrentAction();
+                    
+                    // If output port does not have a connection then we've reached the end of the execution.
+                    boolean outputPortAvailable = currentAction.getOutputPorts() != null && !currentAction.getOutputPorts().isEmpty() && currentAction.getOutputPorts().get(0) != null;
+                    if (currentAction.getOutputPorts() == null || currentAction.getOutputPorts() != null && currentAction.getOutputPorts().isEmpty() || outputPortAvailable && currentAction.getOutputPorts().get(0).getConnectionSource() == null) {
+                        running = false;
                     }
 
-                    tries++;
-                } while (actionResult.getStatusCode() == StatusCode.FAILURE && currentAction.getRetries() >= tries && !currentAction.isContinueOnFailure());
+                    // Set next port if available
+                    // TODO: IfAction will not work as this will override the value set by IfAction. Suggestion: Move it before the .run command.
+                    if (outputPortAvailable) {
+                        execution.setCurrentAction(currentAction.getOutputPorts().get(0).getConnectionSource().getTarget().getAction());
+                    }
 
-                TaskExecutionLog log = new TaskExecutionLog();
-                log.setTaskExecution(execution);
+                    ActionResult actionResult = new ActionResult();
+                    int tries = 0;
+                    do {
+                        try {
+                            actionResult = currentAction.run(taskService, execution, variableExtractorUtil);
 
-                LOG.info("Ran current action: {} with status code: {} and with result: {}", currentAction.getClass().getSimpleName(), actionResult.getStatusCode(), actionResult.getOutput() != null && !actionResult.getOutput().isEmpty() ? actionResult.getOutput() : actionResult.getErrorMsg());
+                            // Handle failOn
+                            if (currentAction.getFailOn() != null && !currentAction.getFailOn().isEmpty()) {
+                                String failOn = variableExtractorUtil.extract(currentAction.getFailOn(), execution, currentAction.getScriptLanguage());
+                                if (failOn != null && !failOn.isEmpty()) {
+                                    actionResult.setErrorMsg("Failed on: " + failOn);
+                                    actionResult.setStatusCode(StatusCode.FAILURE);
+                                }
+                            }
+                        } catch (Exception e) {
+                            LOG.error("Exception occurred: {}", e);
+                            actionResult.setErrorMsg(e.toString());
+                            actionResult.setStatusCode(StatusCode.FAILURE);
+                        }
 
-                log.setOutput(actionResult.getOutput());
-                log.setOutputType(actionResult.getOutputType());
+                        tries++;
+                    } while (actionResult.getStatusCode() == StatusCode.FAILURE && currentAction.getRetries() >= tries && !currentAction.isContinueOnFailure());
 
-                // If action did not go well
-                if (actionResult.getStatusCode() == StatusCode.FAILURE && !currentAction.isContinueOnFailure()) {
-                    log.setOutput(actionResult.getErrorMsg());
+                    TaskExecutionLog log = new TaskExecutionLog();
+                    log.setTaskExecution(execution);
+
+                    LOG.info("Ran current action: {} with status code: {} and with result: {}", currentAction.getClass().getSimpleName(), actionResult.getStatusCode(), actionResult.getOutput() != null && !actionResult.getOutput().isEmpty() ? actionResult.getOutput() : actionResult.getErrorMsg());
+
+                    log.setOutput(actionResult.getOutput());
                     log.setOutputType(actionResult.getOutputType());
-                    execution.setSuccess(false);
+
+                    // If action did not go well
+                    if (actionResult.getStatusCode() == StatusCode.FAILURE && !currentAction.isContinueOnFailure()) {
+                        log.setOutput(actionResult.getErrorMsg());
+                        log.setOutputType(actionResult.getOutputType());
+                        execution.setSuccess(false);
+                        execution.addLog(log);
+                        broadcastResults(log);
+                        break;
+                    }
+
+                    // Add log to the execution
                     execution.addLog(log);
+
+                    // Send message to MQ
                     broadcastResults(log);
-                    break;
+
                 }
-
-                // Add log to the execution
-                execution.addLog(log);
-
-                // Send message to MQ
-                broadcastResults(log);
             }
 
             TaskExecutionLog executionCompleted = new TaskExecutionLog();

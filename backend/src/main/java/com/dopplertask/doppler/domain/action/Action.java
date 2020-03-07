@@ -1,5 +1,7 @@
 package com.dopplertask.doppler.domain.action;
 
+import com.dopplertask.doppler.domain.ActionPort;
+import com.dopplertask.doppler.domain.ActionPortType;
 import com.dopplertask.doppler.domain.ActionResult;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
@@ -25,12 +27,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -38,8 +42,12 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
@@ -63,7 +71,8 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
         @JsonSubTypes.Type(value = SetVariableAction.class, name = "SetVariableAction"),
         @JsonSubTypes.Type(value = ScriptAction.class, name = "ScriptAction"),
         @JsonSubTypes.Type(value = IfAction.class, name = "IfAction"),
-        @JsonSubTypes.Type(value = MouseAction.class, name = "MouseAction")
+        @JsonSubTypes.Type(value = MouseAction.class, name = "MouseAction"),
+        @JsonSubTypes.Type(value = StartAction.class, name = "StartAction")
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Action {
@@ -98,11 +107,27 @@ public class Action {
     @Column
     private ScriptLanguage scriptLanguage = ScriptLanguage.VELOCITY;
 
-    /**
-     * This path describes the path for this particular action. This is used in the executionimpl to choose the correct actions.
-     */
-    @Column
-    private String path;
+    @OneToMany(mappedBy = "action", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<ActionPort> ports = new ArrayList<>();
+
+    @JsonIgnore
+    public List<ActionPort> getOutputPorts() {
+        if (ports != null) {
+            return ports.stream().filter(actionPort -> actionPort.getPortType() == ActionPortType.OUTPUT).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
+
+    @JsonIgnore
+    public List<ActionPort> getInputPorts() {
+        if (ports != null) {
+            return ports.stream().filter(actionPort -> actionPort.getPortType() == ActionPortType.INPUT).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
+
+    public Action() {
+    }
 
 
     public Long getId() {
@@ -165,14 +190,6 @@ public class Action {
         this.failOn = failOn;
     }
 
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     public ScriptLanguage getScriptLanguage() {
         return scriptLanguage;
     }
@@ -188,9 +205,17 @@ public class Action {
                 new PropertyInformation("scriptLanguage", "Script Language", PropertyInformation.PropertyInformationType.DROPDOWN, "VELOCITY", "VELOCITY (default), JAVASCRIPT.",
                         List.of(new PropertyInformation("VELOCITY", "Velocity"), new PropertyInformation("JAVASCRIPT", "Javascript"))
                 ),
-                new PropertyInformation("retries","Retries", PropertyInformation.PropertyInformationType.NUMBER, "0","Amount of retries."),
-                new PropertyInformation("failOn","Fail on", PropertyInformation.PropertyInformationType.STRING, "","The current action will fail if this evaluates to anything.")
+                new PropertyInformation("retries", "Retries", PropertyInformation.PropertyInformationType.NUMBER, "0", "Amount of retries."),
+                new PropertyInformation("failOn", "Fail on", PropertyInformation.PropertyInformationType.STRING, "", "The current action will fail if this evaluates to anything.")
         );
+    }
+
+    public List<ActionPort> getPorts() {
+        return ports;
+    }
+
+    public void setPorts(List<ActionPort> ports) {
+        this.ports = ports;
     }
 
     public static class PropertyInformation {

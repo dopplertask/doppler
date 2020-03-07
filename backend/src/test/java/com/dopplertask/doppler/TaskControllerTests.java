@@ -35,6 +35,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Transactional
 public class TaskControllerTests {
 
     @Autowired
@@ -74,10 +76,14 @@ public class TaskControllerTests {
                 "\"description\":\"Testing\"," +
                 "    \"actions\":[\n" +
                 "        {\n" +
+                "            \"@type\":\"StartAction\"\n" +
+                "        },\n" +
+                "        {\n" +
                 "            \"@type\":\"PrintAction\",\n" +
                 "            \"message\":\"Testing text\"\n" +
                 "        }\n" +
-                "    ]\n" +
+                "    ]," +
+                "   \"connections\":[]\n" +
                 "}\n";
         MvcResult result = this.mockMvc.perform(post("/task").content(createJson)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.checksum").isString()).andReturn();
 
@@ -97,10 +103,14 @@ public class TaskControllerTests {
                 "\"description\":\"Testing\"," +
                 "    \"actions\":[\n" +
                 "        {\n" +
+                "            \"@type\":\"StartAction\"\n" +
+                "        },\n" +
+                "        {\n" +
                 "            \"@type\":\"PrintAction\",\n" +
                 "            \"message\":\"$parameters.get('message')\"\n" +
                 "        }\n" +
-                "    ]\n" +
+                "    ],\n" +
+                "   \"connections\":[]\n" +
                 "}\n";
         MvcResult result = this.mockMvc.perform(post("/task").content(createJson)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.checksum").isString()).andReturn();
 

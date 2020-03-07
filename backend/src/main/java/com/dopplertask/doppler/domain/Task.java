@@ -2,11 +2,8 @@ package com.dopplertask.doppler.domain;
 
 
 import com.dopplertask.doppler.domain.action.Action;
+import com.dopplertask.doppler.domain.action.StartAction;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -20,6 +17,10 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "Task")
@@ -53,6 +54,9 @@ public class Task {
     @Column(unique = true)
     @JsonIgnore
     private String checksum;
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
+    private List<Connection> connections;
 
     public Long getId() {
         return id;
@@ -116,5 +120,21 @@ public class Task {
 
     public void setTaskParameterList(List<TaskParameter> taskParameterList) {
         this.taskParameterList = taskParameterList;
+    }
+
+    public Action getStartAction() {
+        List<Action> actions = actionList.stream().filter(action -> action instanceof StartAction).collect(Collectors.toList());
+        if (actions.isEmpty()) {
+            return null;
+        }
+        return actions.get(0);
+    }
+
+    public List<Connection> getConnections() {
+        return connections;
+    }
+
+    public void setConnections(List<Connection> connections) {
+        this.connections = connections;
     }
 }

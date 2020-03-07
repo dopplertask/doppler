@@ -2,6 +2,9 @@ package com.dopplertask.doppler.service;
 
 import com.dopplertask.doppler.dao.TaskDao;
 import com.dopplertask.doppler.dao.TaskExecutionDao;
+import com.dopplertask.doppler.domain.ActionPort;
+import com.dopplertask.doppler.domain.ActionPortType;
+import com.dopplertask.doppler.domain.Connection;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.TaskExecutionStatus;
@@ -10,7 +13,6 @@ import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.domain.action.common.LinkedTaskAction;
 import com.dopplertask.doppler.dto.TaskCreationDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +33,9 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -52,6 +56,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Autowired
     private ExecutionService executionService;
+
 
     @Override
     public TaskExecution delegate(TaskRequest request) {
@@ -82,11 +87,10 @@ public class TaskServiceImpl implements TaskService {
     public TaskExecution runRequest(TaskExecutionRequest taskExecutionRequest) {
         TaskExecution execution = executionService.startExecution(taskExecutionRequest, this);
 
-        if(execution != null) {
-            if(execution.getStatus() == TaskExecutionStatus.FAILED) {
+        if (execution != null) {
+            if (execution.getStatus() == TaskExecutionStatus.FAILED) {
                 return execution;
-            }
-            else {
+            } else {
                 return executionService.processActions(execution.getTask().getId(), execution.getId(), this);
             }
         }
@@ -103,13 +107,13 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    public Long createTask(String name, List<TaskParameter> taskParameters, List<Action> actions, String description, String checksum) {
-        return createTask(name, taskParameters, actions, description, checksum, true);
+    public Long createTask(String name, List<TaskParameter> taskParameters, List<Action> actions, String description, List<Connection> connections, String checksum) {
+        return createTask(name, taskParameters, actions, description, connections, checksum, true);
     }
 
     @Override
     @Transactional
-    public Long createTask(String name, List<TaskParameter> taskParameters, List<Action> actions, String description, String checksum, boolean buildTask) {
+    public Long createTask(String name, List<TaskParameter> taskParameters, List<Action> actions, String description, List<Connection> connections, String checksum, boolean buildTask) {
 
         if (name.contains(" ")) {
             throw new WhiteSpaceInNameException("Could not create task. Task name contains whitespace.");
@@ -124,6 +128,8 @@ public class TaskServiceImpl implements TaskService {
         Task task = new Task();
 
         task.setName(name);
+
+        Map<String, ActionPort> portMap = new HashMap<>();
         actions.forEach(action -> {
             action.setTask(task);
 
@@ -141,19 +147,57 @@ public class TaskServiceImpl implements TaskService {
                     throw new LinkedTaskNotFoundException("Linked Task does not have any task name associated");
                 }
             }
+
+
+            for (ActionPort actionPort : action.getPorts()) {
+                actionPort.setAction(action);
+                portMap.put(actionPort.getExternalId(), actionPort);
+            }
+
         });
 
-        if(taskParameters != null) {
+        if (taskParameters != null) {
             taskParameters.forEach(taskParameter -> taskParameter.setTask(task));
             task.setTaskParameterList(taskParameters);
         }
         task.setActionList(actions);
+
+        // Check if action is available
+        if (task.getStartAction() == null) {
+            throw new NoStartActionFoundException("No start action is found in the task. Please create one.");
+        }
+
         task.setCreated(new Date());
         task.setChecksum(checksum);
         task.setDescription(description);
 
+        // Prepare connections
+        connections.forEach(connection -> {
+            connection.setTask(task);
+            if (connection.getSource() != null && connection.getTarget() != null && connection.getSource().getExternalId() != null && connection.getTarget().getExternalId() != null) {
+                ActionPort sourcePort = portMap.get(connection.getSource().getExternalId());
+                ActionPort targetPort = portMap.get(connection.getTarget().getExternalId());
+                if (sourcePort.getPortType() == ActionPortType.OUTPUT && targetPort.getPortType() == ActionPortType.INPUT) {
+                    connection.setSource(sourcePort);
+                    connection.setTarget(targetPort);
+                } else {
+                    throw new IncompleteConnectionException("Source port is not an output port or the target port is not an input port.");
+                }
+            } else {
+                throw new IncompleteConnectionException("The connection lacks a source or target port.");
+            }
+        });
+
+        task.setConnections(connections);
+
         // Save the new task
         taskDao.save(task);
+
+
+
+
+/*
+        actionPortDao.findByExternalIdAndTask()*/
 
         return task.getId();
     }
@@ -213,7 +257,7 @@ public class TaskServiceImpl implements TaskService {
         if (taskOptional.isPresent()) {
             Task task = taskOptional.get();
 
-            TaskCreationDTO dto = new TaskCreationDTO(task.getName(), task.getTaskParameterList(), task.getActionList(), task.getDescription());
+            TaskCreationDTO dto = new TaskCreationDTO(task.getName(), task.getTaskParameterList(), task.getActionList(), task.getDescription(), task.getConnections());
 
             ObjectMapper mapper = new ObjectMapper();
             try {
