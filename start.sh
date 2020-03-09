@@ -1,2 +1,2 @@
 #!/bin/sh -x
-java -jar /opt/spring-boot/doppler-0.3.1.jar
+java -jar /opt/spring-boot/doppler-0.5.0.jar
