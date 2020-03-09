@@ -39,7 +39,7 @@ ENV PATH="$PATH:$JAVA_HOME/bin"
 
 COPY --from=jlink-package /root/start.sh /opt/spring-boot/
 COPY --from=golang-packagge /bin/doppler /bin/doppler
-COPY --from=jlink-package /root/backend/build/libs/doppler-0.3.1.jar /opt/spring-boot/
+COPY --from=jlink-package /root/backend/build/libs/doppler-0.5.0.jar /opt/spring-boot/
 COPY --from=jlink-package /opt/jdk-11-mini-runtime /opt/jdk-11-mini-runtime
 
 
