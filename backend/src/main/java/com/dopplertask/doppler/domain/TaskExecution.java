@@ -1,10 +1,6 @@
 package com.dopplertask.doppler.domain;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.dopplertask.doppler.domain.action.Action;
 
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
@@ -23,6 +19,11 @@ import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "TaskExecution")
@@ -54,10 +55,8 @@ public class TaskExecution {
     @Enumerated(EnumType.STRING)
     private TaskExecutionStatus status = TaskExecutionStatus.CREATED;
 
-    /**
-     * This path is used to determine which actions should be executed.
-     */
-    private String activePath;
+    @Transient
+    private Action currentAction;
 
     private boolean success = true;
 
@@ -133,11 +132,11 @@ public class TaskExecution {
         this.depth = depth;
     }
 
-    public String getActivePath() {
-        return activePath;
+    public Action getCurrentAction() {
+        return currentAction;
     }
 
-    public void setActivePath(String activePath) {
-        this.activePath = activePath;
+    public void setCurrentAction(Action currentAction) {
+        this.currentAction = currentAction;
     }
 }

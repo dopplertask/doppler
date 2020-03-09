@@ -1,10 +1,10 @@
 package com.dopplertask.doppler.service;
 
+import com.dopplertask.doppler.domain.Connection;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.TaskParameter;
 import com.dopplertask.doppler.domain.action.Action;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -51,9 +51,9 @@ public interface TaskService {
      */
     List<Task> getAllTasks();
 
-    Long createTask(String name, List<TaskParameter> taskParameters, List<Action> actions, String description, String checksum);
+    Long createTask(String name, List<TaskParameter> taskParameters, List<Action> actions, String description, List<Connection> connections, String checksum);
 
-    Long createTask(String name, List<TaskParameter> taskParameters, List<Action> actions, String description, String checksum, boolean buildTask);
+    Long createTask(String name, List<TaskParameter> taskParameters, List<Action> actions, String description, List<Connection> connections, String checksum, boolean buildTask);
 
     List<TaskExecution> getExecutions();
 

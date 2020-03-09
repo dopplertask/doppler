@@ -126,7 +126,7 @@ public class TaskController {
         byte[] encodedhash = digest.digest(compactJSON.getBytes(StandardCharsets.UTF_8));
         String sha3_256hex = bytesToHex(encodedhash);
 
-        Long id = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), sha3_256hex);
+        Long id = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), taskCreationDTO.getConnections(), sha3_256hex);
 
         if (id != null) {
             SimpleChecksumResponseDto checksumResponseDto = new SimpleChecksumResponseDto();

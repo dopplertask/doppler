@@ -2,8 +2,12 @@ package com.dopplertask.doppler;
 
 import com.dopplertask.doppler.dao.TaskDao;
 import com.dopplertask.doppler.dao.TaskExecutionDao;
+import com.dopplertask.doppler.domain.ActionPort;
+import com.dopplertask.doppler.domain.ActionPortType;
+import com.dopplertask.doppler.domain.Connection;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
+import com.dopplertask.doppler.domain.action.StartAction;
 import com.dopplertask.doppler.domain.action.common.SetVariable;
 import com.dopplertask.doppler.domain.action.common.SetVariableAction;
 import com.dopplertask.doppler.service.ExecutionServiceImpl;
@@ -20,6 +24,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -99,18 +104,50 @@ public class ExecutionServiceTest {
         Assert.assertEquals(exampleTask, resultExecution.getTask());
     }
 
+
     @Test
     public void testProcessActionsShouldReturnExecutionWithNewParams() throws IOException {
         // Prepare Task
         Task exampleTask = new Task();
         exampleTask.setId(20L);
         exampleTask.setName("ExampleTask");
+
+
+        Connection connection = new Connection();
+        connection.setTask(exampleTask);
+
+
+        StartAction startAction = new StartAction();
+
+        ActionPort outputPort = new ActionPort();
+        connection.setSource(outputPort);
+
+        outputPort.setAction(startAction);
+        outputPort.setPortType(ActionPortType.OUTPUT);
+        outputPort.setConnectionSource(connection);
+        startAction.setPorts(List.of(outputPort));
+
         SetVariableAction setVariableAction = new SetVariableAction();
         SetVariable setVariable = new SetVariable();
         setVariable.setName("testVar");
         setVariable.setValue("testValue One two three $executionId");
+
+        ActionPort inputPort = new ActionPort();
+        inputPort.setPortType(ActionPortType.INPUT);
+        inputPort.setAction(setVariableAction);
+
+        connection.setTarget(inputPort);
+        inputPort.setConnectionTarget(connection);
+
+        setVariableAction.setPorts(List.of(inputPort));
         setVariableAction.setSetVariableList(List.of(setVariable));
+
+
+
+        exampleTask.getActionList().add(startAction);
         exampleTask.getActionList().add(setVariableAction);
+
+        exampleTask.setConnections(List.of(connection));
         Optional<Task> exampleTaskOptional = Optional.of(exampleTask);
 
         // Prepare Execution

@@ -18,8 +18,6 @@ public class IfAction extends Action {
 
     private String condition;
 
-    private String pathTrue;
-    private String pathFalse;
 
     public IfAction() {
         // Init
@@ -32,21 +30,21 @@ public class IfAction extends Action {
         String localCondition;
         switch (getScriptLanguage()) {
             case VELOCITY:
-                localCondition = variableExtractorUtil.extract("#if(" + condition + ")\n" + pathTrue + "#else\n" + pathFalse + "#end", execution, getScriptLanguage());
+                localCondition = variableExtractorUtil.extract("#if(" + condition + ")\ntrue#else\nfalse#end", execution, getScriptLanguage());
                 break;
             case JAVASCRIPT:
-                localCondition = variableExtractorUtil.extract("if(" + condition + ") {\n\"" + pathTrue + "\"; } else {\n\"" + pathFalse + "\";}", execution, ScriptLanguage.JAVASCRIPT);
+                localCondition = variableExtractorUtil.extract("if(" + condition + ") {\n\"true\"; } else {\n\"false\";}", execution, ScriptLanguage.JAVASCRIPT);
                 break;
             default:
                 throw new IllegalStateException("Unexpected script engine");
         }
 
-        if (pathTrue != null && pathTrue.equals(localCondition)) {
+        if ("true".equals(localCondition)) {
             actionResult.setOutput("If evaluated to true. Next actions path: " + localCondition);
-            execution.setActivePath(pathTrue);
+            execution.setCurrentAction(getOutputPorts().get(0).getConnectionSource().getTarget().getAction());
         } else {
             actionResult.setOutput("If evaluated to false. Next actions path: " + localCondition);
-            execution.setActivePath(pathFalse);
+            execution.setCurrentAction(getOutputPorts().get(1).getConnectionSource().getTarget().getAction());
         }
 
         return actionResult;
@@ -61,19 +59,4 @@ public class IfAction extends Action {
         this.condition = condition;
     }
 
-    public String getPathTrue() {
-        return pathTrue;
-    }
-
-    public void setPathTrue(String pathTrue) {
-        this.pathTrue = pathTrue;
-    }
-
-    public String getPathFalse() {
-        return pathFalse;
-    }
-
-    public void setPathFalse(String pathFalse) {
-        this.pathFalse = pathFalse;
-    }
 }
