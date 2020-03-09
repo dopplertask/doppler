@@ -1,4 +1,4 @@
-# doppler
+# doppler - Task automation
 
 ![DopplerTask - Open-source Workflow Automation](https://raw.githubusercontent.com/dopplertask/doppler/master/docs/images/dopplertask_logo.png)
 
@@ -16,7 +16,7 @@ Using snap:
 
 Install JDK 11 and gradle.
 
-To run the backend:
+To run the backend, go to backend and run:
 ```gradle clean build bootRun```
 
 To compile and run the cli:
@@ -73,7 +73,7 @@ To require certain parameters to be provided the following can be added:
 
 #### Common variables for all actions
 * scriptLanguage: VELOCITY (default), JAVASCRIPT
-* path: (String) Describes which group this action belongs to. An if-statement has a true and a false path, and each action after an if statement can be connected this way.
+* ports: Defined input and output ports for the current action. A connection object connects two ports together. The next action can be reached via a connection object.
 
 #### PrintAction
 ##### Variables
