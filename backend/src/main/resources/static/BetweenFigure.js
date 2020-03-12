@@ -12,12 +12,16 @@ let BetweenFigure = draw2d.shape.node.Between.extend({
         this.getPorts().each(function (i, port) {
           port.setName(port.getId())
         })
-        let label = new draw2d.shape.basic.Label({text: "Start"});
+        let label = new draw2d.shape.basic.Label({text: this.userData.name});
         label.setStroke(0);
-        this.add(label, new draw2d.layout.locator.CenterLocator(this));
+        this.add(label, new draw2d.layout.locator.BottomLocator(this));
     },
 
+     onDoubleClick: function() {
+         console.log("Double click")
+         editModelForFigure()
 
+ },
     /**
      * @method
      * Called if the user drop this element onto the dropTarget.

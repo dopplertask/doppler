@@ -15,7 +15,7 @@ let StartFigure = draw2d.shape.node.Start.extend({
         })
         let label = new draw2d.shape.basic.Label({text: attr.actionName});
         label.setStroke(0);
-        this.add(label, new draw2d.layout.locator.CenterLocator(this));
+        this.add(label, new draw2d.layout.locator.BottomLocator(this));
     },
 
     setLabels: function(amount) {

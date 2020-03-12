@@ -8,7 +8,7 @@ function makeid(length) {
     return result;
 }
 
-let BetweenMultiOutputFigure = draw2d.shape.node.Between.extend({
+let IfAction = draw2d.shape.node.Between.extend({
 
 
 
@@ -24,11 +24,10 @@ let BetweenMultiOutputFigure = draw2d.shape.node.Between.extend({
         this.getPorts().each(function (i, port) {
             port.setName(port.getId())
         })
-        this.userData = {"action": "IfAction", "propertyInformation": []}
         console.log(this.getPorts());
-        let label = new draw2d.shape.basic.Label({text: "Start"});
+        let label = new draw2d.shape.basic.Label({text: "IfAction"});
         label.setStroke(0);
-        this.add(label, new draw2d.layout.locator.CenterLocator(this));
+        this.add(label, new draw2d.layout.locator.BottomLocator(this));
     },
 
     onDoubleClick: function() {

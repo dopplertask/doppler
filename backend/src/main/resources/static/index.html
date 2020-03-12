@@ -15,7 +15,7 @@
     <script src="draw2d.js"></script>
     <script src="StartFigure.js"></script>
     <script src="BetweenFigure.js"></script>
-    <script src="BetweenMultiOutputFigure.js"></script>
+    <script src="IfAction.js"></script>
     <script src="MyInterceptorPolicy.js"></script>
     <script src="gui/Application.js"></script>
     <script src="gui/View.js"></script>
@@ -44,12 +44,51 @@
 
         };
 
+
         let app;
+        let actions = [];
+
+
+        function addNode(actionObject) {
+            let action;
+            if (actionObject.userData.name != "IfAction") {
+                action = new BetweenFigure({x: 550, y: 340, width: 120, height: 120, userData: actionObject.userData});
+
+            } else {
+                action = new IfAction({x: 550, y: 340, width: 120, height: 120, userData: actionObject.userData});
+            }
+
+            return action;
+        }
+
         document.addEventListener("DOMContentLoaded", function () {
 
             // Everything is loaded - core and application. Now can create the
             // application
             //
+
+            $.get("/task/actions", function (data, status) {
+
+                let i = 0;
+                data.actions.forEach(function (element) {
+                    let action;
+                    if (element.name != "IfAction") {
+                        action = new BetweenFigure({x: 550, y: 340, width: 120, height: 120, userData: element});
+
+                    } else {
+                        action = new IfAction({x: 550, y: 340, width: 120, height: 120, userData: element});
+                    }
+
+                    actions.push(action);
+                    $("#navigation").append(
+                        "<div class=\"palette_node_element\" onclick=\"app.view.add(addNode(actions[" + i + "]))\">" + action.userData.name
+                        + "</div>");
+
+                    i++;
+                    // onclick = app.view.add(actions[i])
+                })
+
+            });
 
             app = new example.Application();
 
@@ -75,7 +114,7 @@
             // Add my implemention of a "Between" figure for the smart insert feature
             // inspect the "Between.onDrop" method for more details
 
-            app.view.add(new StartFigure({x: 550, y: 340, width: 80, height: 80, actionName: "Start"}))
+            app.view.add(new StartFigure({x: 550, y: 340, width: 120, height: 120, actionName: "Start"}))
             /////////////////////////////////////////////////////////////////////
             // JUST ADD SOME DOCU ELEMENTS ON THE SCREEN
             /////////////////////////////////////////////////////////////////////
@@ -103,7 +142,7 @@
                             currentActionPorts.push({externalId: json[i].ports[j].name, portType: decidedPortType})
                         }
 
-                        outputBody.actions.push({"@type": json[i].userData.action, ports: currentActionPorts});
+                        outputBody.actions.push({"@type": json[i].userData.name, ports: currentActionPorts});
                     }
                     if (json[i].type == "draw2d.Connection") {
                         outputBody.connections.push(
@@ -114,15 +153,11 @@
             });
         }
 
-        function addNodeToApp() {
-            app.view.add(new BetweenMultiOutputFigure({x: 550, y: 340, width: 80, height: 80}))
-        }
-
         function editModelForFigure() {
             let currentSelection = app.view.selection.all.data[0];
 
             $('#exampleModal').modal('show');
-            $('#exampleModalLabel').html("Edit action: " + currentSelection.userData.action);
+            $('#exampleModalLabel').html("Edit action: " + currentSelection.userData.name);
         }
 
 
@@ -144,7 +179,7 @@
 <div id="navigation" class="">
     <div data-shape="StartFigure" class="palette_node_element draw2d_droppable">Start</div>
     <div data-shape="BetweenFigure" class="palette_node_element draw2d_droppable">End</div>
-    <div class="palette_node_element" onclick="addNodeToApp()">Between</div>
+    <div class="palette_node_element" onclick="addNodeToApp()">If-action</div>
 
     <!-- Button trigger modal -->
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
