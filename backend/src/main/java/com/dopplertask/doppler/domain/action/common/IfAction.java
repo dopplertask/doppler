@@ -10,6 +10,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.io.IOException;
+import java.util.List;
 
 @Entity
 @Table(name = "IfAction")
@@ -57,6 +58,14 @@ public class IfAction extends Action {
 
     public void setCondition(String condition) {
         this.condition = condition;
+    }
+
+    @Override
+    public List<PropertyInformation> getActionInfo() {
+        List<PropertyInformation> actionInfo = super.getActionInfo();
+
+        actionInfo.add(new PropertyInformation("condition", "Condition", PropertyInformation.PropertyInformationType.STRING, "", "Condition to evaluate."));
+        return actionInfo;
     }
 
 }

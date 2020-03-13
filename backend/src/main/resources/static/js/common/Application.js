@@ -24,7 +24,7 @@ example.Application = Class.extend(
 	       
 	       
 	       // layout FIRST the body
-	       this.appLayout = $('#container').layout({
+	       /*this.appLayout = $('#container').layout({
 	   	     west: {
 	              resizable:true,
 	              closable:true,
@@ -56,6 +56,6 @@ example.Application = Class.extend(
                   spacing_closed:0,
 	              paneSelector: "#canvas"
 	            }
-	       });
+	       });*/
 	}
 });

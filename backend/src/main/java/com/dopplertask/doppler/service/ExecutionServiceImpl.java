@@ -328,16 +328,13 @@ public class ExecutionServiceImpl implements ExecutionService {
                 while (running) {
                     // Start processing task
                     Action currentAction = execution.getCurrentAction();
-                    
+
                     // If output port does not have a connection then we've reached the end of the execution.
                     boolean outputPortAvailable = currentAction.getOutputPorts() != null && !currentAction.getOutputPorts().isEmpty() && currentAction.getOutputPorts().get(0) != null;
                     if (currentAction.getOutputPorts() == null || currentAction.getOutputPorts() != null && currentAction.getOutputPorts().isEmpty() || outputPortAvailable && currentAction.getOutputPorts().get(0).getConnectionSource() == null) {
                         running = false;
-                    }
-
-                    // Set next port if available
-                    // TODO: IfAction will not work as this will override the value set by IfAction. Suggestion: Move it before the .run command.
-                    if (outputPortAvailable) {
+                    } else {
+                        // There is a port so lets pick the first one.
                         execution.setCurrentAction(currentAction.getOutputPorts().get(0).getConnectionSource().getTarget().getAction());
                     }
 

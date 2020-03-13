@@ -29,6 +29,7 @@ public class Application {
         broker.addConnector("tcp://localhost:61616");
         broker.addConnector("vm://localhost");
         broker.addConnector("stomp://localhost:61613");
+        broker.addConnector( "ws://localhost:61614" );
         broker.setPersistent(false);
         return broker;
     }

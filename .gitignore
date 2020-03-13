@@ -3,3 +3,4 @@
 AutomationService.iml
 backend/build
 backend/.gradle
+backend/src/main/resources/static/node_modules/

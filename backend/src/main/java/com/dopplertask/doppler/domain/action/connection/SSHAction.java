@@ -14,6 +14,7 @@ import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import java.io.IOException;
+import java.util.List;
 
 @Entity
 @Table(name = "SSHAction")
@@ -93,5 +94,16 @@ public class SSHAction extends Action {
 
     public void setCommand(String command) {
         this.command = command;
+    }
+
+    @Override
+    public List<PropertyInformation> getActionInfo() {
+        List<PropertyInformation> actionInfo = super.getActionInfo();
+
+        actionInfo.add(new PropertyInformation("hostname", "Hostname", PropertyInformation.PropertyInformationType.STRING, "", "Hostname or IP"));
+        actionInfo.add(new PropertyInformation("username", "Username", PropertyInformation.PropertyInformationType.STRING, "", "Username"));
+        actionInfo.add(new PropertyInformation("password", "Password", PropertyInformation.PropertyInformationType.STRING, "", "Password"));
+        actionInfo.add(new PropertyInformation("command", "Command", PropertyInformation.PropertyInformationType.MULTILINE, "", "Eg. echo \"Hello world\""));
+        return actionInfo;
     }
 }

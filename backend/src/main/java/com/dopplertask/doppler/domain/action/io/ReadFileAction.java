@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -62,5 +63,13 @@ public class ReadFileAction extends Action {
 
     public void setFilename(String filename) {
         this.filename = filename;
+    }
+
+    @Override
+    public List<PropertyInformation> getActionInfo() {
+        List<PropertyInformation> actionInfo = super.getActionInfo();
+
+        actionInfo.add(new PropertyInformation("filename", "File location", PropertyInformation.PropertyInformationType.STRING, "", "File path. eg. /home/user/file.txt"));
+        return actionInfo;
     }
 }

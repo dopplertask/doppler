@@ -11,11 +11,13 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
+import java.io.IOException;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.io.IOException;
 
 @Entity
 @Table(name = "SecureCopyAction")
@@ -116,5 +118,17 @@ public class SecureCopyAction extends Action {
 
     public void setDestinationFilename(String destinationFilename) {
         this.destinationFilename = destinationFilename;
+    }
+
+    @Override
+    public List<PropertyInformation> getActionInfo() {
+        List<PropertyInformation> actionInfo = super.getActionInfo();
+
+        actionInfo.add(new PropertyInformation("hostname", "Hostname", PropertyInformation.PropertyInformationType.STRING, "", "Hostname or IP"));
+        actionInfo.add(new PropertyInformation("username", "Username", PropertyInformation.PropertyInformationType.STRING, "", "Username"));
+        actionInfo.add(new PropertyInformation("password", "Password", PropertyInformation.PropertyInformationType.STRING, "", "Password"));
+        actionInfo.add(new PropertyInformation("sourceFilename", "Source filename", PropertyInformation.PropertyInformationType.STRING, "", "Eg. /home/user/myfile"));
+        actionInfo.add(new PropertyInformation("destinationFilename", "Destination filename", PropertyInformation.PropertyInformationType.STRING, "", "Eg. on the remote server /home/remote/myfile"));
+        return actionInfo;
     }
 }

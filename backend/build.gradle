@@ -15,11 +15,20 @@ apply plugin: 'io.spring.dependency-management'
 
 bootJar {
     archiveBaseName = 'doppler'
-    archiveVersion = '0.5.0'
+    archiveVersion = '0.6.0'
 }
 
 repositories {
     mavenCentral()
+}
+
+
+sourceSets {
+    main {
+        resources {
+            exclude "**/static/node_modules/**"
+        }
+    }
 }
 
 sourceCompatibility = 11.0
@@ -30,13 +39,14 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-data-jpa:2.2.5.RELEASE")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-activemq
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-activemq', version: '2.2.5.RELEASE'
-    compile("org.apache.activemq:activemq-stomp:5.15.11")
+    compile("org.apache.activemq:activemq-stomp:5.15.12")
+    compile("org.apache.activemq:activemq-http:5.15.12")
 
     // https://mvnrepository.com/artifact/org.apache.velocity.tools/velocity-tools-generic
     compile group: 'org.apache.velocity.tools', name: 'velocity-tools-generic', version: '3.0'
 
     // https://mvnrepository.com/artifact/org.apache.activemq/activemq-broker
-    compile group: 'org.apache.activemq', name: 'activemq-broker', version: '5.15.11'
+    compile group: 'org.apache.activemq', name: 'activemq-broker', version: '5.15.12'
 
     // https://mvnrepository.com/artifact/mysql/mysql-connector-java
     compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.15'
@@ -83,3 +93,4 @@ test {
         exceptionFormat "full"
     }
 }
+
