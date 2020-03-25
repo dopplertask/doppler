@@ -2,7 +2,9 @@ package com.dopplertask.doppler.service;
 
 import com.dopplertask.doppler.dao.TaskDao;
 import com.dopplertask.doppler.dao.TaskExecutionDao;
+import com.dopplertask.doppler.domain.ActionPort;
 import com.dopplertask.doppler.domain.ActionResult;
+import com.dopplertask.doppler.domain.OutputType;
 import com.dopplertask.doppler.domain.StatusCode;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
@@ -13,6 +15,7 @@ import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.dto.TaskCreationDTO;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +46,7 @@ public class ExecutionServiceImpl implements ExecutionService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ExecutionServiceImpl.class);
     private static final String DOPPLERTASK_WORKFLOW_DOWNLOAD = "https://www.dopplertask.com/getworkflow.php";
+    private static final int MAX_ACTION_ACCESS_LIMIT = 1000;
 
     private JmsTemplate jmsTemplate;
     private TaskDao taskDao;
@@ -322,12 +326,26 @@ public class ExecutionServiceImpl implements ExecutionService {
 
             execution.setCurrentAction(task.getStartAction());
 
-
             boolean running = true;
             if (execution.getCurrentAction() != null) {
                 while (running) {
                     // Start processing task
                     Action currentAction = execution.getCurrentAction();
+
+                    // Add count to action
+                    execution.addActionAccessCountByOne(currentAction.getId());
+
+                    // Prevent overflood (Hard limit)
+                    if (execution.getActionAccessCount(currentAction.getId()) > MAX_ACTION_ACCESS_LIMIT) {
+                        TaskExecutionLog log = new TaskExecutionLog();
+                        log.setTaskExecution(execution);
+                        log.setOutput("Action access amount has reached it's maximum limit. Please consider using less loops." + currentAction.getClass().getName());
+                        log.setOutputType(OutputType.STRING);
+                        execution.setSuccess(false);
+                        execution.addLog(log);
+                        broadcastResults(log);
+                        break;
+                    }
 
                     // If output port does not have a connection then we've reached the end of the execution.
                     boolean outputPortAvailable = currentAction.getOutputPorts() != null && !currentAction.getOutputPorts().isEmpty() && currentAction.getOutputPorts().get(0) != null;
@@ -335,8 +353,11 @@ public class ExecutionServiceImpl implements ExecutionService {
                         running = false;
                     } else {
                         // There is a port so lets pick the first one.
-                        execution.setCurrentAction(currentAction.getOutputPorts().get(0).getConnectionSource().getTarget().getAction());
+                        ActionPort targetPort = currentAction.getOutputPorts().get(0).getConnectionSource().getTarget();
+                        Action nextAction = targetPort.getAction();
+                        execution.setCurrentAction(nextAction);
                     }
+
 
                     ActionResult actionResult = new ActionResult();
                     int tries = 0;

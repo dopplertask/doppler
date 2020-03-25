@@ -6,21 +6,21 @@ class openTaskModal extends React.Component {
         super(props);
         this.renderOutput = this.renderOutput.bind(this);
         this.state = {
-            tasks: []
+            tasks: {}
         }
     }
 
     componentDidMount() {
         let openTaskModal = this;
         $.ajax({
-            type: "GET",
-            url: "/task",
-            contentType: 'application/json',
-            success: success => {
-                openTaskModal.setState({tasks: success})
-            },
-            dataType: "json"
-        });
+                   type: "GET",
+                   url: "/task/grouped",
+                   contentType: 'application/json',
+                   success: success => {
+                       openTaskModal.setState({tasks: success})
+                   },
+                   dataType: "json"
+               });
     }
 
     renderOutput() {
@@ -33,7 +33,7 @@ class openTaskModal extends React.Component {
             <div className="modal-dialog modal-lg" role="document">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h5 className="modal-title" id="openTaskModalLabel">Run task</h5>
+                        <h5 className="modal-title" id="openTaskModalLabel">Open task</h5>
                         <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -43,26 +43,28 @@ class openTaskModal extends React.Component {
                             <thead>
                             <tr>
                                 <th scope="col">Task name</th>
-                                <th scope="col">Created</th>
+                                <th scope="col">Version</th>
                                 <th scope="col">Actions</th>
                             </tr>
                             </thead>
                             <tbody>
 
                             {
-                                this.state.tasks.map(task => {
-                                    return (
-                                        <tr key={task.checksum}>
-                                            <td>{task.name}</td>
-                                            <td>{task.created}</td>
-                                            <td></td>
-                                            <td><a href="#" className="btn btn-primary"
-                                                   onClick={() => {
-                                                       $("#openTaskModal").modal("hide");
-                                                       this.props.openTask(task.name)
-                                                   }}>Open</a></td>
-
-                                        </tr>)
+                                Object.keys(this.state.tasks).map(task => {
+                                    return (<tr key={task}>
+                                        <td>{task}</td>
+                                        <td>
+                                            <select id={task + "_versions"}>
+                                                {this.state.tasks[task].map((taskValue) => <option key={taskValue.checksum}
+                                                                                                   value={taskValue.checksum}>{taskValue.created}</option>)}
+                                            </select>
+                                        </td>
+                                        <td><a href="#" className="btn btn-primary"
+                                               onClick={() => {
+                                                   $("#openTaskModal").modal("hide");
+                                                   this.props.openTask($("#" + task + "_versions").val())
+                                               }}>Open</a></td>
+                                    </tr>)
                                 })
                             }
                             </tbody>

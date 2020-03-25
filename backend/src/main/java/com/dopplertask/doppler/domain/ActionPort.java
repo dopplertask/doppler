@@ -3,6 +3,8 @@ package com.dopplertask.doppler.domain;
 import com.dopplertask.doppler.domain.action.Action;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +16,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -38,15 +41,15 @@ public class ActionPort {
     @JsonIgnore
     private Action action;
 
+    @OneToMany(mappedBy = "target", cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Connection> connectionTarget;
+
     @OneToOne(mappedBy = "source", cascade = CascadeType.ALL,
             fetch = FetchType.LAZY, optional = false)
     @JsonIgnore
     private Connection connectionSource;
-
-    @OneToOne(mappedBy = "target", cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY, optional = false)
-    @JsonIgnore
-    private Connection connectionTarget;
 
 
     public ActionPort() {
@@ -76,6 +79,16 @@ public class ActionPort {
         this.externalId = externalId;
     }
 
+
+    public Action getAction() {
+        return action;
+    }
+
+    public void setAction(Action action) {
+        this.action = action;
+    }
+
+
     public Connection getConnectionSource() {
         return connectionSource;
     }
@@ -84,19 +97,11 @@ public class ActionPort {
         this.connectionSource = connectionSource;
     }
 
-    public Connection getConnectionTarget() {
+    public List<Connection> getConnectionTarget() {
         return connectionTarget;
     }
 
-    public void setConnectionTarget(Connection connectionTarget) {
+    public void setConnectionTarget(List<Connection> connectionTarget) {
         this.connectionTarget = connectionTarget;
-    }
-
-    public Action getAction() {
-        return action;
-    }
-
-    public void setAction(Action action) {
-        this.action = action;
     }
 }

@@ -6,10 +6,13 @@ class RunTaskModal extends React.Component {
         super(props);
         this.renderOutput = this.renderOutput.bind(this);
         this.cleanup = this.cleanup.bind(this);
+        this.runTask = this.runTask.bind(this);
+        this.parameterChange = this.parameterChange.bind(this);
         this.state = {
             taskName: this.props.taskName,
             start: this.props.start,
-            executionId: -1
+            executionId: -1,
+            parameterValues: {}
         }
     }
 
@@ -41,8 +44,26 @@ class RunTaskModal extends React.Component {
                     }
                 })
 
-
         }
+    }
+
+    runTask() {
+        this.props.setStartToTrue();
+    }
+
+    parameterChange(event) {
+        const target = event.target;
+        let value = target.value;
+
+        if (value.length == 0) {
+            value = undefined;
+        }
+        this.setState(prevState => ({
+            parameterValues: {
+                ...prevState.parameterValues,
+                [target.id]: value
+            }
+        }));
     }
 
     renderOutput() {
@@ -50,40 +71,41 @@ class RunTaskModal extends React.Component {
             let runTaskModal = this;
             let json = {
                 taskName: this.state.taskName,
-                parameters: {"test": "test"}
+                parameters: this.state.parameterValues
             }
             $.ajax({
-                type: "POST",
-                url: "/schedule/task",
-                data: JSON.stringify(json),
-                contentType: 'application/json',
-                success: execution => {
-                    runTaskModal.setState({
-                        executionId: execution.id
-                    }, createStomp => {
-                        let client = Stomp.client("ws://localhost:61614/stomp", "v11.stomp");
-                        let headers = {
-                            id: 'JUST.FCX',
-                            ack: 'client',
-                            selector: 'executionId=' + runTaskModal.state.executionId
-                        };
-                        client.connect("admin", "admin", function () {
-                            client.subscribe("/queue/taskexecution_destination",
-                                function (message) {
-                                    let messageBody = JSON.parse(message.body);
-                                    jQuery("#outputDiv").append(messageBody.output + "<br>");
-                                    message.ack();
+                       type: "POST",
+                       url: "/schedule/task",
+                       data: JSON.stringify(json),
+                       contentType: 'application/json',
+                       success: execution => {
+                           runTaskModal.setState({
+                                                     executionId: execution.id
+                                                 }, createStomp => {
+                               let client = Stomp.client("ws://localhost:61614/stomp", "v11.stomp");
+                               let headers = {
+                                   id: 'JUST.FCX',
+                                   ack: 'client',
+                                   selector: 'executionId=' + runTaskModal.state.executionId
+                               };
+                               client.connect("admin", "admin", function () {
+                                   client.subscribe("/queue/taskexecution_destination",
+                                                    function (message) {
+                                                        let messageBody = JSON.parse(message.body);
+                                                        jQuery("#outputDiv").append(messageBody.output + "<br>");
+                                                        message.ack();
 
-                                    if (message.headers["lastMessage"] == "true" && message.headers["executionId"] == runTaskModal.state.executionId) {
-                                        client.disconnect();
-                                        runTaskModal.cleanup();
-                                    }
-                                }, headers);
-                        });
-                    })
-                },
-                dataType: "json"
-            });
+                                                        if (message.headers["lastMessage"] == "true"
+                                                            && message.headers["executionId"] == runTaskModal.state.executionId) {
+                                                            client.disconnect();
+                                                            runTaskModal.cleanup();
+                                                        }
+                                                    }, headers);
+                               });
+                           })
+                       },
+                       dataType: "json"
+                   });
 
         }
     }
@@ -107,6 +129,36 @@ class RunTaskModal extends React.Component {
                         {this.state.taskName}
 
                         <h4>Task execution output</h4>
+
+                        <h5>Parameter values</h5>
+                        <div className="container">
+
+                            {
+                                this.props.parameters.map(parameter => (
+                                    <div className="row" key={parameter.name}>
+                                        <div className="col-sm">
+                                            {parameter.name}
+                                        </div>
+                                        <div className="col-sm">
+                                            {parameter.description}
+                                        </div>
+                                        <div className="col-sm">
+                                            <input className="form-control"
+                                                   type="text"
+                                                   id={parameter.name}
+                                                   onChange={this.parameterChange}
+                                            />
+                                        </div>
+
+                                    </div>
+                                ))
+                            }
+
+                        </div>
+                        <button type="button" className="btn btn-primary"
+                                onClick={this.runTask}>Run task
+                        </button>
+                        <br/>
                         <code id="outputDiv"></code>
 
 

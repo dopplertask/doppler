@@ -338,6 +338,21 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
+    public Task getTaskByChecksum(String checksum) {
+        Optional<Task> task = taskDao.findFirstByChecksumStartingWith(checksum);
+
+        if (task.isPresent()) {
+            Task taskObj = task.get();
+            Hibernate.initialize(taskObj.getActionList());
+            Hibernate.initialize(taskObj.getTaskParameterList());
+            Hibernate.initialize(taskObj.getConnections());
+            return taskObj;
+        }
+        return null;
+    }
+
+    @Override
     public TaskExecution runRequest(TaskRequest request) {
         TaskExecution execution = new TaskExecution();
         execution.setDepth(request.getDepth());

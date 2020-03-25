@@ -72,4 +72,6 @@ public interface TaskService {
     Task deleteTask(String taskNameOrChecksum);
 
     Task getTaskByName(String taskName);
+
+    Task getTaskByChecksum(String checksum);
 }

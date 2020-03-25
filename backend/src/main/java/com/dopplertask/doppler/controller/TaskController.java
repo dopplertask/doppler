@@ -40,7 +40,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -155,6 +157,27 @@ public class TaskController {
         return new ResponseEntity<>(taskResponseDTOList, HttpStatus.OK);
     }
 
+    @GetMapping("/task/grouped")
+    public ResponseEntity<Map<String, List<TaskResponseSingleDTO>>> getTasksGrouped() {
+        List<Task> tasks = taskService.getAllTasks();
+
+        HashMap<String, List<TaskResponseSingleDTO>> groupedTasks = new HashMap<>();
+        for (Task task : tasks) {
+            TaskResponseSingleDTO taskDto = new TaskResponseSingleDTO();
+            taskDto.setChecksum(task.getChecksum());
+            taskDto.setName(task.getName());
+            taskDto.setCreated(task.getCreated());
+
+            if (!groupedTasks.containsKey(task.getName())) {
+                groupedTasks.put(task.getName(), new ArrayList<>());
+            }
+
+            groupedTasks.get(task.getName()).add(taskDto);
+        }
+
+        return new ResponseEntity<>(groupedTasks, HttpStatus.OK);
+    }
+
     @GetMapping("/task/detail")
     public ResponseEntity<List<TaskResponseSingleDTO>> getDetailedTasks() {
         List<Task> tasks = taskService.getAllTasks();
@@ -166,7 +189,7 @@ public class TaskController {
             taskDto.setName(task.getName());
             taskDto.setCreated(task.getCreated());
             taskDto.setActions(task.getActionList());
-            taskDto.setTaskParameters(task.getTaskParameterList());
+            taskDto.setParameters(task.getTaskParameterList());
             taskDto.setConnections(task.getConnections());
 
             taskResponseDTOList.add(taskDto);
@@ -184,7 +207,7 @@ public class TaskController {
             taskDto.setDescription(task.getDescription());
             taskDto.setActions(task.getActionList());
             taskDto.setChecksum(task.getChecksum());
-            taskDto.setTaskParameters(task.getTaskParameterList());
+            taskDto.setParameters(task.getTaskParameterList());
             taskDto.setConnections(task.getConnections());
 
             return new ResponseEntity<>(taskDto, HttpStatus.OK);
@@ -202,7 +225,25 @@ public class TaskController {
             taskDto.setDescription(task.getDescription());
             taskDto.setActions(task.getActionList());
             taskDto.setChecksum(task.getChecksum());
-            taskDto.setTaskParameters(task.getTaskParameterList());
+            taskDto.setParameters(task.getTaskParameterList());
+            taskDto.setConnections(task.getConnections());
+
+            return new ResponseEntity<>(taskDto, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/task/{checksum}/checksum")
+    public ResponseEntity<TaskResponseSingleDTO> getTaskByChecksum(@PathVariable("checksum") String checksum) {
+        Task task = taskService.getTaskByChecksum(checksum);
+        if (task != null) {
+            TaskResponseSingleDTO taskDto = new TaskResponseSingleDTO();
+            taskDto.setName(task.getName());
+            taskDto.setDescription(task.getDescription());
+            taskDto.setActions(task.getActionList());
+            taskDto.setChecksum(task.getChecksum());
+            taskDto.setParameters(task.getTaskParameterList());
             taskDto.setConnections(task.getConnections());
 
             return new ResponseEntity<>(taskDto, HttpStatus.OK);
