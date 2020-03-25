@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 import java.util.function.Consumer;
 
 import javax.persistence.Column;
@@ -87,5 +88,13 @@ public class ExecuteCommandAction extends Action {
             new BufferedReader(new InputStreamReader(inputStream)).lines()
                     .forEach(consumer);
         }
+    }
+
+    @Override
+    public List<PropertyInformation> getActionInfo() {
+        List<PropertyInformation> actionInfo = super.getActionInfo();
+
+        actionInfo.add(new PropertyInformation("command", "Command", PropertyInformation.PropertyInformationType.MULTILINE, "", "Command to execute."));
+        return actionInfo;
     }
 }

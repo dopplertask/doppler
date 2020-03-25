@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import java.io.IOException;
+import java.util.List;
 
 @Entity
 @Table(name = "ScriptAction")
@@ -40,6 +41,14 @@ public class ScriptAction extends Action {
 
     public void setScript(String script) {
         this.script = script;
+    }
+
+    @Override
+    public List<PropertyInformation> getActionInfo() {
+        List<PropertyInformation> actionInfo = super.getActionInfo();
+
+        actionInfo.add(new PropertyInformation("script", "Script", PropertyInformation.PropertyInformationType.MULTILINE, "", "Command to execute."));
+        return actionInfo;
     }
 
 }

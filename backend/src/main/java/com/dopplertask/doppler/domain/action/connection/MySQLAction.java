@@ -14,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -189,6 +190,20 @@ public class MySQLAction extends Action {
 
     public void setPort(String port) {
         this.port = port;
+    }
+
+    @Override
+    public List<PropertyInformation> getActionInfo() {
+        List<PropertyInformation> actionInfo = super.getActionInfo();
+
+        actionInfo.add(new PropertyInformation("hostname", "Hostname", PropertyInformation.PropertyInformationType.STRING, "", "Hostname or IP"));
+        actionInfo.add(new PropertyInformation("username", "Username", PropertyInformation.PropertyInformationType.STRING, "", "Username"));
+        actionInfo.add(new PropertyInformation("password", "Password", PropertyInformation.PropertyInformationType.STRING, "", "Password"));
+        actionInfo.add(new PropertyInformation("database", "Database", PropertyInformation.PropertyInformationType.STRING, "", "Database name"));
+        actionInfo.add(new PropertyInformation("port", "Port", PropertyInformation.PropertyInformationType.STRING, "3306", "Default is 3306"));
+        actionInfo.add(new PropertyInformation("timezone", "Timezone", PropertyInformation.PropertyInformationType.STRING, "", "Specify timezone. Example CET"));
+        actionInfo.add(new PropertyInformation("command", "MySQL Statement", PropertyInformation.PropertyInformationType.STRING, "", "Statement to execute"));
+        return actionInfo;
     }
 }
 

@@ -100,6 +100,9 @@ public class Action {
 
     private Integer retries = 0;
 
+    private Integer guiXPos;
+    private Integer guiYPos;
+
     /**
      * All action values are evaluated with VELOCITY as standard, but can be changed to other languages.
      */
@@ -200,13 +203,13 @@ public class Action {
 
     @JsonIgnore
     public List<PropertyInformation> getActionInfo() {
-        return List.of(
-                new PropertyInformation("continueOnFailure", "Continue on failure", PropertyInformation.PropertyInformationType.STRING, "", "true or false. Lets the action continue on failure, ignoring any retry."),
+        return new ArrayList<>(List.of(
+                new PropertyInformation("continueOnFailure", "Continue on failure", PropertyInformation.PropertyInformationType.BOOLEAN, "", "true or false. Lets the action continue on failure, ignoring any retry."),
                 new PropertyInformation("scriptLanguage", "Script Language", PropertyInformation.PropertyInformationType.DROPDOWN, "VELOCITY", "VELOCITY (default), JAVASCRIPT.",
                         List.of(new PropertyInformation("VELOCITY", "Velocity"), new PropertyInformation("JAVASCRIPT", "Javascript"))
                 ),
                 new PropertyInformation("retries", "Retries", PropertyInformation.PropertyInformationType.NUMBER, "0", "Amount of retries."),
-                new PropertyInformation("failOn", "Fail on", PropertyInformation.PropertyInformationType.STRING, "", "The current action will fail if this evaluates to anything.")
+                new PropertyInformation("failOn", "Fail on", PropertyInformation.PropertyInformationType.STRING, "", "The current action will fail if this evaluates to anything."))
         );
     }
 
@@ -216,6 +219,22 @@ public class Action {
 
     public void setPorts(List<ActionPort> ports) {
         this.ports = ports;
+    }
+
+    public Integer getGuiXPos() {
+        return guiXPos;
+    }
+
+    public void setGuiXPos(Integer guiXPos) {
+        this.guiXPos = guiXPos;
+    }
+
+    public Integer getGuiYPos() {
+        return guiYPos;
+    }
+
+    public void setGuiYPos(Integer guiYPos) {
+        this.guiYPos = guiYPos;
     }
 
     public static class PropertyInformation {
@@ -301,8 +320,8 @@ public class Action {
             this.options = options;
         }
 
-        protected enum PropertyInformationType {
-            STRING, BOOLEAN, NUMBER, DROPDOWN, DROPDOWN_ITEM
+        public enum PropertyInformationType {
+            STRING, MULTILINE, BOOLEAN, NUMBER, DROPDOWN, DROPDOWN_ITEM
         }
     }
 }

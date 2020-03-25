@@ -12,6 +12,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.io.IOException;
+import java.util.List;
 
 @Entity
 @Table(name = "TimedWait")
@@ -57,5 +58,13 @@ public class TimedWait extends Action {
 
     public void setSeconds(Long seconds) {
         this.seconds = seconds;
+    }
+
+    @Override
+    public List<PropertyInformation> getActionInfo() {
+        List<PropertyInformation> actionInfo = super.getActionInfo();
+
+        actionInfo.add(new PropertyInformation("seconds", "Time (Seconds)", PropertyInformation.PropertyInformationType.NUMBER, "", "Amount of seconds to wait"));
+        return actionInfo;
     }
 }

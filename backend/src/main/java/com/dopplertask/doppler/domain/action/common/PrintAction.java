@@ -12,6 +12,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.io.IOException;
+import java.util.List;
 
 @Entity
 @Table(name = "PrintAction")
@@ -51,6 +52,14 @@ public class PrintAction extends Action {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    @Override
+    public List<PropertyInformation> getActionInfo() {
+        List<PropertyInformation> actionInfo = super.getActionInfo();
+
+        actionInfo.add(new PropertyInformation("message", "Message"));
+        return actionInfo;
     }
 }
 
