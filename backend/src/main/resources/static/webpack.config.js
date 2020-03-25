@@ -35,7 +35,6 @@ module.exports = {
         }),
         new CopyPlugin([
             {from: 'css', to: 'css'},
-            {from: 'webfonts', to: 'webfonts'},
             {from: 'images', to: 'images'}
         ]),
     ],

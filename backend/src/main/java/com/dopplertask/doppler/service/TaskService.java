@@ -70,4 +70,6 @@ public interface TaskService {
      * @return
      */
     Task deleteTask(String taskNameOrChecksum);
+
+    Task getTaskByName(String taskName);
 }

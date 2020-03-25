@@ -1,19 +1,23 @@
 import * as React from "react";
+import RunTaskModal from "./RunTaskModal";
 import EditActionModal from "./EditActionModal";
 import SaveModal from "./SaveModal";
-import RunTaskModal from "./RunTaskModal";
+import OpenTaskModal from "./OpenTaskModal";
 
 class MainApp extends React.Component {
 
     constructor(props) {
         super(props);
+        let unsavedTaskNamePrefix = "_" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         this.state = {
             availableActions: [],
             app: {},
+            requiredParameters: [],
             selectedAction: {userData: {customData: {}}},
             saveDialogVisible: false,
-            taskName: "workflow",
-            start: false
+            taskName: "task" + unsavedTaskNamePrefix,
+            start: false,
+            saved: false
         }
 
         this.createNode = this.createNode.bind(this);
@@ -27,6 +31,8 @@ class MainApp extends React.Component {
         this.downloadWorkflow = this.downloadWorkflow.bind(this);
         this.updateFieldData = this.updateFieldData.bind(this);
         this.setStartToFalse = this.setStartToFalse.bind(this);
+        this.openTask = this.openTask.bind(this);
+        this.initApp = this.initApp.bind(this);
     }
 
     setStartToFalse() {
@@ -36,30 +42,46 @@ class MainApp extends React.Component {
     }
 
     componentDidMount() {
-        /*      var client = Stomp.client("ws://localhost:61614/stomp", "v11.stomp");
-              var headers = { id:'JUST.FCX', ack: 'client'};
-              client.connect("admin", "admin", function () {
-                  client.subscribe("/queue/taskexecution_destination",
-                                   function (message) {
-                                       alert(message);
-                                       message.ack();
-                                   }, headers);
-              });
-      */
+        let app = this.initApp();
+
+        this.setState({app: app}, callback => {
+            $.get("/task/actions", (data, status) => {
+                let actions = [];
+                data.actions.forEach(element => {
+                    actions.push(element);
+
+                    // Auto add the start action
+                    if (element.name == "StartAction") {
+                        this.state.app.view.add(
+                            new StartFigure({x: 50, y: 340, width: 120, height: 120, userData: element}))
+                    }
+
+                })
+
+                // Set state.
+                this.setState(prevState => ({
+                    availableActions: actions
+                }));
+
+            });
+
+        });
+
+    }
+
+    initApp() {
+        let mainApp = this;
         let createConnection = function (sourcePort, targetPort) {
 
             let conn = new draw2d.Connection({
                 router: new draw2d.layout.connection.InteractiveManhattanConnectionRouter(),
-                color: "#00ff17",
+                color: "#334455",
                 radius: 20,
-                outlineColor: "#30ff30",
+                outlineColor: "#334455",
                 source: sourcePort,
                 target: targetPort,
                 stroke: 2
             });
-
-            console.log("Source PORT: " + conn.getSource());
-            console.log("Target PORT: " + conn.getTarget());
 
             return conn;
 
@@ -70,53 +92,47 @@ class MainApp extends React.Component {
         app.view.installEditPolicy(new draw2d.policy.connection.DragConnectionCreatePolicy({
             createConnection: createConnection
         }));
-
-        $.get("/task/actions", (data, status) => {
-            let actions = [];
-            data.actions.forEach(element => {
-                let action;
-                if (element.name == "IfAction") {
-                    action = new IfAction({x: 550, y: 340, width: 120, height: 120, userData: element});
-                } else if (element.name == "StartAction") {
-                    action = new StartFigure({x: 550, y: 340, width: 120, height: 120, userData: element});
-                } else {
-                    action = new BetweenFigure({x: 550, y: 340, width: 120, height: 120, userData: element});
-                }
-
-                actions.push(action);
-
-                // Auto add the start action
-                if (action.userData.name == "StartAction") {
-                    app.view.add(new StartFigure({x: 50, y: 340, width: 120, height: 120, userData: action.userData}))
-                }
-
-            })
-
-            // Set state.
-            this.setState(prevState => ({
-                availableActions: actions
-            }));
-
+        app.view.getCommandStack().on("change", function (e) {
+            if (e.isPostChangeEvent()) {
+                mainApp.setState({saved: false})
+            }
         });
-
-        this.setState({app: app});
+        return app;
     }
 
-    createNode(actionObject) {
+    createNode(actionName) {
         let action;
-        if (actionObject.userData.name == "IfAction") {
-            action = new IfAction({x: 550, y: 340, width: 120, height: 120, userData: actionObject.userData});
+        if (actionName == "IfAction") {
+            action = new IfAction({
+                x: 550,
+                y: 340,
+                width: 120,
+                height: 120,
+                userData: this.state.availableActions.find(availableAction => availableAction.name == actionName)
+            });
             action.onDoubleClick = () => this.editModelForFigure();
             action.userData.customData = {
                 "scriptLanguage": "VELOCITY"
             };
-        } else if (actionObject.userData.name == "StartAction") {
-            action = new StartFigure({x: 550, y: 340, width: 120, height: 120, userData: actionObject.userData});
+        } else if (actionName == "StartAction") {
+            action = new StartFigure({
+                x: 550,
+                y: 340,
+                width: 120,
+                height: 120,
+                userData: this.state.availableActions.find(availableAction => availableAction.name == actionName)
+            });
             action.onDoubleClick = () => this.editModelForFigure();
             action.userData.customData = [];
 
         } else {
-            action = new BetweenFigure({x: 550, y: 340, width: 120, height: 120, userData: actionObject.userData});
+            action = new BetweenFigure({
+                x: 550,
+                y: 340,
+                width: 120,
+                height: 120,
+                userData: this.state.availableActions.find(availableAction => availableAction.name == actionName)
+            });
             action.onDoubleClick = () => this.editModelForFigure();
             action.userData.customData = {
                 "scriptLanguage": "VELOCITY"
@@ -159,7 +175,8 @@ class MainApp extends React.Component {
 
                         outputBody.actions.push({
                             "@type": json[i].userData.name,
-                            ports: currentActionPorts, ...json[i].userData.customData,
+                            ...json[i].userData.customData,
+                            ports: currentActionPorts,
                             guiXPos: json[i].x,
                             guiYPos: json[i].y
                         });
@@ -194,6 +211,83 @@ class MainApp extends React.Component {
 
     }
 
+    openTask(taskName) {
+        let mainApp = this;
+        $.ajax({
+                type: "GET",
+                url: "/task/" + taskName + "/taskname",
+                contentType: 'application/json',
+                success: task => {
+                    this.state.app.view.clear();
+
+                    task.actions.forEach((action, i) => {
+                        let generatedAction = this.createNode(action["@type"]);
+                        generatedAction.userData.customData = action;
+                        generatedAction.x = action.guiXPos;
+                        generatedAction.y = action.guiYPos;
+                        let inputPortIndex = 0;
+                        let outputPortIndex = 0;
+
+
+                        action.ports.forEach((port, i) => {
+                            if (port.portType == "INPUT") {
+                                generatedAction.getInputPort(inputPortIndex).setId(port.externalId);
+                                generatedAction.getInputPort(inputPortIndex).setName(port.externalId);
+                                inputPortIndex++;
+                            } else {
+                                generatedAction.getOutputPort(outputPortIndex).setId(port.externalId);
+                                generatedAction.getOutputPort(outputPortIndex).setName(port.externalId);
+                                outputPortIndex++;
+                            }
+                        })
+
+                        this.state.app.view.add(generatedAction);
+                    })
+
+
+                    // Very inefficient
+                    // TODO: Improve performance
+                    task.connections.forEach(connection => {
+                        let conVisual = new draw2d.Connection({
+                            router: new draw2d.layout.connection.InteractiveManhattanConnectionRouter(),
+                            color: "#334455",
+                            radius: 20,
+                            outlineColor: "#334455",
+                            stroke: 2
+                        });
+
+                        this.state.app.view.figures.data.forEach(figure => {
+                            figure.outputPorts.data.forEach(outputPort => {
+                                    if (outputPort.name == connection.source.externalId) {
+                                        conVisual.setSource(outputPort);
+                                    }
+                                }
+                            )
+                            figure.inputPorts.data.forEach(inputPort => {
+                                    if (inputPort.name == connection.target.externalId) {
+                                        conVisual.setTarget(inputPort);
+                                    }
+                                }
+                            )
+                        })
+
+                        this.state.app.view.add(conVisual);
+                    })
+
+
+                    mainApp.setState({
+                        taskName: task.name,
+                        requiredParameters: task.parameters,
+                        saved: true
+                    });
+                }
+                ,
+                dataType: "json"
+            }
+        )
+        ;
+    }
+
     editModelForFigure() {
         this.setState({selectedAction: {}});
         let currentSelection = this.state.app.view.selection.all.data[0];
@@ -209,15 +303,32 @@ class MainApp extends React.Component {
             taskName: value
         }));
 
+        this.setState({saved: false});
+
     }
 
     saveActionSettings() {
         let currentSelection = this.state.app.view.selection.all.data[0];
         currentSelection.userData = this.state.selectedAction.userData;
-        console.log(JSON.stringify(currentSelection.userData))
+        console.log(JSON.stringify(currentSelection.userData));
+        this.setState({saved: false});
     }
 
     render() {
+        let runBtn;
+        if (this.state.saved) {
+            runBtn = (<div><a href="#" onClick={() => {
+                this.setState({start: true})
+                $("#runTaskModal").modal("show");
+
+            }} className="btn btn-primary btn-block">Run
+                Workflow</a></div>);
+        } else {
+            runBtn = (<div><a href="#" onClick={() => {
+                alert("Please save the workflow first");
+            }} className="btn btn-primary disabled btn-block">Run
+                Workflow</a></div>);
+        }
         return <div id="container">
 
             <div className="row h-100 p-0 m-0">
@@ -226,21 +337,26 @@ class MainApp extends React.Component {
                     <img src="images/logo.png" alt="" className="w-100"/>
                     <nav className="nav flex-column">
                         {this.state.availableActions.map(action => (
-                            <a href="#" className="nav-link" key={action.userData.name}
-                               onClick={() => this.state.app.view.add(this.createNode(action))}>{action.userData.name}</a>
+                            <a href="#" className="nav-link" key={action.name}
+                               onClick={() => {
+                                   this.setState({saved: false});
+                                   this.state.app.view.add(this.createNode(action.name))
+                               }}>{action.name}</a>
                         ))}
                     </nav>
 
-                    <div><a href="#" onClick={this.downloadWorkflow} className="btn btn-primary">Export Workflow</a>
+                    <div><a href="#" onClick={this.downloadWorkflow} className="btn btn-primary btn-block">Export
+                        Workflow</a>
                     </div>
-                    <div><a href="#" onClick={() => $("#saveModal").modal("show")} className="btn btn-primary">Save
+                    <div><a href="#" onClick={() => $("#saveModal").modal("show")}
+                            className="btn btn-primary btn-block">Save
                         Workflow</a></div>
-                    <div><a href="#" onClick={() => {
-                        this.setState({start: true})
-                        $("#runTaskModal").modal("show");
+                    <div><a href="#" onClick={() => $("#openTaskModal").modal("show")}
+                            className="btn btn-primary btn-block">Open
+                        Workflow</a>
+                    </div>
+                    {runBtn}
 
-                    }} className="btn btn-primary">Run
-                        Workflow</a></div>
                 </div>
                 <div className="col-sm-10 col-md-10 col-lg-10 m-0 p-0">
                     <div id="canvas" className="w-100 h-100"></div>
@@ -264,6 +380,9 @@ class MainApp extends React.Component {
             <RunTaskModal
                 taskName={this.state.taskName} start={this.state.start} setStartToFalse={this.setStartToFalse}/>
 
+            <OpenTaskModal
+                openTask={this.openTask}/>
+
         </div>;
     }
 
@@ -285,6 +404,7 @@ class MainApp extends React.Component {
             });
         });
 
+        this.setState({saved: true})
     }
 
     closeSaveDialog() {
@@ -304,6 +424,7 @@ class MainApp extends React.Component {
                 }
             }
         }));
+        this.setState({saved: false})
     }
 }
 

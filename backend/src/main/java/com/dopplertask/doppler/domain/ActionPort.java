@@ -40,10 +40,12 @@ public class ActionPort {
 
     @OneToOne(mappedBy = "source", cascade = CascadeType.ALL,
             fetch = FetchType.LAZY, optional = false)
+    @JsonIgnore
     private Connection connectionSource;
 
     @OneToOne(mappedBy = "target", cascade = CascadeType.ALL,
             fetch = FetchType.LAZY, optional = false)
+    @JsonIgnore
     private Connection connectionTarget;
 
 

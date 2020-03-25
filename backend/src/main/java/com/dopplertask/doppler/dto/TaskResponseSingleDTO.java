@@ -1,5 +1,7 @@
 package com.dopplertask.doppler.dto;
 
+import com.dopplertask.doppler.domain.Connection;
+import com.dopplertask.doppler.domain.TaskParameter;
 import com.dopplertask.doppler.domain.action.Action;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -9,6 +11,7 @@ import java.util.List;
 public class TaskResponseSingleDTO {
 
     private String checksum;
+    private List<TaskParameter> taskParameters;
     private String name;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String description;
@@ -16,6 +19,8 @@ public class TaskResponseSingleDTO {
     private List<Action> actions;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Date created;
+
+    private List<Connection> connections;
 
     public String getName() {
         return name;
@@ -55,5 +60,21 @@ public class TaskResponseSingleDTO {
 
     public void setCreated(Date created) {
         this.created = created;
+    }
+
+    public List<TaskParameter> getTaskParameters() {
+        return taskParameters;
+    }
+
+    public void setTaskParameters(List<TaskParameter> taskParameters) {
+        this.taskParameters = taskParameters;
+    }
+
+    public List<Connection> getConnections() {
+        return connections;
+    }
+
+    public void setConnections(List<Connection> connections) {
+        this.connections = connections;
     }
 }
