@@ -1,5 +1,7 @@
 package com.dopplertask.doppler.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,6 +17,7 @@ public class Connection {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Long id;
 
     @OneToOne
@@ -27,6 +30,7 @@ public class Connection {
 
     @ManyToOne
     @JoinColumn(name = "task")
+    @JsonIgnore
     private Task task;
 
     public Connection() {

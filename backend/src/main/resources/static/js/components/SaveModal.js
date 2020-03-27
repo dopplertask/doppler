@@ -13,13 +13,15 @@ class SaveModal extends React.Component {
             <div className="modal-dialog" role="document">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h5 className="modal-title" id="saveModalLabel">Save workflow</h5>
+                        <h5 className="modal-title" id="saveModalLabel">Save task</h5>
                         <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div className="modal-body" id="saveModalBody">
-                        <input type="text" id="taskName" value={this.props.taskName}
+                        <label
+                            htmlFor="taskNameInput">Task name</label>
+                        <input type="text" className="form-control" id="taskNameInput" value={this.props.taskName}
                                onChange={this.props.handleSaveModalField}/>
                     </div>
                     <div className="modal-footer">

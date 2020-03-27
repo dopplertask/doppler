@@ -13,6 +13,7 @@ import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.domain.action.common.LinkedTaskAction;
 import com.dopplertask.doppler.dto.TaskCreationDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +102,11 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     public List<Task> getAllTasks() {
         List<Task> tasks = taskDao.findAll();
-        tasks.forEach(task -> Hibernate.initialize(task.getActionList()));
+        tasks.forEach(task -> {
+            Hibernate.initialize(task.getActionList());
+            Hibernate.initialize(task.getTaskParameterList());
+            Hibernate.initialize(task.getConnections());
+        });
         return tasks;
     }
 
@@ -122,6 +127,7 @@ public class TaskServiceImpl implements TaskService {
         // If we try to add the same task again, we just return the current id.
         Optional<Task> existingTask = taskDao.findByChecksum(checksum);
         if (existingTask.isPresent()) {
+            existingTask.get().setCreated(new Date());
             return existingTask.get().getId();
         }
 
@@ -214,6 +220,8 @@ public class TaskServiceImpl implements TaskService {
         if (taskOptional.isPresent()) {
             Task task = taskOptional.get();
             Hibernate.initialize(task.getActionList());
+            Hibernate.initialize(task.getTaskParameterList());
+            Hibernate.initialize(task.getConnections());
             return task;
         }
         return null;
@@ -312,6 +320,21 @@ public class TaskServiceImpl implements TaskService {
         }
 
         throw new TaskNotFoundException("Task could not be found.");
+    }
+
+    @Override
+    @Transactional
+    public Task getTaskByName(String taskName) {
+        Optional<Task> task = taskDao.findFirstByNameOrderByCreatedDesc(taskName);
+
+        if (task.isPresent()) {
+            Task taskObj = task.get();
+            Hibernate.initialize(taskObj.getActionList());
+            Hibernate.initialize(taskObj.getTaskParameterList());
+            Hibernate.initialize(taskObj.getConnections());
+            return taskObj;
+        }
+        return null;
     }
 
     @Override

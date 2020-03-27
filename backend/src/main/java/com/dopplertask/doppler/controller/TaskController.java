@@ -21,6 +21,7 @@ import com.dopplertask.doppler.service.ExecutionService;
 import com.dopplertask.doppler.service.TaskRequest;
 import com.dopplertask.doppler.service.TaskService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -165,6 +166,8 @@ public class TaskController {
             taskDto.setName(task.getName());
             taskDto.setCreated(task.getCreated());
             taskDto.setActions(task.getActionList());
+            taskDto.setTaskParameters(task.getTaskParameterList());
+            taskDto.setConnections(task.getConnections());
 
             taskResponseDTOList.add(taskDto);
         }
@@ -181,6 +184,26 @@ public class TaskController {
             taskDto.setDescription(task.getDescription());
             taskDto.setActions(task.getActionList());
             taskDto.setChecksum(task.getChecksum());
+            taskDto.setTaskParameters(task.getTaskParameterList());
+            taskDto.setConnections(task.getConnections());
+
+            return new ResponseEntity<>(taskDto, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/task/{name}/taskname")
+    public ResponseEntity<TaskResponseSingleDTO> getTask(@PathVariable("name") String id) {
+        Task task = taskService.getTaskByName(id);
+        if (task != null) {
+            TaskResponseSingleDTO taskDto = new TaskResponseSingleDTO();
+            taskDto.setName(task.getName());
+            taskDto.setDescription(task.getDescription());
+            taskDto.setActions(task.getActionList());
+            taskDto.setChecksum(task.getChecksum());
+            taskDto.setTaskParameters(task.getTaskParameterList());
+            taskDto.setConnections(task.getConnections());
 
             return new ResponseEntity<>(taskDto, HttpStatus.OK);
         }
