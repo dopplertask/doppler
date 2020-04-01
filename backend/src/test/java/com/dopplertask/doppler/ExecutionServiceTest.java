@@ -137,7 +137,7 @@ public class ExecutionServiceTest {
         inputPort.setAction(setVariableAction);
 
         connection.setTarget(inputPort);
-        inputPort.setConnectionTarget(connection);
+        inputPort.setConnectionTarget(List.of(connection));
 
         setVariableAction.setPorts(List.of(inputPort));
         setVariableAction.setSetVariableList(List.of(setVariable));
