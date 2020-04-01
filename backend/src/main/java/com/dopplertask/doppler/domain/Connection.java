@@ -24,7 +24,7 @@ public class Connection {
     @JoinColumn(name = "source")
     private ActionPort source;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "target")
     private ActionPort target;
 

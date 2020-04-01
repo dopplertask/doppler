@@ -2,6 +2,12 @@ package com.dopplertask.doppler.domain;
 
 import com.dopplertask.doppler.domain.action.Action;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -19,11 +25,6 @@ import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Entity
 @Table(name = "TaskExecution")
@@ -57,6 +58,9 @@ public class TaskExecution {
 
     @Transient
     private Action currentAction;
+
+    @Transient
+    private Map<Long, Integer> actionAccessCountMap = new HashMap<Long, Integer>();
 
     private boolean success = true;
 
@@ -138,5 +142,28 @@ public class TaskExecution {
 
     public void setCurrentAction(Action currentAction) {
         this.currentAction = currentAction;
+    }
+
+    public int getActionAccessCount(Long actionId) {
+        Integer count = this.actionAccessCountMap.get(actionId);
+        if (count == null) {
+            return 0;
+        } else {
+            return count;
+        }
+    }
+
+    /**
+     * Add access count to an action.
+     *
+     * @param actionId
+     */
+    public void addActionAccessCountByOne(Long actionId) {
+        Integer count = this.actionAccessCountMap.get(actionId);
+        if (count == null) {
+            this.actionAccessCountMap.put(actionId, 1);
+        } else {
+            this.actionAccessCountMap.put(actionId, count + 1);
+        }
     }
 }

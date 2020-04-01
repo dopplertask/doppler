@@ -5,22 +5,27 @@ import com.dopplertask.doppler.domain.TaskParameter;
 import com.dopplertask.doppler.domain.action.Action;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class TaskResponseSingleDTO {
 
-    private String checksum;
-    private List<TaskParameter> taskParameters;
     private String name;
+    private String checksum;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Date created;
+    private List<TaskParameter> parameters;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String description;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<Action> actions;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Date created;
-
     private List<Connection> connections;
+
+    public TaskResponseSingleDTO() {
+        parameters = new ArrayList<>();
+        connections = new ArrayList<>();
+    }
 
     public String getName() {
         return name;
@@ -62,19 +67,19 @@ public class TaskResponseSingleDTO {
         this.created = created;
     }
 
-    public List<TaskParameter> getTaskParameters() {
-        return taskParameters;
-    }
-
-    public void setTaskParameters(List<TaskParameter> taskParameters) {
-        this.taskParameters = taskParameters;
-    }
-
     public List<Connection> getConnections() {
         return connections;
     }
 
     public void setConnections(List<Connection> connections) {
         this.connections = connections;
+    }
+
+    public List<TaskParameter> getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(List<TaskParameter> parameters) {
+        this.parameters = parameters;
     }
 }

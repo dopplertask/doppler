@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.2.5.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.2.6.RELEASE")
     }
 }
 
@@ -15,7 +15,7 @@ apply plugin: 'io.spring.dependency-management'
 
 bootJar {
     archiveBaseName = 'doppler'
-    archiveVersion = '0.6.0'
+    archiveVersion = '0.7.0'
 }
 
 repositories {
@@ -35,10 +35,10 @@ sourceCompatibility = 11.0
 targetCompatibility = 11.0
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web:2.2.5.RELEASE")
-    compile("org.springframework.boot:spring-boot-starter-data-jpa:2.2.5.RELEASE")
+    compile("org.springframework.boot:spring-boot-starter-web:2.2.6.RELEASE")
+    compile("org.springframework.boot:spring-boot-starter-data-jpa:2.2.6.RELEASE")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-activemq
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-activemq', version: '2.2.5.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-activemq', version: '2.2.6.RELEASE'
     compile("org.apache.activemq:activemq-stomp:5.15.12")
     compile("org.apache.activemq:activemq-http:5.15.12")
 
@@ -83,7 +83,7 @@ dependencies {
     compile group: 'org.reflections', name: 'reflections', version: '0.9.12'
 
 
-    testCompile('org.springframework.boot:spring-boot-starter-test:2.2.5.RELEASE')
+    testCompile('org.springframework.boot:spring-boot-starter-test:2.2.6.RELEASE')
     testCompile('com.jayway.jsonpath:json-path:2.4.0')
 }
 
