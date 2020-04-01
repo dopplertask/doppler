@@ -36,6 +36,7 @@ class MainApp extends React.Component {
         this.saveSettings = this.saveSettings.bind(this);
         this.openTask = this.openTask.bind(this);
         this.initApp = this.initApp.bind(this);
+        this.newWorkflow = this.newWorkflow.bind(this);
 
     }
 
@@ -49,6 +50,25 @@ class MainApp extends React.Component {
         this.setState({
                           start: true
                       })
+    }
+
+    newWorkflow() {
+        function createNewTask() {
+            let unsavedTaskNamePrefix = "_" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2,
+                                                                                                                                 15);
+            this.state.app.view.clear();
+            this.setState({
+                              taskName: "task" + unsavedTaskNamePrefix,
+                              parameters: [],
+                              saved: false
+                          });
+        }
+
+        if (!this.state.saved && confirm("You have unsaved changes. Do you want to continue?")) {
+            createNewTask.call(this);
+        } else if (this.state.saved) {
+            createNewTask.call(this);
+        }
     }
 
     componentDidMount() {
@@ -378,6 +398,9 @@ class MainApp extends React.Component {
                                         <span className="fa fa-home solo"><img src="images/logo.png" alt=""
                                         /></span>
                                     </li>
+                                    <li><a href="#" onClick={this.newWorkflow}
+                                           className="fa fa-home solo">New task</a>
+                                    </li>
                                     <li><a href="#" onClick={() => $("#taskSettingsModal").modal("show")}
                                            className="fa fa-home solo">Task parameters</a>
                                     </li>
@@ -399,6 +422,10 @@ class MainApp extends React.Component {
                                 </ul>
                                 {runBtn}
                             </nav>
+
+                            <br/>
+                            Current task:<br/>
+                            {!this.state.saved ? ("[UNSAVED]") : ("")} {this.state.taskName}
                         </div>
                         <div className="col-sm-10 col-md-10 col-lg-10 m-0 p-0">
                             <div id="canvas" className="w-100 h-100"></div>
