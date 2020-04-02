@@ -40,6 +40,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -174,6 +176,11 @@ public class TaskController {
 
             groupedTasks.get(task.getName()).add(taskDto);
         }
+
+        // Sort tasks
+        groupedTasks.forEach((s, taskResponseSingleDTOS) -> {
+            Collections.sort(taskResponseSingleDTOS, Comparator.comparing(TaskResponseSingleDTO::getCreated).reversed());
+        });
 
         return new ResponseEntity<>(groupedTasks, HttpStatus.OK);
     }
