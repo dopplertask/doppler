@@ -27,6 +27,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -34,7 +43,6 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -43,11 +51,6 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
@@ -110,7 +113,8 @@ public class Action {
     @Column
     private ScriptLanguage scriptLanguage = ScriptLanguage.VELOCITY;
 
-    @OneToMany(mappedBy = "action", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "action", cascade = CascadeType.ALL)
+    @Fetch(value = FetchMode.JOIN)
     private List<ActionPort> ports = new ArrayList<>();
 
     @JsonIgnore
@@ -204,7 +208,7 @@ public class Action {
     @JsonIgnore
     public List<PropertyInformation> getActionInfo() {
         return new ArrayList<>(List.of(
-                new PropertyInformation("continueOnFailure", "Continue on failure", PropertyInformation.PropertyInformationType.BOOLEAN, "", "true or false. Lets the action continue on failure, ignoring any retry."),
+                new PropertyInformation("continueOnFailure", "Continue on failure", PropertyInformation.PropertyInformationType.BOOLEAN, "false", "true or false. Lets the action continue on failure, ignoring any retry."),
                 new PropertyInformation("scriptLanguage", "Script Language", PropertyInformation.PropertyInformationType.DROPDOWN, "VELOCITY", "VELOCITY (default), JAVASCRIPT.",
                         List.of(new PropertyInformation("VELOCITY", "Velocity"), new PropertyInformation("JAVASCRIPT", "Javascript"))
                 ),
@@ -321,7 +325,7 @@ public class Action {
         }
 
         public enum PropertyInformationType {
-            STRING, MULTILINE, BOOLEAN, NUMBER, DROPDOWN, DROPDOWN_ITEM
+            STRING, MULTILINE, BOOLEAN, NUMBER, DROPDOWN, MAP
         }
     }
 }

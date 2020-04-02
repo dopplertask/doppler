@@ -6,12 +6,8 @@ import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.List;
-import java.util.function.Consumer;
 
 import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
@@ -33,7 +29,7 @@ public class SetVariableAction extends Action {
         ActionResult actionResult = new ActionResult();
         StringBuilder builder = new StringBuilder();
 
-        for(SetVariable setVariable : setVariableList) {
+        for (SetVariable setVariable : setVariableList) {
             if (setVariable.getValue() != null) {
                 String evaluatedValue = variableExtractorUtil.extract(setVariable.getValue(), execution, getScriptLanguage());
                 execution.getParameters().put(setVariable.getName(), evaluatedValue);
@@ -52,9 +48,19 @@ public class SetVariableAction extends Action {
     }
 
     public void setSetVariableList(List<SetVariable> setVariableList) {
-        setVariableList.forEach(setVariable -> setVariable.setSetVariableAction(this));
         this.setVariableList = setVariableList;
+        this.setVariableList.forEach(setVariable -> setVariable.setSetVariableAction(this));
     }
 
+    @Override
+    public List<PropertyInformation> getActionInfo() {
+        List<PropertyInformation> actionInfo = super.getActionInfo();
 
+        actionInfo.add(new PropertyInformation("setVariableList", "Variables", PropertyInformation.PropertyInformationType.MAP, "", "", List.of(
+                new PropertyInformation("name", "Name"),
+                new PropertyInformation("value", "Value")
+        )));
+
+        return actionInfo;
+    }
 }

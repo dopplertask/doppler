@@ -103,7 +103,7 @@ public class BrowseWebAction extends Action {
             } else {
                 // Normal UI Actions
                 WebElement element = findWebElement(uiAction, wait, actionResult);
-                if(actionResult.getStatusCode() == StatusCode.FAILURE) {
+                if (actionResult.getStatusCode() == StatusCode.FAILURE) {
                     webDriver.quit();
                     return actionResult;
                 }
@@ -185,7 +185,7 @@ public class BrowseWebAction extends Action {
 
     public void setActionList(List<UIAction> actionList) {
         this.actionList = actionList;
-        actionList.forEach(uiAction -> uiAction.setBrowseWebAction(this));
+        this.actionList.forEach(uiAction -> uiAction.setBrowseWebAction(this));
     }
 
     public boolean isHeadless() {
@@ -194,6 +194,34 @@ public class BrowseWebAction extends Action {
 
     public void setHeadless(boolean headless) {
         this.headless = headless;
+    }
+
+    @Override
+    public List<PropertyInformation> getActionInfo() {
+        List<PropertyInformation> actionInfo = super.getActionInfo();
+
+        actionInfo.add(new PropertyInformation("url", "URL", PropertyInformation.PropertyInformationType.STRING, "", "URL of the web page"));
+        actionInfo.add(new PropertyInformation("headless", "Headless mode", PropertyInformation.PropertyInformationType.BOOLEAN, "true", "URL of the web page"));
+
+        actionInfo.add(new PropertyInformation("actionList", "Action list", PropertyInformation.PropertyInformationType.MAP, "", "", List.of(
+                new PropertyInformation("fieldName", "Field name"),
+                new PropertyInformation("action", "Action", PropertyInformation.PropertyInformationType.DROPDOWN, "PRESS", "", List.of(
+                        new PropertyInformation("PRESS", "Press"),
+                        new PropertyInformation("SELECT", "Select"),
+                        new PropertyInformation("WRITE", "Write"),
+                        new PropertyInformation("WAIT", "Wait"),
+                        new PropertyInformation("ACCEPT_ALERT", "Accept alert")
+                )),
+                new PropertyInformation("findByType", "Find By Type", PropertyInformation.PropertyInformationType.DROPDOWN, "ID", "", List.of(
+                        new PropertyInformation("ID", "Id"),
+                        new PropertyInformation("NAME", "Name"),
+                        new PropertyInformation("XPATH", "XPath"),
+                        new PropertyInformation("CSS", "CSS")
+                )),
+                new PropertyInformation("value", "Value")
+        )));
+
+        return actionInfo;
     }
 }
 

@@ -7,23 +7,25 @@ import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.persistence.CollectionTable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
+import javax.persistence.FetchType;
 import javax.persistence.Lob;
-import javax.persistence.MapKeyColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -34,11 +36,8 @@ public class HttpAction extends Action {
     @Column
     private String url;
 
-    @ElementCollection
-    @MapKeyColumn(name = "headerName")
-    @Column(name = "headerValue")
-    @CollectionTable(name = "httpaction_headers", joinColumns = @JoinColumn(name = "httpaction_id"))
-    private Map<String, String> headers = new HashMap<>();
+    @OneToMany(mappedBy = "httpAction", cascade = CascadeType.ALL)
+    private List<HttpHeader> headers = new ArrayList<>();
 
     @Column
     private String method;
@@ -84,8 +83,8 @@ public class HttpAction extends Action {
         }
 
 
-        for (Map.Entry<String, String> entry : headers.entrySet()) {
-            builder = builder.header(entry.getKey(), variableExtractorUtil.extract(entry.getValue(), execution, getScriptLanguage()));
+        for (HttpHeader entry : headers) {
+            builder = builder.header(variableExtractorUtil.extract(entry.getHeaderName(), execution, getScriptLanguage()), variableExtractorUtil.extract(entry.getHeaderValue(), execution, getScriptLanguage()));
         }
 
         HttpClient client = HttpClient.newHttpClient();
@@ -108,5 +107,59 @@ public class HttpAction extends Action {
         }
 
         return actionResult;
+    }
+
+    @Override
+    public List<PropertyInformation> getActionInfo() {
+        List<PropertyInformation> actionInfo = super.getActionInfo();
+
+        actionInfo.add(new PropertyInformation("url", "URL", PropertyInformation.PropertyInformationType.STRING, "", "Hostname or IP"));
+        actionInfo.add(new PropertyInformation("method", "Method", PropertyInformation.PropertyInformationType.DROPDOWN, "GET", "HTTP Method",
+                List.of(new PropertyInformation("GET", "GET"),
+                        new PropertyInformation("POST", "POST"),
+                        new PropertyInformation("PUT", "PUT"),
+                        new PropertyInformation("DELETE", "DELETE")
+                )
+        ));
+        actionInfo.add(new PropertyInformation("body", "Body", PropertyInformation.PropertyInformationType.MULTILINE, "", "Contents to send"));
+        actionInfo.add(new PropertyInformation("headers", "Headers", PropertyInformation.PropertyInformationType.MAP, "", "Username",
+                List.of(new PropertyInformation("headerName", "Key"),
+                        new PropertyInformation("headerValue", "Value")
+                )));
+
+        return actionInfo;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public List<HttpHeader> getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(List<HttpHeader> headers) {
+        headers.forEach(header -> header.setHttpAction(this));
+        this.headers = headers;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
     }
 }

@@ -6,7 +6,6 @@ class SaveModal extends React.Component {
         super(props);
     }
 
-
     render() {
         return (<div className="modal fade" id="saveModal" tabIndex="-1" role="dialog"
                      aria-labelledby="saveModalLabel" aria-hidden="true">
