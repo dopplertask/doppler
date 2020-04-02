@@ -92,7 +92,21 @@ class RunTaskModal extends React.Component {
                                    client.subscribe("/queue/taskexecution_destination",
                                                     function (message) {
                                                         let messageBody = JSON.parse(message.body);
-                                                        jQuery("#outputDiv").append(messageBody.output + "<br>");
+                                                        var tagsToReplace = {
+                                                            '&': '&amp;',
+                                                            '<': '&lt;',
+                                                            '>': '&gt;'
+                                                        };
+
+                                                        function replaceTag(tag) {
+                                                            return tagsToReplace[tag] || tag;
+                                                        }
+
+                                                        function safe_tags_replace(str) {
+                                                            return str.replace(/[&<>]/g, replaceTag);
+                                                        }
+
+                                                        jQuery("#outputDiv").append(safe_tags_replace(messageBody.output) + "<br>");
                                                         message.ack();
 
                                                         if (message.headers["lastMessage"] == "true"
@@ -155,7 +169,7 @@ class RunTaskModal extends React.Component {
                             }
 
                         </div>
-                        <button type="button" className="btn btn-primary"
+                        <button type="button" className={"btn btn-primary" + (this.state.start ? " disabled" : "")}
                                 onClick={this.runTask}>Run task
                         </button>
                         <br/>

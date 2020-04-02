@@ -14,7 +14,6 @@ import com.dopplertask.doppler.domain.action.common.LinkedTaskAction;
 import com.dopplertask.doppler.dto.TaskCreationDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,9 +102,8 @@ public class TaskServiceImpl implements TaskService {
     public List<Task> getAllTasks() {
         List<Task> tasks = taskDao.findAll();
         tasks.forEach(task -> {
-            Hibernate.initialize(task.getActionList());
-            Hibernate.initialize(task.getTaskParameterList());
-            Hibernate.initialize(task.getConnections());
+
+
         });
         return tasks;
     }
@@ -199,12 +197,6 @@ public class TaskServiceImpl implements TaskService {
         // Save the new task
         taskDao.save(task);
 
-
-
-
-/*
-        actionPortDao.findByExternalIdAndTask()*/
-
         return task.getId();
     }
 
@@ -219,9 +211,6 @@ public class TaskServiceImpl implements TaskService {
         Optional<Task> taskOptional = taskDao.findById(id);
         if (taskOptional.isPresent()) {
             Task task = taskOptional.get();
-            Hibernate.initialize(task.getActionList());
-            Hibernate.initialize(task.getTaskParameterList());
-            Hibernate.initialize(task.getConnections());
             return task;
         }
         return null;
@@ -329,9 +318,6 @@ public class TaskServiceImpl implements TaskService {
 
         if (task.isPresent()) {
             Task taskObj = task.get();
-            Hibernate.initialize(taskObj.getActionList());
-            Hibernate.initialize(taskObj.getTaskParameterList());
-            Hibernate.initialize(taskObj.getConnections());
             return taskObj;
         }
         return null;
@@ -344,9 +330,6 @@ public class TaskServiceImpl implements TaskService {
 
         if (task.isPresent()) {
             Task taskObj = task.get();
-            Hibernate.initialize(taskObj.getActionList());
-            Hibernate.initialize(taskObj.getTaskParameterList());
-            Hibernate.initialize(taskObj.getConnections());
             return taskObj;
         }
         return null;

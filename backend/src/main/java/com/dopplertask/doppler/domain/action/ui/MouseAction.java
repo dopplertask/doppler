@@ -7,15 +7,17 @@ import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 
+import java.awt.*;
+import java.awt.event.InputEvent;
+import java.io.IOException;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
-import java.awt.*;
-import java.awt.event.InputEvent;
-import java.io.IOException;
 
 @Entity
 @Table(name = "MouseAction")
@@ -76,15 +78,27 @@ public class MouseAction extends Action {
                     }
                     break;
                 case CLICK:
+                    if (localPositionX != null && localPositionY != null) {
+                        robot.mouseMove(Integer.parseInt(localPositionX), Integer.parseInt(localPositionY));
+                        actionResult.setOutput("Mouse was moved to X: " + localPositionX + ", Y: " + localPositionY);
+                    }
                     robot.mousePress(selectedButton);
                     robot.mouseRelease(selectedButton);
                     actionResult.setOutput("Mouse " + selectedButton + " was clicked.");
                     break;
                 case PRESS:
+                    if (localPositionX != null && localPositionY != null) {
+                        robot.mouseMove(Integer.parseInt(localPositionX), Integer.parseInt(localPositionY));
+                        actionResult.setOutput("Mouse was moved to X: " + localPositionX + ", Y: " + localPositionY);
+                    }
                     robot.mousePress(selectedButton);
                     actionResult.setOutput("Mouse " + selectedButton + " was pressed.");
                     break;
                 case RELEASE:
+                    if (localPositionX != null && localPositionY != null) {
+                        robot.mouseMove(Integer.parseInt(localPositionX), Integer.parseInt(localPositionY));
+                        actionResult.setOutput("Mouse was moved to X: " + localPositionX + ", Y: " + localPositionY);
+                    }
                     robot.mouseRelease(selectedButton);
                     actionResult.setOutput("Mouse " + selectedButton + " was released.");
                     break;
@@ -100,6 +114,28 @@ public class MouseAction extends Action {
 
     }
 
+    @Override
+    public java.util.List<PropertyInformation> getActionInfo() {
+        java.util.List<PropertyInformation> actionInfo = super.getActionInfo();
+
+        actionInfo.add(new PropertyInformation("button", "Button", PropertyInformation.PropertyInformationType.DROPDOWN, "LEFT", "Button to press", List.of(
+                new PropertyInformation("LEFT", "Left click"),
+                new PropertyInformation("RIGHT", "Right click")
+        )));
+
+        actionInfo.add(new PropertyInformation("action", "Action", PropertyInformation.PropertyInformationType.DROPDOWN, "MOVE", "", List.of(
+                new PropertyInformation("MOVE", "Move"),
+                new PropertyInformation("CLICK", "Click"),
+                new PropertyInformation("PRESS", "Press"),
+                new PropertyInformation("RELEASE", "Release")
+        )));
+
+        actionInfo.add(new PropertyInformation("positionX", "Position X", PropertyInformation.PropertyInformationType.STRING, "0", "Move mouse to this X pos."));
+        actionInfo.add(new PropertyInformation("positionY", "Position Y", PropertyInformation.PropertyInformationType.STRING, "0", "Move mouse to this Y pos."));
+
+
+        return actionInfo;
+    }
 
     public String getPositionX() {
         return positionX;

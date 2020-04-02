@@ -78,6 +78,21 @@ class MainApp extends React.Component {
             $.get("/task/actions", (data, status) => {
                 let actions = [];
                 data.actions.forEach(element => {
+                    element.customData = [];
+                    element.propertyInformationList.map(pi => {
+                        if (pi.type === "MAP") {
+                            element.customData[pi.name] = []
+                        } else if (pi.type === "BOOLEAN") {
+                            if (pi.defaultValue == "true") {
+                                element.customData[pi.name] = true || "";
+                            } else {
+                                element.customData[pi.name] = false || "";
+                            }
+                        } else {
+                            element.customData[pi.name] = pi.defaultValue || "";
+                        }
+                    })
+
                     actions.push(element);
 
                     // Auto add the start action
@@ -142,9 +157,6 @@ class MainApp extends React.Component {
                                           availableAction => availableAction.name == actionName)
                                   });
             action.onDoubleClick = () => this.editModelForFigure();
-            action.userData.customData = {
-                "scriptLanguage": "VELOCITY"
-            };
         } else if (actionName == "StartAction") {
             action = new StartFigure({
                                          x: 550,
@@ -155,8 +167,6 @@ class MainApp extends React.Component {
                                              availableAction => availableAction.name == actionName)
                                      });
             action.onDoubleClick = () => this.editModelForFigure();
-            action.userData.customData = [];
-
         } else {
             action = new BetweenFigure({
                                            x: 550,
@@ -167,9 +177,6 @@ class MainApp extends React.Component {
                                                availableAction => availableAction.name == actionName)
                                        });
             action.onDoubleClick = () => this.editModelForFigure();
-            action.userData.customData = {
-                "scriptLanguage": "VELOCITY"
-            };
         }
 
         return action;
@@ -513,6 +520,7 @@ class MainApp extends React.Component {
         }));
         this.setState({saved: false})
     }
+
 }
 
 export default MainApp;

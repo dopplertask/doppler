@@ -26,10 +26,10 @@ class Editor extends React.Component {
         this.editor.setFontSize(16);
 
         this.editor.setOptions({
-            enableBasicAutocompletion: true,
-            enableSnippets: true,
-            enableLiveAutocompletion: false
-        });
+                                   enableBasicAutocompletion: true,
+                                   enableSnippets: true,
+                                   enableLiveAutocompletion: false
+                               });
 
         this.editor.setOption("enableSnippets", true);
         this.editor.setOption("maxLines", this.props.simple ? 1 : 30);
