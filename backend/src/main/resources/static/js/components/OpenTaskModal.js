@@ -4,9 +4,9 @@ class openTaskModal extends React.Component {
 
     constructor(props) {
         super(props);
-        this.renderOutput = this.renderOutput.bind(this);
         this.state = {
-            tasks: {}
+            tasks: {},
+            saved: false
         }
     }
 
@@ -23,7 +23,25 @@ class openTaskModal extends React.Component {
                });
     }
 
-    renderOutput() {
+    componentDidUpdate(prevProps, prevState) {
+        if (prevProps.saved != this.props.saved) {
+            if (this.props.saved) {
+                let openTaskModal = this;
+                $.ajax({
+                           type: "GET",
+                           url: "/task/grouped",
+                           contentType: 'application/json',
+                           success: success => {
+                               openTaskModal.setState({tasks: success})
+                           },
+                           dataType: "json"
+                       });
+
+            }
+            this.setState({
+                              saved: this.props.saved
+                          })
+        }
 
     }
 

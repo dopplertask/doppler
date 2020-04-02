@@ -463,7 +463,7 @@ class MainApp extends React.Component {
                 parameters={this.state.parameters} setStartToTrue={this.setStartToTrue}/>
 
             <OpenTaskModal
-                openTask={this.openTask}/>
+                openTask={this.openTask} saved={this.state.saved}/>
 
             <TaskSettings parameters={this.state.parameters}
                           saveSettings={this.saveSettings}
@@ -493,12 +493,12 @@ class MainApp extends React.Component {
                        contentType: 'application/json',
                        success: success => {
                            console.log(success)
+                           this.setState({saved: true})
                        },
                        dataType: "json"
                    });
         });
 
-        this.setState({saved: true})
     }
 
     closeSaveDialog() {
