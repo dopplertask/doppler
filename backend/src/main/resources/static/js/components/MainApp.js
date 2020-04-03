@@ -57,6 +57,15 @@ class MainApp extends React.Component {
             let unsavedTaskNamePrefix = "_" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2,
                                                                                                                                  15);
             this.state.app.view.clear();
+            this.state.app.view.add(new StartFigure({
+                                                        x: 50,
+                                                        y: 340,
+                                                        width: 120,
+                                                        height: 120,
+                                                        userData: this.state.availableActions.find(
+                                                            availableAction => availableAction.name == "StartAction")
+                                                    }));
+
             this.setState({
                               taskName: "task" + unsavedTaskNamePrefix,
                               parameters: [],
@@ -116,7 +125,7 @@ class MainApp extends React.Component {
 
     initApp() {
         let mainApp = this;
-        let createConnection = function (sourcePort, targetPort) {
+        var createConnection = function (sourcePort, targetPort) {
 
             let conn = new draw2d.Connection({
                                                  router: new draw2d.layout.connection.InteractiveManhattanConnectionRouter(),
@@ -482,6 +491,18 @@ class MainApp extends React.Component {
 
     saveWorkflow() {
         // Validation before sending to API.
+        let startActions = 0;
+        this.state.app.view.figures.data.forEach(figure => {
+            if (figure instanceof StartFigure) {
+                startActions++;
+            }
+        })
+
+        // Validate
+        if (startActions > 1) {
+            alert("Only one start action is allowed.");
+            return;
+        }
         console.log("Save workflow API call to backend")
 
         this.prepareJSON(json => {

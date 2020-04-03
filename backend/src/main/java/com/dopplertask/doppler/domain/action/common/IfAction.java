@@ -1,16 +1,18 @@
 package com.dopplertask.doppler.domain.action.common;
 
 import com.dopplertask.doppler.domain.ActionResult;
+import com.dopplertask.doppler.domain.StatusCode;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 
+import java.io.IOException;
+import java.util.List;
+
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.io.IOException;
-import java.util.List;
 
 @Entity
 @Table(name = "IfAction")
@@ -29,25 +31,29 @@ public class IfAction extends Action {
 
         ActionResult actionResult = new ActionResult();
         String localCondition;
-        switch (getScriptLanguage()) {
-            case VELOCITY:
-                localCondition = variableExtractorUtil.extract("#if(" + condition + ")\ntrue#else\nfalse#end", execution, getScriptLanguage());
-                break;
-            case JAVASCRIPT:
-                localCondition = variableExtractorUtil.extract("if(" + condition + ") {\n\"true\"; } else {\n\"false\";}", execution, ScriptLanguage.JAVASCRIPT);
-                break;
-            default:
-                throw new IllegalStateException("Unexpected script engine");
-        }
+        if (condition != null && !condition.isEmpty()) {
+            switch (getScriptLanguage()) {
+                case VELOCITY:
+                    localCondition = variableExtractorUtil.extract("#if(" + condition + ")\ntrue#else\nfalse#end", execution, getScriptLanguage());
+                    break;
+                case JAVASCRIPT:
+                    localCondition = variableExtractorUtil.extract("if(" + condition + ") {\n\"true\"; } else {\n\"false\";}", execution, ScriptLanguage.JAVASCRIPT);
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected script engine");
+            }
 
-        if ("true".equals(localCondition)) {
-            actionResult.setOutput("If evaluated to true. Next actions path: " + localCondition);
-            execution.setCurrentAction(getOutputPorts().get(0).getConnectionSource().getTarget().getAction());
+            if ("true".equals(localCondition)) {
+                actionResult.setOutput("If evaluated to true.");
+                execution.setCurrentAction(getOutputPorts().get(0).getConnectionSource().getTarget().getAction());
+            } else {
+                actionResult.setOutput("If evaluated to false.");
+                execution.setCurrentAction(getOutputPorts().get(1).getConnectionSource().getTarget().getAction());
+            }
         } else {
-            actionResult.setOutput("If evaluated to false. Next actions path: " + localCondition);
-            execution.setCurrentAction(getOutputPorts().get(1).getConnectionSource().getTarget().getAction());
+            actionResult.setStatusCode(StatusCode.FAILURE);
+            actionResult.setErrorMsg("Please enter a condition.");
         }
-
         return actionResult;
     }
 
