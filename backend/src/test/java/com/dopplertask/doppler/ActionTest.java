@@ -68,7 +68,7 @@ public class ActionTest {
         ifAction.setCondition("'test' == 'test'");
 
         ActionResult actionResult = ifAction.run(null, taskExecution, variableExtractorUtil);
-        Assert.assertEquals("If evaluated to true. Next actions path: true", actionResult.getOutput());
+        Assert.assertEquals("If evaluated to true.", actionResult.getOutput());
         Assert.assertEquals("True path", ((PrintAction) taskExecution.getCurrentAction()).getMessage());
     }
 
@@ -110,7 +110,7 @@ public class ActionTest {
         ifAction.setCondition("'test' == 'test_false'");
 
         ActionResult actionResult = ifAction.run(null, taskExecution, variableExtractorUtil);
-        Assert.assertEquals("If evaluated to false. Next actions path: false", actionResult.getOutput());
+        Assert.assertEquals("If evaluated to false.", actionResult.getOutput());
         Assert.assertEquals("False path", ((PrintAction) taskExecution.getCurrentAction()).getMessage());
     }
 

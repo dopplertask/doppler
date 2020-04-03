@@ -37,7 +37,25 @@ class MainApp extends React.Component {
         this.openTask = this.openTask.bind(this);
         this.initApp = this.initApp.bind(this);
         this.newWorkflow = this.newWorkflow.bind(this);
+        this.searchActions = this.searchActions.bind(this);
 
+    }
+
+    searchActions() {
+        let input, filter, ul, li, a, i, txtValue;
+        input = document.getElementById("actionSearchInput");
+        filter = input.value.toUpperCase();
+        ul = document.getElementById("actionSearchUL");
+        li = ul.getElementsByTagName("li");
+        for (i = 0; i < li.length; i++) {
+            a = li[i].getElementsByTagName("a")[0];
+            txtValue = a.textContent || a.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                li[i].style.display = "";
+            } else {
+                li[i].style.display = "none";
+            }
+        }
     }
 
     setStartToFalse() {
@@ -387,10 +405,15 @@ class MainApp extends React.Component {
 
                 <div id="sidebar-wrapper">
                     <nav id="spy">
-                        <ul className="sidebar-nav nav">
-                            <li className="sidebar-brand">
-                                <span className="fa fa-home solo">Add action</span>
-                            </li>
+                        <div className="sidebar-title">
+                            <span className="fa fa-home solo">Actions</span>
+                        </div>
+
+                        <div className="sidebar-search">
+                            <input type="text" id="actionSearchInput" placeholder="Search actions..."
+                                   onKeyUp={() => this.searchActions()}
+                                   className="form-control"/></div>
+                        <ul id="actionSearchUL" className="sidebar-nav nav">
                             {this.state.availableActions.map(action => (
                                 <li><a href="#" key={action.name}
                                        onClick={() => {
