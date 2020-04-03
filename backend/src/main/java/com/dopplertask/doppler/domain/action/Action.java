@@ -18,6 +18,7 @@ import com.dopplertask.doppler.domain.action.connection.MySQLAction;
 import com.dopplertask.doppler.domain.action.connection.SSHAction;
 import com.dopplertask.doppler.domain.action.connection.SecureCopyAction;
 import com.dopplertask.doppler.domain.action.io.ReadFileAction;
+import com.dopplertask.doppler.domain.action.io.WriteFileAction;
 import com.dopplertask.doppler.domain.action.ui.BrowseWebAction;
 import com.dopplertask.doppler.domain.action.ui.MouseAction;
 import com.dopplertask.doppler.service.TaskService;
@@ -75,7 +76,8 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
         @JsonSubTypes.Type(value = ScriptAction.class, name = "ScriptAction"),
         @JsonSubTypes.Type(value = IfAction.class, name = "IfAction"),
         @JsonSubTypes.Type(value = MouseAction.class, name = "MouseAction"),
-        @JsonSubTypes.Type(value = StartAction.class, name = "StartAction")
+        @JsonSubTypes.Type(value = StartAction.class, name = "StartAction"),
+        @JsonSubTypes.Type(value = WriteFileAction.class, name = "WriteFileAction")
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Action {

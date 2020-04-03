@@ -9,9 +9,9 @@ import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -20,23 +20,23 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "ReadFileAction")
-@DiscriminatorValue("readfile_action")
-public class ReadFileAction extends Action {
+@Table(name = "WriteFileAction")
+@DiscriminatorValue("writefile_action")
+public class WriteFileAction extends Action {
 
     @Column
     private String filename;
 
     @Column
-    private String parameterName;
+    private String contents;
 
-    public ReadFileAction() {
+    public WriteFileAction() {
     }
 
     @Override
     public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
         String filenameVariable = variableExtractorUtil.extract(filename, execution, getScriptLanguage());
-        String parameterNameVariable = variableExtractorUtil.extract(parameterName, execution, getScriptLanguage());
+        String contentsVariable = variableExtractorUtil.extract(contents, execution, getScriptLanguage());
 
         try {
             // Support shell ~ for home directory
@@ -44,19 +44,17 @@ public class ReadFileAction extends Action {
                 filenameVariable = filenameVariable.replace("~/", System.getProperty("user.home") + "/");
             }
 
-            String fileContents = Files.readString(Paths.get(filenameVariable), StandardCharsets.UTF_8);
-
-            execution.getParameters().put(parameterNameVariable, fileContents);
+            Files.writeString(Paths.get(filenameVariable), contentsVariable, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
 
             ActionResult actionResult = new ActionResult();
-            actionResult.setOutput(fileContents);
+            actionResult.setOutput(contents);
             actionResult.setOutputType(OutputType.STRING);
             actionResult.setStatusCode(StatusCode.SUCCESS);
 
             return actionResult;
         } catch (IOException e) {
             ActionResult actionResult = new ActionResult();
-            actionResult.setOutput("File could not be read [filename=" + filenameVariable + "]");
+            actionResult.setOutput("File could not be written [filename=" + filenameVariable + "]");
             actionResult.setOutputType(OutputType.STRING);
             actionResult.setStatusCode(StatusCode.FAILURE);
             return actionResult;
@@ -71,20 +69,20 @@ public class ReadFileAction extends Action {
         this.filename = filename;
     }
 
-    public String getParameterName() {
-        return parameterName;
-    }
-
-    public void setParameterName(String parameterName) {
-        this.parameterName = parameterName;
-    }
-
     @Override
     public List<PropertyInformation> getActionInfo() {
         List<PropertyInformation> actionInfo = super.getActionInfo();
 
         actionInfo.add(new PropertyInformation("filename", "File location", PropertyInformation.PropertyInformationType.STRING, "", "File path. eg. /home/user/file.txt"));
-        actionInfo.add(new PropertyInformation("parameterName", "Parameter Name", PropertyInformation.PropertyInformationType.STRING, "", "Parameter name to store contents."));
+        actionInfo.add(new PropertyInformation("contents", "Contents", PropertyInformation.PropertyInformationType.MULTILINE, "", "Contents of the file"));
         return actionInfo;
+    }
+
+    public String getContents() {
+        return contents;
+    }
+
+    public void setContents(String contents) {
+        this.contents = contents;
     }
 }
