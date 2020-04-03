@@ -159,6 +159,7 @@ class RunTaskModal extends React.Component {
                                         <div className="col-sm">
                                             <input className="form-control"
                                                    type="text"
+                                                   placeholder={parameter.defaultValue}
                                                    id={parameter.name}
                                                    onChange={this.parameterChange}
                                             />
