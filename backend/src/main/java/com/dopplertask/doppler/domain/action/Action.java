@@ -12,6 +12,7 @@ import com.dopplertask.doppler.domain.action.common.PrintAction;
 import com.dopplertask.doppler.domain.action.common.ScriptAction;
 import com.dopplertask.doppler.domain.action.common.ScriptLanguage;
 import com.dopplertask.doppler.domain.action.common.SetVariableAction;
+import com.dopplertask.doppler.domain.action.common.SwitchAction;
 import com.dopplertask.doppler.domain.action.common.TimedWait;
 import com.dopplertask.doppler.domain.action.connection.HttpAction;
 import com.dopplertask.doppler.domain.action.connection.MySQLAction;
@@ -27,15 +28,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -52,6 +46,11 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
@@ -77,7 +76,8 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
         @JsonSubTypes.Type(value = IfAction.class, name = "IfAction"),
         @JsonSubTypes.Type(value = MouseAction.class, name = "MouseAction"),
         @JsonSubTypes.Type(value = StartAction.class, name = "StartAction"),
-        @JsonSubTypes.Type(value = WriteFileAction.class, name = "WriteFileAction")
+        @JsonSubTypes.Type(value = WriteFileAction.class, name = "WriteFileAction"),
+        @JsonSubTypes.Type(value = SwitchAction.class, name = "SwitchAction")
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Action {

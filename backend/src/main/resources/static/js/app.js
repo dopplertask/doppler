@@ -20,6 +20,7 @@ import "script-loader!./common/MyInterceptorPolicy.js";
 import "script-loader!./common/StartFigure.js";
 import "script-loader!./common/BetweenFigure.js";
 import "script-loader!./common/IfAction.js";
+import "script-loader!./common/SwitchAction.js";
 
 import "script-loader!./common/bootstrap.min.js";
 
