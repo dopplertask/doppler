@@ -60,35 +60,35 @@ class MainApp extends React.Component {
 
     setStartToFalse() {
         this.setState({
-                          start: false
-                      })
+            start: false
+        })
     }
 
     setStartToTrue() {
         this.setState({
-                          start: true
-                      })
+            start: true
+        })
     }
 
     newWorkflow() {
         function createNewTask() {
             let unsavedTaskNamePrefix = "_" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2,
-                                                                                                                                 15);
+                15);
             this.state.app.view.clear();
             this.state.app.view.add(new StartFigure({
-                                                        x: 50,
-                                                        y: 340,
-                                                        width: 120,
-                                                        height: 120,
-                                                        userData: this.state.availableActions.find(
-                                                            availableAction => availableAction.name == "StartAction")
-                                                    }));
+                x: 50,
+                y: 340,
+                width: 120,
+                height: 120,
+                userData: this.state.availableActions.find(
+                    availableAction => availableAction.name == "StartAction")
+            }));
 
             this.setState({
-                              taskName: "task" + unsavedTaskNamePrefix,
-                              parameters: [],
-                              saved: false
-                          });
+                taskName: "task" + unsavedTaskNamePrefix,
+                parameters: [],
+                saved: false
+            });
         }
 
         if (!this.state.saved && confirm("You have unsaved changes. Do you want to continue?")) {
@@ -146,14 +146,14 @@ class MainApp extends React.Component {
         var createConnection = function (sourcePort, targetPort) {
 
             let conn = new draw2d.Connection({
-                                                 router: new draw2d.layout.connection.InteractiveManhattanConnectionRouter(),
-                                                 color: "#334455",
-                                                 radius: 20,
-                                                 outlineColor: "#334455",
-                                                 source: sourcePort,
-                                                 target: targetPort,
-                                                 stroke: 2
-                                             });
+                router: new draw2d.layout.connection.InteractiveManhattanConnectionRouter(),
+                color: "#334455",
+                radius: 20,
+                outlineColor: "#334455",
+                source: sourcePort,
+                target: targetPort,
+                stroke: 2
+            });
 
             return conn;
 
@@ -162,8 +162,8 @@ class MainApp extends React.Component {
         let app = new example.Application();
 
         app.view.installEditPolicy(new draw2d.policy.connection.DragConnectionCreatePolicy({
-                                                                                               createConnection: createConnection
-                                                                                           }));
+            createConnection: createConnection
+        }));
         app.view.getCommandStack().on("change", function (e) {
             if (e.isPostChangeEvent()) {
                 mainApp.setState({saved: false})
@@ -176,33 +176,43 @@ class MainApp extends React.Component {
         let action;
         if (actionName == "IfAction") {
             action = new IfAction({
-                                      x: 550,
-                                      y: 340,
-                                      width: 120,
-                                      height: 120,
-                                      userData: this.state.availableActions.find(
-                                          availableAction => availableAction.name == actionName)
-                                  });
+                x: 550,
+                y: 340,
+                width: 120,
+                height: 120,
+                userData: this.state.availableActions.find(
+                    availableAction => availableAction.name == actionName)
+            });
+            action.onDoubleClick = () => this.editModelForFigure();
+        } else if (actionName == "SwitchAction") {
+            action = new SwitchAction({
+                x: 550,
+                y: 340,
+                width: 120,
+                height: 120,
+                userData: this.state.availableActions.find(
+                    availableAction => availableAction.name == actionName)
+            });
             action.onDoubleClick = () => this.editModelForFigure();
         } else if (actionName == "StartAction") {
             action = new StartFigure({
-                                         x: 550,
-                                         y: 340,
-                                         width: 120,
-                                         height: 120,
-                                         userData: this.state.availableActions.find(
-                                             availableAction => availableAction.name == actionName)
-                                     });
+                x: 550,
+                y: 340,
+                width: 120,
+                height: 120,
+                userData: this.state.availableActions.find(
+                    availableAction => availableAction.name == actionName)
+            });
             action.onDoubleClick = () => this.editModelForFigure();
         } else {
             action = new BetweenFigure({
-                                           x: 550,
-                                           y: 340,
-                                           width: 120,
-                                           height: 120,
-                                           userData: this.state.availableActions.find(
-                                               availableAction => availableAction.name == actionName)
-                                       });
+                x: 550,
+                y: 340,
+                width: 120,
+                height: 120,
+                userData: this.state.availableActions.find(
+                    availableAction => availableAction.name == actionName)
+            });
             action.onDoubleClick = () => this.editModelForFigure();
         }
 
@@ -233,11 +243,11 @@ class MainApp extends React.Component {
                         }
 
                         outputBody.actions.push({
-                                                    "@type": "StartAction",
-                                                    ports: currentActionPorts,
-                                                    guiXPos: json[i].x,
-                                                    guiYPos: json[i].y
-                                                });
+                            "@type": "StartAction",
+                            ports: currentActionPorts,
+                            guiXPos: json[i].x,
+                            guiYPos: json[i].y
+                        });
                     }
                     if (json[i].type == "draw2d.shape.node.Between") {
                         let currentActionPorts = [];
@@ -247,12 +257,12 @@ class MainApp extends React.Component {
                         }
 
                         outputBody.actions.push({
-                                                    "@type": json[i].userData.name,
-                                                    ...json[i].userData.customData,
-                                                    ports: currentActionPorts,
-                                                    guiXPos: json[i].x,
-                                                    guiYPos: json[i].y
-                                                });
+                            "@type": json[i].userData.name,
+                            ...json[i].userData.customData,
+                            ports: currentActionPorts,
+                            guiXPos: json[i].x,
+                            guiYPos: json[i].y
+                        });
                     }
                     if (json[i].type == "draw2d.Connection") {
                         outputBody.connections.push(
@@ -287,73 +297,73 @@ class MainApp extends React.Component {
     openTask(checksum) {
         let mainApp = this;
         $.ajax({
-                   type: "GET",
-                   url: "/task/" + checksum + "/checksum",
-                   contentType: 'application/json',
-                   success: task => {
-                       this.state.app.view.clear();
+                type: "GET",
+                url: "/task/" + checksum + "/checksum",
+                contentType: 'application/json',
+                success: task => {
+                    this.state.app.view.clear();
 
-                       task.actions.forEach((action, i) => {
-                           let generatedAction = this.createNode(action["@type"]);
-                           generatedAction.userData.customData = action;
-                           generatedAction.x = action.guiXPos;
-                           generatedAction.y = action.guiYPos;
-                           let inputPortIndex = 0;
-                           let outputPortIndex = 0;
+                    task.actions.forEach((action, i) => {
+                        let generatedAction = this.createNode(action["@type"]);
+                        generatedAction.userData.customData = action;
+                        generatedAction.x = action.guiXPos;
+                        generatedAction.y = action.guiYPos;
+                        let inputPortIndex = 0;
+                        let outputPortIndex = 0;
 
-                           action.ports.forEach((port, i) => {
-                               if (port.portType == "INPUT") {
-                                   generatedAction.getInputPort(inputPortIndex).setId(port.externalId);
-                                   generatedAction.getInputPort(inputPortIndex).setName(port.externalId);
-                                   inputPortIndex++;
-                               } else {
-                                   generatedAction.getOutputPort(outputPortIndex).setId(port.externalId);
-                                   generatedAction.getOutputPort(outputPortIndex).setName(port.externalId);
-                                   outputPortIndex++;
-                               }
-                           })
+                        action.ports.forEach((port, i) => {
+                            if (port.portType == "INPUT") {
+                                generatedAction.getInputPort(inputPortIndex).setId(port.externalId);
+                                generatedAction.getInputPort(inputPortIndex).setName(port.externalId);
+                                inputPortIndex++;
+                            } else {
+                                generatedAction.getOutputPort(outputPortIndex).setId(port.externalId);
+                                generatedAction.getOutputPort(outputPortIndex).setName(port.externalId);
+                                outputPortIndex++;
+                            }
+                        })
 
-                           this.state.app.view.add(generatedAction);
-                       })
+                        this.state.app.view.add(generatedAction);
+                    })
 
-                       // Very inefficient
-                       // TODO: Improve performance
-                       task.connections.forEach(connection => {
-                           let conVisual = new draw2d.Connection({
-                                                                     router: new draw2d.layout.connection.InteractiveManhattanConnectionRouter(),
-                                                                     color: "#334455",
-                                                                     radius: 20,
-                                                                     outlineColor: "#334455",
-                                                                     stroke: 2
-                                                                 });
+                    // Very inefficient
+                    // TODO: Improve performance
+                    task.connections.forEach(connection => {
+                        let conVisual = new draw2d.Connection({
+                            router: new draw2d.layout.connection.InteractiveManhattanConnectionRouter(),
+                            color: "#334455",
+                            radius: 20,
+                            outlineColor: "#334455",
+                            stroke: 2
+                        });
 
-                           this.state.app.view.figures.data.forEach(figure => {
-                               figure.outputPorts.data.forEach(outputPort => {
-                                                                   if (outputPort.name == connection.source.externalId) {
-                                                                       conVisual.setSource(outputPort);
-                                                                   }
-                                                               }
-                               )
-                               figure.inputPorts.data.forEach(inputPort => {
-                                                                  if (inputPort.name == connection.target.externalId) {
-                                                                      conVisual.setTarget(inputPort);
-                                                                  }
-                                                              }
-                               )
-                           })
+                        this.state.app.view.figures.data.forEach(figure => {
+                            figure.outputPorts.data.forEach(outputPort => {
+                                    if (outputPort.name == connection.source.externalId) {
+                                        conVisual.setSource(outputPort);
+                                    }
+                                }
+                            )
+                            figure.inputPorts.data.forEach(inputPort => {
+                                    if (inputPort.name == connection.target.externalId) {
+                                        conVisual.setTarget(inputPort);
+                                    }
+                                }
+                            )
+                        })
 
-                           this.state.app.view.add(conVisual);
-                       })
+                        this.state.app.view.add(conVisual);
+                    })
 
-                       mainApp.setState({
-                                            taskName: task.name,
-                                            parameters: task.parameters,
-                                            saved: true
-                                        });
-                   }
-                   ,
-                   dataType: "json"
-               }
+                    mainApp.setState({
+                        taskName: task.name,
+                        parameters: task.parameters,
+                        saved: true
+                    });
+                }
+                ,
+                dataType: "json"
+            }
         )
         ;
     }
@@ -380,6 +390,9 @@ class MainApp extends React.Component {
     saveActionSettings() {
         let currentSelection = this.state.app.view.selection.all.data[0];
         currentSelection.userData = this.state.selectedAction.userData;
+        if (typeof currentSelection.updatePorts === "function") {
+            currentSelection.updatePorts();
+        }
         console.log(JSON.stringify(currentSelection.userData));
         this.setState({saved: false});
     }
@@ -507,8 +520,8 @@ class MainApp extends React.Component {
 
     saveSettings(parameters) {
         this.setState({
-                          parameters: parameters
-                      })
+            parameters: parameters
+        })
 
     }
 
@@ -531,16 +544,16 @@ class MainApp extends React.Component {
         this.prepareJSON(json => {
             console.log(json);
             $.ajax({
-                       type: "POST",
-                       url: "/task",
-                       data: json,
-                       contentType: 'application/json',
-                       success: success => {
-                           console.log(success)
-                           this.setState({saved: true})
-                       },
-                       dataType: "json"
-                   });
+                type: "POST",
+                url: "/task",
+                data: json,
+                contentType: 'application/json',
+                success: success => {
+                    console.log(success)
+                    this.setState({saved: true})
+                },
+                dataType: "json"
+            });
         });
 
     }
