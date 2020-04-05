@@ -7,6 +7,8 @@ import com.dopplertask.doppler.domain.Connection;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.action.common.IfAction;
 import com.dopplertask.doppler.domain.action.common.PrintAction;
+import com.dopplertask.doppler.domain.action.common.XMLAction;
+import com.dopplertask.doppler.domain.action.common.XMLActionType;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 import org.apache.velocity.app.VelocityEngine;
 import org.junit.Assert;
@@ -114,5 +116,54 @@ public class ActionTest {
         Assert.assertEquals("False path", ((PrintAction) taskExecution.getCurrentAction()).getMessage());
     }
 
+    @Test
+    public void testXMLActionXMLToJSON() throws IOException {
+        TaskExecution taskExecution = new TaskExecution();
+
+        XMLAction xmlAction = new XMLAction();
+        xmlAction.setContent("<xml><doppler style=\"blue\"></doppler><example>Some text</example></xml>");
+        xmlAction.setType(XMLActionType.XML_TO_JSON);
+
+        ActionResult actionResult = xmlAction.run(null, taskExecution, variableExtractorUtil);
+        Assert.assertNotEquals("{\"doppler\":{\"style\":\"blue\"},\"example\":\"Some text\"}", actionResult.getOutput());
+    }
+
+    @Test
+    public void testXMLActionJSONToXML() throws IOException {
+        TaskExecution taskExecution = new TaskExecution();
+
+        XMLAction xmlAction = new XMLAction();
+        xmlAction.setContent("{\"doppler\":{\"style\":\"blue\"},\"example\":\"Some text\"}");
+        xmlAction.setType(XMLActionType.JSON_TO_XML);
+
+        ActionResult actionResult = xmlAction.run(null, taskExecution, variableExtractorUtil);
+        Assert.assertNotEquals("<xml><doppler><style>blue</style></doppler><example>Some text</example></xml>", actionResult.getOutput());
+    }
+
+    @Test
+    public void testXMLActionXMLToJSONMinimized() throws IOException {
+        TaskExecution taskExecution = new TaskExecution();
+
+        XMLAction xmlAction = new XMLAction();
+        xmlAction.setContent("<xml><doppler style=\"blue\"></doppler><example>Some text</example></xml>");
+        xmlAction.setType(XMLActionType.XML_TO_JSON);
+        xmlAction.setMinimize(true);
+
+        ActionResult actionResult = xmlAction.run(null, taskExecution, variableExtractorUtil);
+        Assert.assertEquals("{\"doppler\":{\"style\":\"blue\"},\"example\":\"Some text\"}", actionResult.getOutput());
+    }
+
+    @Test
+    public void testXMLActionJSONToXMLMinimized() throws IOException {
+        TaskExecution taskExecution = new TaskExecution();
+
+        XMLAction xmlAction = new XMLAction();
+        xmlAction.setContent("{\"doppler\":{\"style\":\"blue\"},\"example\":\"Some text\"}");
+        xmlAction.setType(XMLActionType.JSON_TO_XML);
+        xmlAction.setMinimize(true);
+
+        ActionResult actionResult = xmlAction.run(null, taskExecution, variableExtractorUtil);
+        Assert.assertEquals("<xml><doppler><style>blue</style></doppler><example>Some text</example></xml>", actionResult.getOutput());
+    }
 
 }

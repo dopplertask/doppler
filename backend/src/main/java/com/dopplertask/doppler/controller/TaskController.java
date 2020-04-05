@@ -21,7 +21,6 @@ import com.dopplertask.doppler.service.ExecutionService;
 import com.dopplertask.doppler.service.TaskRequest;
 import com.dopplertask.doppler.service.TaskService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -332,6 +331,7 @@ public class TaskController {
             actionListResponseDto.getActions().add(new ActionInfoDto(currentClass.getSimpleName(), instance.getActionInfo()));
         }
 
+        Collections.sort(actionListResponseDto.getActions(), (Comparator.comparing(ActionInfoDto::getName)));
 
         return new ResponseEntity<>(actionListResponseDto, HttpStatus.OK);
     }

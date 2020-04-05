@@ -14,6 +14,7 @@ import com.dopplertask.doppler.domain.action.common.ScriptLanguage;
 import com.dopplertask.doppler.domain.action.common.SetVariableAction;
 import com.dopplertask.doppler.domain.action.common.SwitchAction;
 import com.dopplertask.doppler.domain.action.common.TimedWait;
+import com.dopplertask.doppler.domain.action.common.XMLAction;
 import com.dopplertask.doppler.domain.action.connection.HttpAction;
 import com.dopplertask.doppler.domain.action.connection.MySQLAction;
 import com.dopplertask.doppler.domain.action.connection.SSHAction;
@@ -77,7 +78,8 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
         @JsonSubTypes.Type(value = MouseAction.class, name = "MouseAction"),
         @JsonSubTypes.Type(value = StartAction.class, name = "StartAction"),
         @JsonSubTypes.Type(value = WriteFileAction.class, name = "WriteFileAction"),
-        @JsonSubTypes.Type(value = SwitchAction.class, name = "SwitchAction")
+        @JsonSubTypes.Type(value = SwitchAction.class, name = "SwitchAction"),
+        @JsonSubTypes.Type(value = XMLAction.class, name = "XMLAction")
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Action {
