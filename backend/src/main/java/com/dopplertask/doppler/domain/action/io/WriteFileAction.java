@@ -17,6 +17,7 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 @Entity
@@ -27,7 +28,8 @@ public class WriteFileAction extends Action {
     @Column
     private String filename;
 
-    @Column
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String contents;
 
     public WriteFileAction() {

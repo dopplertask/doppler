@@ -44,6 +44,8 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.apache.velocity.tools/velocity-tools-generic
     compile group: 'org.apache.velocity.tools', name: 'velocity-tools-generic', version: '3.0'
+// https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-xml
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: '2.10.3'
 
     // https://mvnrepository.com/artifact/org.apache.activemq/activemq-broker
     compile group: 'org.apache.activemq', name: 'activemq-broker', version: '5.15.12'
