@@ -65,6 +65,8 @@ let SwitchAction = draw2d.shape.node.Between.extend({
                 connection.add(label, new draw2d.layout.locator.ParallelMidpointLocator());
             }
         })
+
+        this.layoutPorts();
     },
     /**
      * @method
