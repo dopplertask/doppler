@@ -125,7 +125,7 @@ public class ActionTest {
         xmlAction.setType(XMLActionType.XML_TO_JSON);
 
         ActionResult actionResult = xmlAction.run(null, taskExecution, variableExtractorUtil);
-        Assert.assertNotEquals("{\"doppler\":{\"style\":\"blue\"},\"example\":\"Some text\"}", actionResult.getOutput());
+        Assert.assertEquals("{\"doppler\":{\"style\":\"blue\"},\"example\":\"Some text\"}", actionResult.getOutput());
     }
 
     @Test
@@ -137,7 +137,7 @@ public class ActionTest {
         xmlAction.setType(XMLActionType.JSON_TO_XML);
 
         ActionResult actionResult = xmlAction.run(null, taskExecution, variableExtractorUtil);
-        Assert.assertNotEquals("<xml><doppler><style>blue</style></doppler><example>Some text</example></xml>", actionResult.getOutput());
+        Assert.assertEquals("<xml><doppler><style>blue</style></doppler><example>Some text</example></xml>", actionResult.getOutput());
     }
 
 }
