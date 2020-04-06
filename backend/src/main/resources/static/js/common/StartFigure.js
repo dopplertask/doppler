@@ -3,17 +3,6 @@ let StartFigure = draw2d.shape.node.Start.extend({
 
     init: function (attr) {
         this._super(attr);
-        let startIcon = new draw2d.shape.icon.Svg(10, 10);
-        startIcon.setWidth(30);
-        startIcon.setHeight(24);
-        startIcon.createSet = function () {
-            return this.canvas.paper.path(
-                "M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z");
-        }
-        startIcon.onDoubleClick = function () {
-            this.getParent().onDoubleClick();
-        }
-
         this.setBackgroundColor("#FFF");
         this.setRadius(12);
         this.setResizeable(false);
@@ -26,7 +15,19 @@ let StartFigure = draw2d.shape.node.Start.extend({
         let label = new draw2d.shape.basic.Label({text: "StartAction"});
         label.setStroke(0);
         this.add(label, new draw2d.layout.locator.BottomLocator(this));
-        this.add(startIcon, new draw2d.layout.locator.CenterLocator(this));
+        let actionIcon = new draw2d.shape.basic.Image({
+                                                          path: 'images/actions/StartAction.png',
+                                                          width: 32,
+                                                          height: 32,
+                                                          minWidth: 32,
+                                                          minHeight: 20,
+                                                          boundingBox: new draw2d.geo.Rectangle(0, 0, 32, 32),
+                                                          className: 'activity-image'
+                                                      });
+        actionIcon.onDoubleClick = function () {
+            this.getParent().onDoubleClick();
+        }
+        this.add(actionIcon, new draw2d.layout.locator.CenterLocator(this));
     },
 
     setLabels: function (amount) {

@@ -8,6 +8,40 @@ body {
     transition: all 0.4s ease 0s;
 }
 
+#actionSearchUL {
+    width: 250px;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    line-height: 30px;
+    padding: 12px;
+    width: 100%;
+    color: #495057;
+    text-decoration: none;
+}
+
+.item .menu-image {
+    width: 32px;
+    height: 32px;
+    text-align: center;
+}
+
+.item .menu-image img {
+    max-height: 32px;
+}
+
+.item .menu-text {
+    margin-left: 8px;
+}
+
+.item:hover {
+    background-color: rgb(209, 209, 209);
+    text-decoration: none;
+    color: #495057;
+}
+
 .sidebar-title {
     text-align: center;
     line-height: 60px;

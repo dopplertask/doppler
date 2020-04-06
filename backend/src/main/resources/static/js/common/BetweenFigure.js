@@ -55,10 +55,21 @@ let BetweenFigure = draw2d.shape.node.Between.extend({
         let label = new draw2d.shape.basic.Label({text: this.userData.name});
         label.setStroke(0);
 
-
         this.add(label, new draw2d.layout.locator.BottomLocator(this));
-        this.add(getIcon(this.userData.name), new draw2d.layout.locator.CenterLocator(this))
 
+        let actionIcon = new draw2d.shape.basic.Image({
+                                                          path: 'images/actions/' + this.userData.name + '.png',
+                                                          width: 32,
+                                                          height: 32,
+                                                          minWidth: 20,
+                                                          minHeight: 20,
+                                                          boundingBox: new draw2d.geo.Rectangle(0, 0, 32, 32),
+                                                          className: 'activity-image'
+                                                      });
+        actionIcon.onDoubleClick = function () {
+            this.getParent().onDoubleClick();
+        }
+        this.add(actionIcon, new draw2d.layout.locator.CenterLocator(this));
     },
 
     onDoubleClick: function () {

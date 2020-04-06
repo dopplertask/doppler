@@ -18,7 +18,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "SwitchAction")
-@DiscriminatorValue("if_action")
+@DiscriminatorValue("switch_action")
 public class SwitchAction extends Action {
 
     private String value;
