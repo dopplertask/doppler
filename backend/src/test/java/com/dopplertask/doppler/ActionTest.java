@@ -140,30 +140,4 @@ public class ActionTest {
         Assert.assertNotEquals("<xml><doppler><style>blue</style></doppler><example>Some text</example></xml>", actionResult.getOutput());
     }
 
-    @Test
-    public void testXMLActionXMLToJSONMinimized() throws IOException {
-        TaskExecution taskExecution = new TaskExecution();
-
-        XMLAction xmlAction = new XMLAction();
-        xmlAction.setContent("<xml><doppler style=\"blue\"></doppler><example>Some text</example></xml>");
-        xmlAction.setType(XMLActionType.XML_TO_JSON);
-        xmlAction.setMinimize(true);
-
-        ActionResult actionResult = xmlAction.run(null, taskExecution, variableExtractorUtil);
-        Assert.assertEquals("{\"doppler\":{\"style\":\"blue\"},\"example\":\"Some text\"}", actionResult.getOutput());
-    }
-
-    @Test
-    public void testXMLActionJSONToXMLMinimized() throws IOException {
-        TaskExecution taskExecution = new TaskExecution();
-
-        XMLAction xmlAction = new XMLAction();
-        xmlAction.setContent("{\"doppler\":{\"style\":\"blue\"},\"example\":\"Some text\"}");
-        xmlAction.setType(XMLActionType.JSON_TO_XML);
-        xmlAction.setMinimize(true);
-
-        ActionResult actionResult = xmlAction.run(null, taskExecution, variableExtractorUtil);
-        Assert.assertEquals("<xml><doppler><style>blue</style></doppler><example>Some text</example></xml>", actionResult.getOutput());
-    }
-
 }
