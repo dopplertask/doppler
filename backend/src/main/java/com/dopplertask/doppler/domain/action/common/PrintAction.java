@@ -61,5 +61,10 @@ public class PrintAction extends Action {
         actionInfo.add(new PropertyInformation("message", "Message"));
         return actionInfo;
     }
+
+    @Override
+    public String getDescription() {
+        return "Print a console message";
+    }
 }
 

@@ -205,5 +205,10 @@ public class MySQLAction extends Action {
         actionInfo.add(new PropertyInformation("command", "MySQL Statement", PropertyInformation.PropertyInformationType.STRING, "", "Statement to execute"));
         return actionInfo;
     }
+
+    @Override
+    public String getDescription() {
+        return "Creates a MySQL database connection and runs a command";
+    }
 }
 

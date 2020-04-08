@@ -63,4 +63,9 @@ public class SetVariableAction extends Action {
 
         return actionInfo;
     }
+
+    @Override
+    public String getDescription() {
+        return "Set or modify a variable";
+    }
 }

@@ -87,4 +87,9 @@ public class ReadFileAction extends Action {
         actionInfo.add(new PropertyInformation("parameterName", "Parameter Name", PropertyInformation.PropertyInformationType.STRING, "", "Parameter name to store contents."));
         return actionInfo;
     }
+
+    @Override
+    public String getDescription() {
+        return "Reads a file from disk";
+    }
 }

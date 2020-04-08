@@ -223,5 +223,10 @@ public class BrowseWebAction extends Action {
 
         return actionInfo;
     }
+
+    @Override
+    public String getDescription() {
+        return "Browse the web and do GUI actions.";
+    }
 }
 

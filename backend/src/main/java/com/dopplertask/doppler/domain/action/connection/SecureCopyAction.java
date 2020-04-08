@@ -131,4 +131,9 @@ public class SecureCopyAction extends Action {
         actionInfo.add(new PropertyInformation("destinationFilename", "Destination filename", PropertyInformation.PropertyInformationType.STRING, "", "Eg. on the remote server /home/remote/myfile"));
         return actionInfo;
     }
+
+    @Override
+    public String getDescription() {
+        return "Copy a file to a remote machine";
+    }
 }

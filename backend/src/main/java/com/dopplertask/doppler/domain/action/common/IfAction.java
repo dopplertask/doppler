@@ -74,4 +74,9 @@ public class IfAction extends Action {
         return actionInfo;
     }
 
+    @Override
+    public String getDescription() {
+        return "Evaluate a condition to decide the workflow route";
+    }
+
 }

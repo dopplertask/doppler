@@ -137,6 +137,11 @@ public class MouseAction extends Action {
         return actionInfo;
     }
 
+    @Override
+    public String getDescription() {
+        return "Operate the mouse.";
+    }
+
     public String getPositionX() {
         return positionX;
     }

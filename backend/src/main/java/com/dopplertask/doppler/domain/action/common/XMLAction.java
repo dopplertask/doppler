@@ -10,13 +10,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
+import java.io.IOException;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
-import java.io.IOException;
-import java.util.List;
 
 @Entity
 @Table(name = "XMLAction")
@@ -84,6 +85,11 @@ public class XMLAction extends Action {
 
         )));
         return actionInfo;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Converts from/to XML";
     }
 
     public XMLActionType getType() {

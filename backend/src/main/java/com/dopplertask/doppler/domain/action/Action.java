@@ -29,8 +29,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -47,11 +54,6 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
@@ -82,7 +84,7 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
         @JsonSubTypes.Type(value = XMLAction.class, name = "XMLAction")
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Action {
+public abstract class Action {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -220,6 +222,13 @@ public class Action {
                 new PropertyInformation("failOn", "Fail on", PropertyInformation.PropertyInformationType.STRING, "", "The current action will fail if this evaluates to anything."))
         );
     }
+
+    /**
+     * Describes the action in a short text.
+     *
+     * @return action description.
+     */
+    public abstract String getDescription();
 
     public List<ActionPort> getPorts() {
         return ports;

@@ -7,10 +7,11 @@ import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 
+import java.io.IOException;
+
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.io.IOException;
 
 /**
  * This action defines the start of a task.
@@ -30,5 +31,10 @@ public class StartAction extends Action {
         result.setStatusCode(StatusCode.SUCCESS);
         result.setOutputType(OutputType.STRING);
         return result;
+    }
+
+    @Override
+    public String getDescription() {
+        return "This is the start of every task.";
     }
 }

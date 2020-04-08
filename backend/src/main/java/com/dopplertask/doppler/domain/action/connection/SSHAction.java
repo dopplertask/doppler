@@ -106,4 +106,9 @@ public class SSHAction extends Action {
         actionInfo.add(new PropertyInformation("command", "Command", PropertyInformation.PropertyInformationType.MULTILINE, "", "Eg. echo \"Hello world\""));
         return actionInfo;
     }
+
+    @Override
+    public String getDescription() {
+        return "Connect to a remote machine using SSH";
+    }
 }

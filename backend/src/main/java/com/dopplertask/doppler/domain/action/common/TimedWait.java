@@ -67,4 +67,9 @@ public class TimedWait extends Action {
         actionInfo.add(new PropertyInformation("seconds", "Time (Seconds)", PropertyInformation.PropertyInformationType.NUMBER, "", "Amount of seconds to wait"));
         return actionInfo;
     }
+
+    @Override
+    public String getDescription() {
+        return "Waits an X amount of seconds";
+    }
 }

@@ -7,14 +7,15 @@ import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "SwitchAction")
@@ -108,6 +109,11 @@ public class SwitchAction extends Action {
                 new PropertyInformation("currentCase", "Case")
         )));
         return actionInfo;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Evaluate a condition and route to the desired path";
     }
 
     public List<SwitchCase> getSwitchCases() {

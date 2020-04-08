@@ -80,6 +80,11 @@ public class WriteFileAction extends Action {
         return actionInfo;
     }
 
+    @Override
+    public String getDescription() {
+        return "Writes a file to disk";
+    }
+
     public String getContents() {
         return contents;
     }

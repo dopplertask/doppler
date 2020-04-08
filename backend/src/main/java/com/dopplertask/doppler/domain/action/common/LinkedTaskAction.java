@@ -86,4 +86,9 @@ public class LinkedTaskAction extends Action {
         actionInfo.add(new PropertyInformation("name", "Task name"));
         return actionInfo;
     }
+
+    @Override
+    public String getDescription() {
+        return "Execute another task";
+    }
 }

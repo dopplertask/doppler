@@ -97,4 +97,9 @@ public class ExecuteCommandAction extends Action {
         actionInfo.add(new PropertyInformation("command", "Command", PropertyInformation.PropertyInformationType.MULTILINE, "", "Command to execute."));
         return actionInfo;
     }
+
+    @Override
+    public String getDescription() {
+        return "Executes a command on the current machine";
+    }
 }
