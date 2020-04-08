@@ -8,13 +8,14 @@ import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 
+import java.io.IOException;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
-import java.io.IOException;
-import java.util.List;
 
 @Entity
 @Table(name = "SSHAction")

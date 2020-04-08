@@ -123,6 +123,9 @@ public abstract class Action {
     @Fetch(value = FetchMode.JOIN)
     private List<ActionPort> ports = new ArrayList<>();
 
+    public Action() {
+    }
+
     @JsonIgnore
     public List<ActionPort> getOutputPorts() {
         if (ports != null) {
@@ -138,10 +141,6 @@ public abstract class Action {
         }
         return Collections.emptyList();
     }
-
-    public Action() {
-    }
-
 
     public Long getId() {
         return id;

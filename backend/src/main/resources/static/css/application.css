@@ -9,31 +9,41 @@ body {
 }
 
 #actionSearchUL {
-    width: 250px;
+    width: 100%;
 }
 
 .item {
     display: flex;
     align-items: center;
-    line-height: 30px;
-    padding: 12px;
+    line-height: 24px;
+    padding: 3px;
     width: 100%;
     color: #495057;
     text-decoration: none;
 }
 
 .item .menu-image {
-    width: 32px;
-    height: 32px;
+    width: 25px;
+    height: 25px;
+    margin-left: 12px;
     text-align: center;
 }
 
 .item .menu-image img {
-    max-height: 32px;
+    max-height: 24px;
 }
 
 .item .menu-text {
-    margin-left: 8px;
+    margin-left: 12px;
+}
+
+.item .menu-text-title {
+    font-size: .9em;
+    font-weight: 700;
+}
+
+.item .menu-text-detail {
+    font-size: .8em;
 }
 
 .item:hover {
@@ -55,9 +65,9 @@ body {
 }
 
 #sidebar-wrapper {
-    margin-right: -250px;
-    right: 250px;
-    width: 250px;
+    margin-right: -280px;
+    right: 280px;
+    width: 280px;
     background: #FFF;
     position: fixed;
     height: 100%;
@@ -79,7 +89,7 @@ body {
 }
 
 .sidebar-nav {
-    width: 250px;
+    width: 280px;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -170,12 +180,12 @@ body {
 
     #wrapper.active {
         position: relative;
-        right: 250px;
+        right: 280px;
     }
 
     #wrapper.active #sidebar-wrapper {
-        right: 250px;
-        width: 250px;
+        right: 280px;
+        width: 280px;
         transition: all 0.4s ease 0s;
     }
 

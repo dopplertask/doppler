@@ -441,8 +441,11 @@ class MainApp extends React.Component {
                                    }}>
                                     <div className="menu-image"><img
                                         src={"images/actions/" + action.name + ".png"}/></div>
-                                    <div className="menu-text"> <span
-                                        className="fa fa-anchor solo">{action.name}</span></div>
+                                    <div className="menu-text">
+                                        <div className="menu-text-title"><span
+                                            className="fa fa-anchor solo">{action.name}</span></div>
+                                        <div className="menu-text-detail">{action.description}</div>
+                                    </div>
                                 </a>
                             ))}
                         </div>

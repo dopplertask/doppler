@@ -73,6 +73,18 @@ public class ExecuteCommandAction extends Action {
         this.command = command;
     }
 
+    @Override
+    public List<PropertyInformation> getActionInfo() {
+        List<PropertyInformation> actionInfo = super.getActionInfo();
+
+        actionInfo.add(new PropertyInformation("command", "Command", PropertyInformation.PropertyInformationType.MULTILINE, "", "Command to execute."));
+        return actionInfo;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Executes a command on the current machine";
+    }
 
     private static class StreamGobbler implements Runnable {
         private InputStream inputStream;
@@ -88,18 +100,5 @@ public class ExecuteCommandAction extends Action {
             new BufferedReader(new InputStreamReader(inputStream)).lines()
                     .forEach(consumer);
         }
-    }
-
-    @Override
-    public List<PropertyInformation> getActionInfo() {
-        List<PropertyInformation> actionInfo = super.getActionInfo();
-
-        actionInfo.add(new PropertyInformation("command", "Command", PropertyInformation.PropertyInformationType.MULTILINE, "", "Command to execute."));
-        return actionInfo;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Executes a command on the current machine";
     }
 }
