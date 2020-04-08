@@ -46,9 +46,9 @@ class MainApp extends React.Component {
         input = document.getElementById("actionSearchInput");
         filter = input.value.toUpperCase();
         ul = document.getElementById("actionSearchUL");
-        li = ul.getElementsByTagName("li");
+        li = ul.getElementsByTagName("a");
         for (i = 0; i < li.length; i++) {
-            a = li[i].getElementsByTagName("a")[0];
+            a = li[i].getElementsByTagName("div")[1];
             txtValue = a.textContent || a.innerText;
             if (txtValue.toUpperCase().indexOf(filter) > -1) {
                 li[i].style.display = "";
@@ -317,6 +317,9 @@ class MainApp extends React.Component {
                                    generatedAction.getInputPort(inputPortIndex).setName(port.externalId);
                                    inputPortIndex++;
                                } else {
+                                   if (generatedAction.getOutputPort(outputPortIndex) == undefined) {
+                                       generatedAction.createPort("output");
+                                   }
                                    generatedAction.getOutputPort(outputPortIndex).setId(port.externalId);
                                    generatedAction.getOutputPort(outputPortIndex).setName(port.externalId);
                                    outputPortIndex++;
@@ -426,15 +429,24 @@ class MainApp extends React.Component {
                             <input type="text" id="actionSearchInput" placeholder="Search actions..."
                                    onKeyUp={() => this.searchActions()}
                                    className="form-control"/></div>
-                        <ul id="actionSearchUL" className="sidebar-nav nav">
+
+
+                        <div id="actionSearchUL">
+
                             {this.state.availableActions.map(action => (
-                                <li><a href="#" key={action.name}
-                                       onClick={() => {
-                                           this.setState({saved: false});
-                                           this.state.app.view.add(this.createNode(action.name))
-                                       }}><span className="fa fa-anchor solo">{action.name}</span></a></li>
+                                <a href="#" className="item" key={action.name}
+                                   onClick={() => {
+                                       this.setState({saved: false});
+                                       this.state.app.view.add(this.createNode(action.name))
+                                   }}>
+                                    <div className="menu-image"><img
+                                        src={"images/actions/" + action.name + ".png"}/></div>
+                                    <div className="menu-text"> <span
+                                        className="fa fa-anchor solo">{action.name}</span></div>
+                                </a>
                             ))}
-                        </ul>
+                        </div>
+
                     </nav>
                 </div>
 
