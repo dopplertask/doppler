@@ -7,13 +7,20 @@ public class TaskRequest {
     private String checksum;
     private Map<String, String> parameters;
     private int depth = 0;
+    private boolean removeTaskAfterExecution;
 
     public TaskRequest(String taskName, Map<String, String> parameters) {
-        this.taskName = taskName;
-        this.parameters = parameters;
+        this(taskName, parameters, false);
     }
 
     public TaskRequest() {
+        this.removeTaskAfterExecution = false;
+    }
+
+    public TaskRequest(String taskName, Map<String, String> parameters, boolean removeTaskAfterExecution) {
+        this.taskName = taskName;
+        this.parameters = parameters;
+        this.removeTaskAfterExecution = removeTaskAfterExecution;
     }
 
     public String getTaskName() {
@@ -54,5 +61,13 @@ public class TaskRequest {
 
     public void setDepth(int depth) {
         this.depth = depth;
+    }
+
+    public boolean isRemoveTaskAfterExecution() {
+        return removeTaskAfterExecution;
+    }
+
+    public void setRemoveTaskAfterExecution(boolean removeTaskAfterExecution) {
+        this.removeTaskAfterExecution = removeTaskAfterExecution;
     }
 }

@@ -73,7 +73,13 @@ public class TaskController {
 
     @PostMapping(path = "/schedule/task")
     public ResponseEntity<SimpleIdResponseDto> scheduleTask(@RequestBody TaskRequestDTO taskRequestDTO) {
-        TaskRequest request = new TaskRequest(taskRequestDTO.getTaskName(), taskRequestDTO.getParameters());
+        boolean removeTaskAfterExecution = false;
+        String token = "_UNSAVED_" + (int) (Math.random() * 1000000);
+        if (taskRequestDTO.getTask() != null) {
+            this.taskService.createTask(taskRequestDTO.getTask().getName() + token, taskRequestDTO.getTask().getParameters(), taskRequestDTO.getTask().getActions(), taskRequestDTO.getTask().getDescription(), taskRequestDTO.getTask().getConnections(), taskRequestDTO.getTask().getName() + token);
+            removeTaskAfterExecution = true;
+        }
+        TaskRequest request = new TaskRequest(removeTaskAfterExecution ? taskRequestDTO.getTaskName() + token : taskRequestDTO.getTaskName(), taskRequestDTO.getParameters(), removeTaskAfterExecution);
         request.setChecksum(taskRequestDTO.getTaskName());
         TaskExecution taskExecution = taskService.delegate(request);
 
@@ -85,6 +91,7 @@ public class TaskController {
 
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
+
 
     @PostMapping(path = "/schedule/directtask")
     public ResponseEntity<TaskExecutionLogResponseDTO> runTask(@RequestBody TaskRequestDTO taskRequestDTO) {

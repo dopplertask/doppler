@@ -71,6 +71,7 @@ public class TaskServiceImpl implements TaskService {
         taskExecutionRequest.setParameters(request.getParameters());
         taskExecutionRequest.setExecutionId(execution.getId());
         taskExecutionRequest.setChecksum(request.getChecksum());
+        taskExecutionRequest.setRemoveTaskAfterExecution(request.isRemoveTaskAfterExecution());
 
         jmsTemplate.convertAndSend("automation_destination", taskExecutionRequest);
 
@@ -89,9 +90,21 @@ public class TaskServiceImpl implements TaskService {
 
         if (execution != null) {
             if (execution.getStatus() == TaskExecutionStatus.FAILED) {
+
+                // If set to true, then remove the task after finish executing. This is used for mainly for unsaved workflows.
+                if (taskExecutionRequest.isRemoveTaskAfterExecution()) {
+                    this.deleteTask(taskExecutionRequest.getTaskName());
+                }
+
                 return execution;
             } else {
-                return executionService.processActions(execution.getTask().getId(), execution.getId(), this);
+                TaskExecution taskExecution = executionService.processActions(execution.getTask().getId(), execution.getId(), this);
+
+                // If set to true, then remove the task after finish executing. This is used for mainly for unsaved workflows.
+                if (taskExecutionRequest.isRemoveTaskAfterExecution()) {
+                    this.deleteTask(taskExecutionRequest.getTaskName());
+                }
+                return taskExecution;
             }
         }
         return null;

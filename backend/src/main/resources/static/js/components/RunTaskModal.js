@@ -12,7 +12,8 @@ class RunTaskModal extends React.Component {
             taskName: this.props.taskName,
             start: this.props.start,
             executionId: -1,
-            parameterValues: {}
+            parameterValues: {},
+            saved: this.props.saved
         }
     }
 
@@ -20,7 +21,8 @@ class RunTaskModal extends React.Component {
         this.setState(
             {
                 taskName: this.props.taskName,
-                start: this.props.start
+                start: this.props.start,
+                saved: this.props.saved
             })
     }
 
@@ -32,6 +34,14 @@ class RunTaskModal extends React.Component {
                     taskName: this.props.taskName
                 })
         }
+
+        if (prevProps.saved != this.props.saved) {
+            this.setState(
+                {
+                    saved: this.props.saved
+                })
+        }
+
 
         if (prevProps.start != this.props.start) {
             this.setState(
@@ -68,60 +78,73 @@ class RunTaskModal extends React.Component {
 
     renderOutput() {
         if (this.state.start) {
-            let runTaskModal = this;
             let json = {
                 taskName: this.state.taskName,
                 parameters: this.state.parameterValues
             }
-            $.ajax({
-                       type: "POST",
-                       url: "/schedule/task",
-                       data: JSON.stringify(json),
-                       contentType: 'application/json',
-                       success: execution => {
-                           runTaskModal.setState({
-                                                     executionId: execution.id
-                                                 }, createStomp => {
-                               let client = Stomp.client("ws://localhost:61614/stomp", "v11.stomp");
-                               let headers = {
-                                   id: 'JUST.FCX',
-                                   ack: 'client',
-                                   selector: 'executionId=' + runTaskModal.state.executionId
-                               };
-                               client.connect("admin", "admin", function () {
-                                   client.subscribe("/queue/taskexecution_destination",
-                                                    function (message) {
-                                                        let messageBody = JSON.parse(message.body);
-                                                        var tagsToReplace = {
-                                                            '&': '&amp;',
-                                                            '<': '&lt;',
-                                                            '>': '&gt;'
-                                                        };
 
-                                                        function replaceTag(tag) {
-                                                            return tagsToReplace[tag] || tag;
-                                                        }
+            if (!this.state.saved) {
+                this.props.prepareJSON(jsonResult => {
+                    json.task = JSON.parse(jsonResult);
+                    this.requestRun(json);
+                });
+            } else {
+                this.requestRun(json);
+            }
 
-                                                        function safe_tags_replace(str) {
-                                                            return str.replace(/[&<>]/g, replaceTag);
-                                                        }
-
-                                                        jQuery("#outputDiv").append(safe_tags_replace(messageBody.output) + "<br>");
-                                                        message.ack();
-
-                                                        if (message.headers["lastMessage"] == "true"
-                                                            && message.headers["executionId"] == runTaskModal.state.executionId) {
-                                                            client.disconnect();
-                                                            runTaskModal.cleanup();
-                                                        }
-                                                    }, headers);
-                               });
-                           })
-                       },
-                       dataType: "json"
-                   });
 
         }
+    }
+
+    requestRun(json) {
+        let runTaskModal = this;
+        $.ajax({
+            type: "POST",
+            url: "/schedule/task",
+            data: JSON.stringify(json),
+            contentType: 'application/json',
+            success: execution => {
+                runTaskModal.setState({
+                    executionId: execution.id
+                }, createStomp => {
+                    let client = Stomp.client("ws://localhost:61614/stomp", "v11.stomp");
+                    let headers = {
+                        id: 'JUST.FCX',
+                        ack: 'client',
+                        selector: 'executionId=' + runTaskModal.state.executionId
+                    };
+                    client.connect("admin", "admin", function () {
+                        client.subscribe("/queue/taskexecution_destination",
+                            function (message) {
+                                let messageBody = JSON.parse(message.body);
+                                var tagsToReplace = {
+                                    '&': '&amp;',
+                                    '<': '&lt;',
+                                    '>': '&gt;'
+                                };
+
+                                function replaceTag(tag) {
+                                    return tagsToReplace[tag] || tag;
+                                }
+
+                                function safe_tags_replace(str) {
+                                    return str.replace(/[&<>]/g, replaceTag);
+                                }
+
+                                jQuery("#outputDiv").append(safe_tags_replace(messageBody.output) + "<br>");
+                                message.ack();
+
+                                if (message.headers["lastMessage"] == "true"
+                                    && message.headers["executionId"] == runTaskModal.state.executionId) {
+                                    client.disconnect();
+                                    runTaskModal.cleanup();
+                                }
+                            }, headers);
+                    });
+                })
+            },
+            dataType: "json"
+        });
     }
 
     cleanup() {

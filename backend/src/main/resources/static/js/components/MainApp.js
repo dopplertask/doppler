@@ -401,19 +401,6 @@ class MainApp extends React.Component {
     }
 
     render() {
-        let runBtn;
-        if (this.state.saved) {
-            runBtn = (<div><a href="#" onClick={() => {
-                $("#runTaskModal").modal("show");
-
-            }} className="btn btn-primary btn-block">Run
-                Workflow</a></div>);
-        } else {
-            runBtn = (<div><a href="#" onClick={() => {
-                alert("Please save the workflow first");
-            }} className="btn btn-primary disabled btn-block">Run
-                Workflow</a></div>);
-        }
         return <div id="container">
 
 
@@ -488,7 +475,11 @@ class MainApp extends React.Component {
                                             actions</a>
                                     </li>
                                 </ul>
-                                {runBtn}
+                                <div><a href="#" onClick={() => {
+                                    $("#runTaskModal").modal("show");
+
+                                }} className="btn btn-primary btn-block">Run
+                                    Workflow</a></div>
                             </nav>
 
                             <br/>
@@ -519,7 +510,7 @@ class MainApp extends React.Component {
                 taskName={this.state.taskName}
                 handleSaveModalField={this.handleSaveModalField}/>
 
-            <RunTaskModal
+            <RunTaskModal prepareJSON={this.prepareJSON} saved={this.state.saved}
                 taskName={this.state.taskName} start={this.state.start} setStartToFalse={this.setStartToFalse}
                 parameters={this.state.parameters} setStartToTrue={this.setStartToTrue}/>
 
