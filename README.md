@@ -162,6 +162,17 @@ Provides the following actions: click, move, press and release the mouse button.
 Reads a file from disk.
 ##### Variables
 * filename: name of a file. Using ~ in the beginning of the filename will point to the home directory eg. ~/Downloads/testfile.txt
+* parameterName: The name of the parameter to store the contents in.
+
+#### WriteFileAction
+##### Variables
+* filename: name of a file. Using ~ in the beginning of the filename will point to the home directory eg. ~/Downloads/testfile.txt
+* contents: the contents to write in the file.
+
+#### XMLAction
+##### Variables
+* content: XML or JSON input.
+* type: JSON_TO_XML or XML_TO_JSON.
 
 #### SetVariableAction
 Sets or modifies a variable for the current execution.

@@ -227,6 +227,7 @@ public abstract class Action {
      *
      * @return action description.
      */
+    @JsonIgnore
     public abstract String getDescription();
 
     public List<ActionPort> getPorts() {
