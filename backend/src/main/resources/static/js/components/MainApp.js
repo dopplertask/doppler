@@ -14,13 +14,14 @@ class MainApp extends React.Component {
             availableActions: [],
             app: {},
             parameters: [],
-            selectedAction: {userData: {customData: {}}},
+            selectedAction: {userData: {customData: {}, lastSingleActionExecutionOutput: ""}},
             saveDialogVisible: false,
             taskName: "task" + unsavedTaskNamePrefix,
             start: false,
             saved: false
         }
 
+        this.executeAction = this.executeAction.bind(this);
         this.createNode = this.createNode.bind(this);
         this.prepareJSON = this.prepareJSON.bind(this);
         this.editModelForFigure = this.editModelForFigure.bind(this);
@@ -39,6 +40,52 @@ class MainApp extends React.Component {
         this.newWorkflow = this.newWorkflow.bind(this);
         this.searchActions = this.searchActions.bind(this);
 
+    }
+
+    executeAction() {
+        // Call AJAX
+        let ports = [];
+
+        // Create ports
+        this.state.selectedAction.outputPorts.data.forEach(value => {
+            ports.push({externalId: value.name, portType: "OUTPUT"})
+        });
+
+        this.state.selectedAction.inputPorts.data.forEach(value => {
+            ports.push({externalId: value.name, portType: "INPUT"})
+        });
+
+        let json = {
+            ...this.state.selectedAction.userData.customData,
+            "@type": this.state.selectedAction.userData.name,
+            ports
+        }
+        $.ajax({
+                   type: "POST",
+                   url: "/task/action",
+                   data: JSON.stringify(json),
+                   contentType: 'application/json',
+                   success: success => {
+                       console.log(success);
+                       let output = "Last executed: " + new Date() + " No output. ";
+                       if (success.output != undefined && success.output != "") {
+                           output = success.output;
+                       } else if (success.errorMsg != undefined && success.errorMsg != "") {
+                           output = success.errorMsg;
+                       }
+                       this.setState(prevState => ({
+                           selectedAction: {
+                               ...prevState.selectedAction,
+                               userData: {
+                                   ...prevState.selectedAction.userData,
+                                   lastSingleActionExecutionOutput: output
+                               }
+                           }
+                       }));
+
+                   },
+                   dataType: "json"
+               });
     }
 
     searchActions() {
@@ -106,6 +153,7 @@ class MainApp extends React.Component {
                 let actions = [];
                 data.actions.forEach(element => {
                     element.customData = [];
+                    element.lastSingleActionExecutionOutput = "";
                     element.propertyInformationList.map(pi => {
                         if (pi.type === "MAP") {
                             element.customData[pi.name] = []
@@ -501,7 +549,7 @@ class MainApp extends React.Component {
 
 
             <EditActionModal updateFieldData={this.updateFieldData}
-                             saveActionSettings={this.saveActionSettings}
+                             executeAction={this.executeAction}
                              selectedAction={this.state.selectedAction}
                              discardActionSettings={this.discardActionSettings}/>
 
@@ -511,8 +559,8 @@ class MainApp extends React.Component {
                 handleSaveModalField={this.handleSaveModalField}/>
 
             <RunTaskModal prepareJSON={this.prepareJSON} saved={this.state.saved}
-                taskName={this.state.taskName} start={this.state.start} setStartToFalse={this.setStartToFalse}
-                parameters={this.state.parameters} setStartToTrue={this.setStartToTrue}/>
+                          taskName={this.state.taskName} start={this.state.start} setStartToFalse={this.setStartToFalse}
+                          parameters={this.state.parameters} setStartToTrue={this.setStartToTrue}/>
 
             <OpenTaskModal
                 openTask={this.openTask} saved={this.state.saved}/>
@@ -581,8 +629,10 @@ class MainApp extends React.Component {
                     }
                 }
             }
-        }));
-        this.setState({saved: false})
+        }), () => {
+            this.saveActionSettings();
+        });
+
     }
 
 }

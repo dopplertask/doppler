@@ -42,7 +42,6 @@ class RunTaskModal extends React.Component {
                 })
         }
 
-
         if (prevProps.start != this.props.start) {
             this.setState(
                 {
@@ -92,59 +91,58 @@ class RunTaskModal extends React.Component {
                 this.requestRun(json);
             }
 
-
         }
     }
 
     requestRun(json) {
         let runTaskModal = this;
         $.ajax({
-            type: "POST",
-            url: "/schedule/task",
-            data: JSON.stringify(json),
-            contentType: 'application/json',
-            success: execution => {
-                runTaskModal.setState({
-                    executionId: execution.id
-                }, createStomp => {
-                    let client = Stomp.client("ws://localhost:61614/stomp", "v11.stomp");
-                    let headers = {
-                        id: 'JUST.FCX',
-                        ack: 'client',
-                        selector: 'executionId=' + runTaskModal.state.executionId
-                    };
-                    client.connect("admin", "admin", function () {
-                        client.subscribe("/queue/taskexecution_destination",
-                            function (message) {
-                                let messageBody = JSON.parse(message.body);
-                                var tagsToReplace = {
-                                    '&': '&amp;',
-                                    '<': '&lt;',
-                                    '>': '&gt;'
-                                };
+                   type: "POST",
+                   url: "/schedule/task",
+                   data: JSON.stringify(json),
+                   contentType: 'application/json',
+                   success: execution => {
+                       runTaskModal.setState({
+                                                 executionId: execution.id
+                                             }, createStomp => {
+                           let client = Stomp.client("ws://localhost:61614/stomp", "v11.stomp");
+                           let headers = {
+                               id: 'JUST.FCX',
+                               ack: 'client',
+                               selector: 'executionId=' + runTaskModal.state.executionId
+                           };
+                           client.connect("admin", "admin", function () {
+                               client.subscribe("/queue/taskexecution_destination",
+                                                function (message) {
+                                                    let messageBody = JSON.parse(message.body);
+                                                    var tagsToReplace = {
+                                                        '&': '&amp;',
+                                                        '<': '&lt;',
+                                                        '>': '&gt;'
+                                                    };
 
-                                function replaceTag(tag) {
-                                    return tagsToReplace[tag] || tag;
-                                }
+                                                    function replaceTag(tag) {
+                                                        return tagsToReplace[tag] || tag;
+                                                    }
 
-                                function safe_tags_replace(str) {
-                                    return str.replace(/[&<>]/g, replaceTag);
-                                }
+                                                    function safe_tags_replace(str) {
+                                                        return str.replace(/[&<>]/g, replaceTag);
+                                                    }
 
-                                jQuery("#outputDiv").append(safe_tags_replace(messageBody.output) + "<br>");
-                                message.ack();
+                                                    jQuery("#outputDiv").append(safe_tags_replace(messageBody.output) + "<br>");
+                                                    message.ack();
 
-                                if (message.headers["lastMessage"] == "true"
-                                    && message.headers["executionId"] == runTaskModal.state.executionId) {
-                                    client.disconnect();
-                                    runTaskModal.cleanup();
-                                }
-                            }, headers);
-                    });
-                })
-            },
-            dataType: "json"
-        });
+                                                    if (message.headers["lastMessage"] == "true"
+                                                        && message.headers["executionId"] == runTaskModal.state.executionId) {
+                                                        client.disconnect();
+                                                        runTaskModal.cleanup();
+                                                    }
+                                                }, headers);
+                           });
+                       })
+                   },
+                   dataType: "json"
+               });
     }
 
     cleanup() {
@@ -163,9 +161,7 @@ class RunTaskModal extends React.Component {
                         </button>
                     </div>
                     <div className="modal-body" id="runTaskModalBody">
-                        {this.state.taskName}
-
-                        <h4>Task execution output</h4>
+                        <h4>Task execution</h4>
 
                         <h5>Parameter values</h5>
                         <div className="container">
@@ -193,11 +189,10 @@ class RunTaskModal extends React.Component {
                             }
 
                         </div>
-                        <button type="button" className={"btn btn-primary" + (this.state.start ? " disabled" : "")}
-                                onClick={this.runTask}>Run task
-                        </button>
+
+                        <h5>Output</h5>
                         <br/>
-                        <code id="outputDiv"></code>
+                        <code id="outputDiv">Run the task by clicking the "Run task" button.</code>
 
 
                     </div>
@@ -205,7 +200,9 @@ class RunTaskModal extends React.Component {
                         <button type="button" className="btn btn-secondary" data-dismiss="modal"
                                 onClick={this.props.closeSaveDialog}>Close
                         </button>
-
+                        <button type="button" className={"btn btn-primary" + (this.state.start ? " disabled" : "")}
+                                onClick={this.runTask}>Run task
+                        </button>
                     </div>
                 </div>
             </div>

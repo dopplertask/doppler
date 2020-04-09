@@ -45,7 +45,7 @@ public class SwitchAction extends Action {
             switch (getScriptLanguage()) {
                 case VELOCITY:
                     for (SwitchCase switchCase : switchCases) {
-                        String evaluatedCase = variableExtractorUtil.extract("\"" + switchCase.getCurrentCase() + "\"", execution, getScriptLanguage());
+                        String evaluatedCase = variableExtractorUtil.extract(switchCase.getCurrentCase(), execution, getScriptLanguage());
                         evaluatedCases.add(evaluatedCase);
                         if (i == 0) {
                             statement.append("#if(\"" + value + "\" == \"" + evaluatedCase + "\")" +
@@ -56,7 +56,11 @@ public class SwitchAction extends Action {
                         }
                         i++;
                     }
-                    statement.append("#end");
+
+                    // If there is no cases then we will not print out anything.
+                    if (i != 0) {
+                        statement.append("#end");
+                    }
                     break;
                 case JAVASCRIPT:
                     statement.append("var outputPort = 0;");
@@ -81,9 +85,24 @@ public class SwitchAction extends Action {
 
             localCondition = variableExtractorUtil.extract(statement.toString(), execution, getScriptLanguage());
 
+            int portNr = 0;
+            try {
+                portNr = Integer.parseInt(localCondition);
 
-            actionResult.setOutput("Switch evaluated to port nr: " + localCondition);
-            execution.setCurrentAction(getOutputPorts().get(Integer.parseInt(localCondition)).getConnectionSource().getTarget().getAction());
+                if (portNr < getOutputPorts().size()) {
+                    actionResult.setOutput("Switch evaluated to port nr: " + localCondition);
+                    if (getOutputPorts().get(portNr).getConnectionSource() != null && getOutputPorts().get(portNr).getConnectionSource().getTarget() != null) {
+                        execution.setCurrentAction(getOutputPorts().get(portNr).getConnectionSource().getTarget().getAction());
+                    }
+                } else {
+                    actionResult.setStatusCode(StatusCode.FAILURE);
+                    actionResult.setErrorMsg("Could not match any of the cases.");
+                }
+            } catch (NumberFormatException e) {
+                actionResult.setStatusCode(StatusCode.FAILURE);
+                actionResult.setErrorMsg("Could not evaluate condition to any path.");
+            }
+
 
         } else {
             actionResult.setStatusCode(StatusCode.FAILURE);
