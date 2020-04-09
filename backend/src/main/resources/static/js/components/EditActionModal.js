@@ -73,7 +73,6 @@ class EditActionModal extends React.Component {
      * @param index to remove
      */
     removeMapKey(name, index) {
-        debugger;
         this.props.selectedAction.userData.customData[name].splice(index, 1);
         this.forceUpdate();
     }
@@ -297,16 +296,24 @@ class EditActionModal extends React.Component {
                         </button>
                     </div>
                     <div className="modal-body" id="actionEditModalBody">
-                        {this.renderFields()}
+                        <div className="container">
+                            <div className="row">
+                                <div className="col-6">
+                                    {this.renderFields()}
+                                </div>
+                                <div className="col-6">
+                                    Action execution result:
+                                    <br/>
+                                    <code id="actionExecutionOutput">{this.props.selectedAction.userData != undefined
+                                                                      && this.props.selectedAction.userData.lastSingleActionExecutionOutput
+                                                                      != undefined
+                                                                      && this.props.selectedAction.userData.lastSingleActionExecutionOutput}</code>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" data-dismiss="modal"
-                                onClick={this.props.discardActionSettings}>Close
-                        </button>
-                        <button type="button" data-dismiss="modal" className="btn btn-primary"
-                                onClick={this.props.saveActionSettings}>Save
-                            changes
-                        </button>
+                        <button type="button" className="btn btn-primary" onClick={this.props.executeAction}>Execute node</button>
                     </div>
                 </div>
             </div>

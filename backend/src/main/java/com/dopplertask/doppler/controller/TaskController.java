@@ -1,5 +1,8 @@
 package com.dopplertask.doppler.controller;
 
+import com.dopplertask.doppler.domain.ActionResult;
+import com.dopplertask.doppler.domain.OutputType;
+import com.dopplertask.doppler.domain.StatusCode;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.TaskExecutionLog;
@@ -20,8 +23,10 @@ import com.dopplertask.doppler.dto.TaskResponseSingleDTO;
 import com.dopplertask.doppler.service.ExecutionService;
 import com.dopplertask.doppler.service.TaskRequest;
 import com.dopplertask.doppler.service.TaskService;
+import com.dopplertask.doppler.service.VariableExtractorUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.apache.velocity.app.VelocityEngine;
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -145,6 +150,25 @@ public class TaskController {
             checksumResponseDto.setChecksum(sha3_256hex);
             return new ResponseEntity<>(checksumResponseDto, HttpStatus.OK);
         }
+
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @PostMapping(path = "/task/action")
+    public ResponseEntity<ActionResult> runAction(@RequestBody Action action) throws IOException {
+        try {
+            ActionResult actionResult = action.run(taskService, new TaskExecution(), new VariableExtractorUtil(new VelocityEngine()));
+            if (actionResult != null) {
+                return new ResponseEntity<>(actionResult, HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            ActionResult actionResult = new ActionResult();
+            actionResult.setErrorMsg(e.toString());
+            actionResult.setStatusCode(StatusCode.FAILURE);
+            actionResult.setOutputType(OutputType.STRING);
+            return new ResponseEntity<>(actionResult, HttpStatus.OK);
+        }
+
 
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }

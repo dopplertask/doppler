@@ -52,11 +52,17 @@ public class ExecuteCommandAction extends Action {
                     new StreamGobbler(process.getInputStream(), consumer -> output.append(consumer + "\n"));
             streamGobbler.run();
 
+            StreamGobbler streamGobblerError =
+                    new StreamGobbler(process.getErrorStream(), consumer -> output.append(consumer + "\n"));
+            streamGobblerError.run();
+
             int exitCode = process.waitFor();
             if (exitCode == 0) {
-                actionResult.setOutput(output.toString());
                 actionResult.setStatusCode(StatusCode.SUCCESS);
+            } else {
+                actionResult.setStatusCode(StatusCode.FAILURE);
             }
+            actionResult.setOutput(output.toString());
         } catch (InterruptedException | IOException e) {
             actionResult.setStatusCode(StatusCode.FAILURE);
             actionResult.setErrorMsg("Could not execute task: " + e);

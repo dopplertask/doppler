@@ -45,10 +45,14 @@ public class IfAction extends Action {
 
             if ("true".equals(localCondition)) {
                 actionResult.setOutput("If evaluated to true.");
-                execution.setCurrentAction(getOutputPorts().get(0).getConnectionSource().getTarget().getAction());
+                if (getOutputPorts().size() > 0 && getOutputPorts().get(0).getConnectionSource() != null && getOutputPorts().get(0).getConnectionSource().getTarget() != null) {
+                    execution.setCurrentAction(getOutputPorts().get(0).getConnectionSource().getTarget().getAction());
+                }
             } else {
                 actionResult.setOutput("If evaluated to false.");
-                execution.setCurrentAction(getOutputPorts().get(1).getConnectionSource().getTarget().getAction());
+                if (getOutputPorts().size() > 1 && getOutputPorts().get(1).getConnectionSource() != null && getOutputPorts().get(1).getConnectionSource().getTarget() != null) {
+                    execution.setCurrentAction(getOutputPorts().get(1).getConnectionSource().getTarget().getAction());
+                }
             }
         } else {
             actionResult.setStatusCode(StatusCode.FAILURE);

@@ -32,7 +32,6 @@ let SwitchAction = draw2d.shape.node.Between.extend({
         this.setWidth(80);
         this.setHeight(80);
 
-        console.log(this.getPorts());
         let label = new draw2d.shape.basic.Label({text: "SwitchAction"});
         label.setStroke(0);
         this.add(label, new draw2d.layout.locator.BottomLocator(this));
