@@ -12,7 +12,7 @@ RUN jlink \
 
 ADD . /root
 
-RUN cd ~/backend && ./gradlew build -x test && chmod +x /root/start.sh && chmod +x /root/setup.sh
+RUN cd ~/backend && chmod +x gradlew && ./gradlew build -x test && chmod +x /root/start.sh && chmod +x /root/setup.sh
 
 
 # Second image
