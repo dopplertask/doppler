@@ -17,6 +17,7 @@ parts:
     source-subdir: backend
     gradle-options: [-xtest, build]
     gradle-output-dir: build/libs
+    gradle-version: "6.3"
   doppler:
     plugin: go
     source: https://github.com/dopplertask/doppler
