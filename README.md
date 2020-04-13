@@ -1,22 +1,25 @@
-# doppler - Task automation
-
 <div align="center">
 
 ![DopplerTask - Open-source Workflow Automation](https://raw.githubusercontent.com/dopplertask/doppler/master/docs/images/dopplertask_logo.png)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdopplertask%2Fdopplertask.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdopplertask%2Fdopplertask?ref=badge_shield)
 
-[![Build Status](https://travis-ci.org/dopplertask/doppler.svg?branch=master)](https://travis-ci.org/dopplertask/doppler) [![Dependencies](https://img.shields.io/david/dopplertask/doppler?path=backend/src/main/resources/static)](https://david-dm.org/dopplertask/doppler)
 
-</div>
+[![Build Status](https://travis-ci.org/dopplertask/doppler.svg?branch=master)](https://travis-ci.org/dopplertask/doppler) [![Dependencies](https://img.shields.io/david/dopplertask/doppler?path=backend/src/main/resources/static)](https://david-dm.org/dopplertask/doppler) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdopplertask%2Fdopplertask.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdopplertask%2Fdopplertask?ref=badge_shield)
+
+<h1>DopplerTask - Task Automation</h1>
 
 Doppler is a revolutionary open-source software that allows you to easily automate tasks. Whether it’s a bunch of bash scripts or just starting your car remotely, you can automate it. Build, run, reuse and share automations with anyone around the globe.
 
 On top of all of this life-simplifying project, we are striving to make an climate friendly software that is fast, easy and consumes as little resources as possible.
 
+</div>
+
 
 ## Simple install
 Using snap:
 ```snap install dopplertask```
+
+After install, access the GUI on: 
+```http://localhost:8090/public/index.html```
 ## Prerequisites
 
 Install JDK 11 and gradle.
@@ -27,20 +30,65 @@ To run the backend, go to backend and run:
 To compile and run the cli:
 ```cd cli && go build . && ./cli tasks```
 
+## Docker
+To run the built docker image:
+```docker run -p 8090:8090 -p 61617:61617 dopplertask/dopplertask ```
+
+To rebuild the docker image:
+```docker build -t dopplertask/dopplertask .```
+
 ## Usage
 
 ### Example
 #### Add a task
 
-Below is an example of a Dopplerfile:
+Below is an example json of a Task:
 ```
 {
-  "name": "Test Task",
-  "description": "Testing with restriction",
+  "name": "task_ya0mh2aw9j9n8tyux4fjhj",
+  "description": "",
+  "parameters": [],
   "actions": [
     {
+      "@type": "StartAction",
+      "ports": [
+        {
+          "externalId": "89741e7c-c0f2-2feb-3be5-42cb60c5ff4e",
+          "portType": "OUTPUT"
+        }
+      ],
+      "guiXPos": 50,
+      "guiYPos": 340
+    },
+    {
       "@type": "PrintAction",
-      "message": "This is an example task."
+      "continueOnFailure": "",
+      "scriptLanguage": "VELOCITY",
+      "retries": "0",
+      "failOn": "",
+      "message": "Hello world",
+      "ports": [
+        {
+          "externalId": "a4cc77f7-7a1c-d718-09c0-3cd3b01765b3",
+          "portType": "INPUT"
+        },
+        {
+          "externalId": "ae299ee3-2f2c-1d98-d375-ad0551090a88",
+          "portType": "OUTPUT"
+        }
+      ],
+      "guiXPos": 550,
+      "guiYPos": 340
+    }
+  ],
+  "connections": [
+    {
+      "source": {
+        "externalId": "89741e7c-c0f2-2feb-3be5-42cb60c5ff4e"
+      },
+      "target": {
+        "externalId": "a4cc77f7-7a1c-d718-09c0-3cd3b01765b3"
+      }
     }
   ]
 }
@@ -203,14 +251,6 @@ All actions have retry mechanisms to allow you to retry an action.
 * retries: (Integer) Amount of retries.
 
 
-
-## Docker
-To run the built docker image:
-```docker run -p 8090:8090 -p 61617:61617 dopplertask/doppler-engine ```
-
-To rebuild the docker image:
-```docker build -t dopplertask/doppler-engine .```
-
 ## Authors
 
 * **Feras Wilson**
@@ -218,6 +258,3 @@ To rebuild the docker image:
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details
-
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdopplertask%2Fdopplertask.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdopplertask%2Fdopplertask?ref=badge_large)
