@@ -3,6 +3,7 @@
 <div align="center">
 
 ![DopplerTask - Open-source Workflow Automation](https://raw.githubusercontent.com/dopplertask/doppler/master/docs/images/dopplertask_logo.png)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdopplertask%2Fdopplertask.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdopplertask%2Fdopplertask?ref=badge_shield)
 
 [![Build Status](https://travis-ci.org/dopplertask/doppler.svg?branch=master)](https://travis-ci.org/dopplertask/doppler) [![Dependencies](https://img.shields.io/david/dopplertask/doppler?path=backend/src/main/resources/static)](https://david-dm.org/dopplertask/doppler)
 
@@ -217,3 +218,6 @@ To rebuild the docker image:
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdopplertask%2Fdopplertask.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdopplertask%2Fdopplertask?ref=badge_large)
