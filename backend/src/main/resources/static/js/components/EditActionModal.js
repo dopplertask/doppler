@@ -304,10 +304,11 @@ class EditActionModal extends React.Component {
                                 <div className="col-6">
                                     Action execution result:
                                     <br/>
-                                    <code id="actionExecutionOutput">{this.props.selectedAction.userData != undefined
-                                                                      && this.props.selectedAction.userData.lastSingleActionExecutionOutput
-                                                                      != undefined
-                                                                      && this.props.selectedAction.userData.lastSingleActionExecutionOutput}</code>
+                                    <pre id="actionExecutionOutput" className="code-pre">{this.props.selectedAction.userData
+                                                                                          != undefined
+                                                                                          && this.props.selectedAction.userData.lastSingleActionExecutionOutput
+                                                                                          != undefined
+                                                                                          && this.props.selectedAction.userData.lastSingleActionExecutionOutput}</pre>
                                 </div>
                             </div>
                         </div>

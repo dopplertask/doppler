@@ -4,7 +4,7 @@
   "description": "Doppler is a revolutionary open-source software that allows you to easily automate tasks. Whether it’s a bunch of bash scripts or just starting your car remotely, you can automate it. Build, run, reuse and share automations with anyone around the globe.",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --ignore public --exec \"webpack --mode development\""
+    "start": "nodemon --ignore public --exec \"webpack --mode development && cd ../../../../ && ./gradlew processResources\""
   },
   "keywords": [],
   "author": "Feras Wilson",
