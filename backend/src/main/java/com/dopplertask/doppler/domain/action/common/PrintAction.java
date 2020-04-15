@@ -13,6 +13,7 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 @Entity
@@ -20,7 +21,8 @@ import javax.persistence.Table;
 @DiscriminatorValue("print_action")
 public class PrintAction extends Action {
 
-    @Column
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String message;
 
     public PrintAction() {
@@ -59,7 +61,7 @@ public class PrintAction extends Action {
     public List<PropertyInformation> getActionInfo() {
         List<PropertyInformation> actionInfo = super.getActionInfo();
 
-        actionInfo.add(new PropertyInformation("message", "Message"));
+        actionInfo.add(new PropertyInformation("message", "Message", PropertyInformation.PropertyInformationType.MULTILINE));
         return actionInfo;
     }
 

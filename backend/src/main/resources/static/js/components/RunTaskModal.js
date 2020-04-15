@@ -57,7 +57,11 @@ class RunTaskModal extends React.Component {
     }
 
     runTask() {
-        this.props.setStartToTrue();
+        if (!this.state.start) {
+            this.props.setStart(true);
+        } else {
+            this.props.setStart(false);
+        }
     }
 
     parameterChange(event) {
@@ -146,7 +150,7 @@ class RunTaskModal extends React.Component {
     }
 
     cleanup() {
-        this.props.setStartToFalse();
+        this.props.setStart(false);
     }
 
     render() {
@@ -192,16 +196,17 @@ class RunTaskModal extends React.Component {
 
                         <h5>Output</h5>
                         <br/>
-                        <code id="outputDiv">Run the task by clicking the "Run task" button.</code>
+                        <pre id="outputDiv" className="code-pre">Run the task by clicking the "Run task" button.</pre>
 
 
                     </div>
+
                     <div className="modal-footer">
                         <button type="button" className="btn btn-secondary" data-dismiss="modal"
                                 onClick={this.props.closeSaveDialog}>Close
                         </button>
-                        <button type="button" className={"btn btn-primary" + (this.state.start ? " disabled" : "")}
-                                onClick={this.runTask}>Run task
+                        <button type="button" className={"btn btn-" + (this.state.start ? "danger" : "primary")}
+                                onClick={this.runTask}>{this.state.start ? "Stop Task" : "Run task"}
                         </button>
                     </div>
                 </div>

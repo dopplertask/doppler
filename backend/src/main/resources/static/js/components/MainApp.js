@@ -4,6 +4,7 @@ import EditActionModal from "./EditActionModal";
 import SaveModal from "./SaveModal";
 import OpenTaskModal from "./OpenTaskModal";
 import TaskSettings from "./TaskSettings";
+import ImportTaskModal from "./ImportTaskModal";
 
 class MainApp extends React.Component {
 
@@ -32,13 +33,14 @@ class MainApp extends React.Component {
         this.handleSaveModalField = this.handleSaveModalField.bind(this);
         this.downloadWorkflow = this.downloadWorkflow.bind(this);
         this.updateFieldData = this.updateFieldData.bind(this);
-        this.setStartToFalse = this.setStartToFalse.bind(this);
-        this.setStartToTrue = this.setStartToTrue.bind(this);
+        this.setStart = this.setStart.bind(this);
         this.saveSettings = this.saveSettings.bind(this);
         this.openTask = this.openTask.bind(this);
         this.initApp = this.initApp.bind(this);
         this.newWorkflow = this.newWorkflow.bind(this);
         this.searchActions = this.searchActions.bind(this);
+        this.importTask = this.importTask.bind(this);
+        this.applyJSONToCanvas = this.applyJSONToCanvas.bind(this);
 
     }
 
@@ -105,15 +107,9 @@ class MainApp extends React.Component {
         }
     }
 
-    setStartToFalse() {
+    setStart(start) {
         this.setState({
-                          start: false
-                      })
-    }
-
-    setStartToTrue() {
-        this.setState({
-                          start: true
+                          start: start
                       })
     }
 
@@ -349,74 +345,78 @@ class MainApp extends React.Component {
                    url: "/task/" + checksum + "/checksum",
                    contentType: 'application/json',
                    success: task => {
-                       this.state.app.view.clear();
-
-                       task.actions.forEach((action, i) => {
-                           let generatedAction = this.createNode(action["@type"]);
-                           generatedAction.userData.customData = action;
-                           generatedAction.x = action.guiXPos;
-                           generatedAction.y = action.guiYPos;
-                           let inputPortIndex = 0;
-                           let outputPortIndex = 0;
-
-                           action.ports.forEach((port, i) => {
-                               if (port.portType == "INPUT") {
-                                   generatedAction.getInputPort(inputPortIndex).setId(port.externalId);
-                                   generatedAction.getInputPort(inputPortIndex).setName(port.externalId);
-                                   inputPortIndex++;
-                               } else {
-                                   if (generatedAction.getOutputPort(outputPortIndex) == undefined) {
-                                       generatedAction.createPort("output");
-                                   }
-                                   generatedAction.getOutputPort(outputPortIndex).setId(port.externalId);
-                                   generatedAction.getOutputPort(outputPortIndex).setName(port.externalId);
-                                   outputPortIndex++;
-                               }
-                           })
-
-                           this.state.app.view.add(generatedAction);
-                       })
-
-                       // Very inefficient
-                       // TODO: Improve performance
-                       task.connections.forEach(connection => {
-                           let conVisual = new draw2d.Connection({
-                                                                     router: new draw2d.layout.connection.InteractiveManhattanConnectionRouter(),
-                                                                     color: "#334455",
-                                                                     radius: 20,
-                                                                     outlineColor: "#334455",
-                                                                     stroke: 2
-                                                                 });
-
-                           this.state.app.view.figures.data.forEach(figure => {
-                               figure.outputPorts.data.forEach(outputPort => {
-                                                                   if (outputPort.name == connection.source.externalId) {
-                                                                       conVisual.setSource(outputPort);
-                                                                   }
-                                                               }
-                               )
-                               figure.inputPorts.data.forEach(inputPort => {
-                                                                  if (inputPort.name == connection.target.externalId) {
-                                                                      conVisual.setTarget(inputPort);
-                                                                  }
-                                                              }
-                               )
-                           })
-
-                           this.state.app.view.add(conVisual);
-                       })
-
-                       mainApp.setState({
-                                            taskName: task.name,
-                                            parameters: task.parameters,
-                                            saved: true
-                                        });
+                       this.applyJSONToCanvas(task, mainApp);
                    }
                    ,
                    dataType: "json"
                }
         )
         ;
+    }
+
+    applyJSONToCanvas(task, mainApp) {
+        this.state.app.view.clear();
+
+        task.actions.forEach((action, i) => {
+            let generatedAction = this.createNode(action["@type"]);
+            generatedAction.userData.customData = action;
+            generatedAction.x = action.guiXPos;
+            generatedAction.y = action.guiYPos;
+            let inputPortIndex = 0;
+            let outputPortIndex = 0;
+
+            action.ports.forEach((port, i) => {
+                if (port.portType == "INPUT") {
+                    generatedAction.getInputPort(inputPortIndex).setId(port.externalId);
+                    generatedAction.getInputPort(inputPortIndex).setName(port.externalId);
+                    inputPortIndex++;
+                } else {
+                    if (generatedAction.getOutputPort(outputPortIndex) == undefined) {
+                        generatedAction.createPort("output");
+                    }
+                    generatedAction.getOutputPort(outputPortIndex).setId(port.externalId);
+                    generatedAction.getOutputPort(outputPortIndex).setName(port.externalId);
+                    outputPortIndex++;
+                }
+            })
+
+            this.state.app.view.add(generatedAction);
+        })
+
+        // Very inefficient
+        // TODO: Improve performance
+        task.connections.forEach(connection => {
+            let conVisual = new draw2d.Connection({
+                                                      router: new draw2d.layout.connection.InteractiveManhattanConnectionRouter(),
+                                                      color: "#334455",
+                                                      radius: 20,
+                                                      outlineColor: "#334455",
+                                                      stroke: 2
+                                                  });
+
+            this.state.app.view.figures.data.forEach(figure => {
+                figure.outputPorts.data.forEach(outputPort => {
+                                                    if (outputPort.name == connection.source.externalId) {
+                                                        conVisual.setSource(outputPort);
+                                                    }
+                                                }
+                )
+                figure.inputPorts.data.forEach(inputPort => {
+                                                   if (inputPort.name == connection.target.externalId) {
+                                                       conVisual.setTarget(inputPort);
+                                                   }
+                                               }
+                )
+            })
+
+            this.state.app.view.add(conVisual);
+        })
+
+        mainApp.setState({
+                             taskName: task.name,
+                             parameters: task.parameters,
+                             saved: true
+                         });
     }
 
     editModelForFigure() {
@@ -507,7 +507,7 @@ class MainApp extends React.Component {
                                            className="fa fa-home solo">Task parameters</a>
                                     </li>
                                     <li><a href="#" onClick={this.downloadWorkflow} className="fa fa-home solo">Export
-                                        Workflow</a>
+                                        Task</a>
                                     </li>
                                     <li><a href="#" onClick={this.saveWorkflow}
                                            className="fa fa-home solo">Save</a></li>
@@ -515,7 +515,9 @@ class MainApp extends React.Component {
                                            className="fa fa-home solo">Save as</a></li>
                                     <li><a href="#" onClick={() => $("#openTaskModal").modal("show")}
                                            className="fa fa-home solo">Open
-                                        Workflow</a>
+                                        Task</a></li>
+                                    <li><a href="#" onClick={() => $("#importTaskModal").modal("show")}
+                                           className="fa fa-home solo">Import Task</a>
                                     </li>
                                     <li>
                                         <a href="#" onClick={() => $("#wrapper").toggleClass("active")}
@@ -559,8 +561,8 @@ class MainApp extends React.Component {
                 handleSaveModalField={this.handleSaveModalField}/>
 
             <RunTaskModal prepareJSON={this.prepareJSON} saved={this.state.saved}
-                          taskName={this.state.taskName} start={this.state.start} setStartToFalse={this.setStartToFalse}
-                          parameters={this.state.parameters} setStartToTrue={this.setStartToTrue}/>
+                          taskName={this.state.taskName} start={this.state.start}
+                          parameters={this.state.parameters} setStart={this.setStart}/>
 
             <OpenTaskModal
                 openTask={this.openTask} saved={this.state.saved}/>
@@ -569,8 +571,30 @@ class MainApp extends React.Component {
                           saveSettings={this.saveSettings}
             />
 
+            <ImportTaskModal importTask={this.importTask}/>
+
         </div>
             ;
+    }
+
+    importTask() {
+        if (!this.state.saved) {
+            if (confirm("You have an unsaved workflow. Do you want to continue anyway?")) {
+                let editor = ace.edit("editor_importTaskEditor");
+                let importTaskObj = JSON.parse(editor.getValue());
+
+                this.applyJSONToCanvas(importTaskObj, this)
+
+                $("#importTaskModal").modal("hide");
+            }
+        } else {
+            let editor = ace.edit("editor_importTaskEditor");
+            let importTaskObj = JSON.parse(editor.getValue());
+
+            this.applyJSONToCanvas(importTaskObj, this)
+            
+            $("#importTaskModal").modal("hide");
+        }
     }
 
     saveSettings(parameters) {
