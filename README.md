@@ -13,6 +13,7 @@ On top of all of this life-simplifying project, we are striving to make an clima
 
 ![DopplerTask - GUI](https://raw.githubusercontent.com/dopplertask/doppler/master/docs/images/dopplertask_gui.png)
 </div>
+
 ## Simple install
 Using snap:
 ```snap install dopplertask```
