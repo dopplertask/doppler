@@ -22,6 +22,7 @@ class MainApp extends React.Component {
             saved: false
         }
 
+        this.showNotification = this.showNotification.bind(this);
         this.executeAction = this.executeAction.bind(this);
         this.createNode = this.createNode.bind(this);
         this.prepareJSON = this.prepareJSON.bind(this);
@@ -182,6 +183,8 @@ class MainApp extends React.Component {
             });
 
         });
+
+        $(".toast").toast({delay: 2000})
 
     }
 
@@ -449,8 +452,15 @@ class MainApp extends React.Component {
     }
 
     render() {
-        return <div id="container">
+        return <div id="container" style={{position: "relative", minHeight: "200px"}}>
 
+            <div role="alert" aria-live="assertive" aria-atomic="true" className="toast" data-autohide="true"
+                 style={{position: "absolute", left: "50%", bottom: "10px", transform: "translate(-50%,-50%)", zIndex: 2000}}
+                 id="notificationAlert">
+                <div className="toast-body" id="notificationAlertMessage">
+                    Hello, world! This is a toast message.
+                </div>
+            </div>
 
             <div id="wrapper">
 
@@ -577,23 +587,40 @@ class MainApp extends React.Component {
             ;
     }
 
+    showNotification(msg) {
+        $("#notificationAlertMessage").html(msg)
+        $("#notificationAlert").toast('show');
+    }
+
     importTask() {
         if (!this.state.saved) {
             if (confirm("You have an unsaved workflow. Do you want to continue anyway?")) {
                 let editor = ace.edit("editor_importTaskEditor");
-                let importTaskObj = JSON.parse(editor.getValue());
+                try {
+                    let importTaskObj = JSON.parse(editor.getValue());
 
-                this.applyJSONToCanvas(importTaskObj, this)
+                    this.applyJSONToCanvas(importTaskObj, this);
 
-                $("#importTaskModal").modal("hide");
+                    $("#importTaskModal").modal("hide");
+                    this.showNotification("Task has been imported!");
+                } catch (e) {
+                    this.showNotification("Could not import task. Wrong JSON!");
+                }
+
             }
         } else {
             let editor = ace.edit("editor_importTaskEditor");
-            let importTaskObj = JSON.parse(editor.getValue());
+            try {
+                let importTaskObj = JSON.parse(editor.getValue());
 
-            this.applyJSONToCanvas(importTaskObj, this)
-            
-            $("#importTaskModal").modal("hide");
+                this.applyJSONToCanvas(importTaskObj, this);
+
+                $("#importTaskModal").modal("hide");
+                this.showNotification("Task has been imported!");
+            } catch (e) {
+                this.showNotification("Could not import task. Wrong JSON!");
+            }
+
         }
     }
 
@@ -615,10 +642,9 @@ class MainApp extends React.Component {
 
         // Validate
         if (startActions > 1) {
-            alert("Only one start action is allowed.");
+            this.showNotification("Only one start action is allowed.");
             return;
         }
-        console.log("Save workflow API call to backend")
 
         this.prepareJSON(json => {
             console.log(json);
@@ -630,6 +656,7 @@ class MainApp extends React.Component {
                        success: success => {
                            console.log(success)
                            this.setState({saved: true})
+                           this.showNotification("Task saved!");
                        },
                        dataType: "json"
                    });
