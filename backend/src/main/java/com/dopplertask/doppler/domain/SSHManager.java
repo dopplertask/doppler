@@ -1,6 +1,7 @@
 package com.dopplertask.doppler.domain;
 
 
+import com.dopplertask.doppler.service.ActionResultListener;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
@@ -102,7 +103,7 @@ public class SSHManager {
         return warnMessage;
     }
 
-    public String sendCommand(String command) {
+    public String sendCommand(String command, ActionResultListener listener) {
         StringBuilder outputBuffer = new StringBuilder();
 
         try {
@@ -113,10 +114,18 @@ public class SSHManager {
             int readByte = commandOutput.read();
 
             while (commandOutput.available() > 0) {
+                StringBuilder line = new StringBuilder();
                 while (readByte != 0xffffffff) {
                     outputBuffer.append((char) readByte);
+                    line.append((char) readByte);
+                    // If it is a new line then we send the result
+                    if(readByte == 10) {
+                        listener.execute(line.toString());
+                        line.setLength(0);
+                    }
                     readByte = commandOutput.read();
                 }
+
                 try {
                     Thread.sleep(1000);
                 } catch (Exception ee) {

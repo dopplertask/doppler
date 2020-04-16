@@ -5,6 +5,7 @@ import com.dopplertask.doppler.domain.SSHManager;
 import com.dopplertask.doppler.domain.StatusCode;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.action.Action;
+import com.dopplertask.doppler.service.BroadcastListener;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 import com.jcraft.jsch.ChannelSftp;
@@ -41,7 +42,7 @@ public class SecureCopyAction extends Action {
     private String destinationFilename;
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil, BroadcastListener broadcastListener) throws IOException {
         String connectionIP = variableExtractorUtil.extract(getHostname(), execution, getScriptLanguage());
         String localUsername = variableExtractorUtil.extract(getUsername(), execution, getScriptLanguage());
         String localPassword = variableExtractorUtil.extract(getPassword(), execution, getScriptLanguage());

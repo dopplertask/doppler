@@ -4,6 +4,7 @@ import com.dopplertask.doppler.domain.ActionResult;
 import com.dopplertask.doppler.domain.StatusCode;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.action.Action;
+import com.dopplertask.doppler.service.BroadcastListener;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 
@@ -34,7 +35,7 @@ public class PrintAction extends Action {
 
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil, BroadcastListener broadcastListener) throws IOException {
         String messageVariable = variableExtractorUtil.extract(message, execution, getScriptLanguage());
 
         ActionResult actionResult = new ActionResult();

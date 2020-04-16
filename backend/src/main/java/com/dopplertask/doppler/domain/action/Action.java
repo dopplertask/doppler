@@ -23,6 +23,7 @@ import com.dopplertask.doppler.domain.action.io.ReadFileAction;
 import com.dopplertask.doppler.domain.action.io.WriteFileAction;
 import com.dopplertask.doppler.domain.action.ui.BrowseWebAction;
 import com.dopplertask.doppler.domain.action.ui.MouseAction;
+import com.dopplertask.doppler.service.BroadcastListener;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -158,15 +159,20 @@ public abstract class Action {
         this.task = task;
     }
 
+    public final ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
+        return run(taskService, execution, variableExtractorUtil, null);
+    }
+
     /**
      * Executes an action.
      *
      * @param taskService           which handles task execution.
      * @param execution             of the current task.
      * @param variableExtractorUtil utility to evaluate velocity code.
+     * @param broadcastListener     custom broadcast message from within the action.
      * @return an action result which represents the outcome of the executed action.
      */
-    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil, BroadcastListener broadcastListener) throws IOException {
         return new ActionResult();
     }
 

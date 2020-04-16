@@ -3,6 +3,7 @@ package com.dopplertask.doppler.domain.action.common;
 import com.dopplertask.doppler.domain.ActionResult;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.action.Action;
+import com.dopplertask.doppler.service.BroadcastListener;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 
@@ -28,7 +29,7 @@ public class ScriptAction extends Action {
     }
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil, BroadcastListener broadcastListener) throws IOException {
 
         ActionResult actionResult = new ActionResult();
         actionResult.setOutput(variableExtractorUtil.extract(script, execution, getScriptLanguage()));

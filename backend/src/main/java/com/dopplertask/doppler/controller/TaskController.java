@@ -157,7 +157,8 @@ public class TaskController {
     @PostMapping(path = "/task/action")
     public ResponseEntity<ActionResult> runAction(@RequestBody Action action) throws IOException {
         try {
-            ActionResult actionResult = action.run(taskService, new TaskExecution(), new VariableExtractorUtil(new VelocityEngine()));
+            ActionResult actionResult = action.run(taskService, new TaskExecution(), new VariableExtractorUtil(new VelocityEngine()), (output, outputType) -> {
+            });
             if (actionResult != null) {
                 return new ResponseEntity<>(actionResult, HttpStatus.OK);
             }

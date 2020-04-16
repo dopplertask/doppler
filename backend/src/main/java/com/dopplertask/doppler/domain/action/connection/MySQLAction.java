@@ -4,6 +4,7 @@ import com.dopplertask.doppler.domain.ActionResult;
 import com.dopplertask.doppler.domain.StatusCode;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.action.Action;
+import com.dopplertask.doppler.service.BroadcastListener;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 import com.mysql.cj.jdbc.MysqlDataSource;
@@ -54,7 +55,7 @@ public class MySQLAction extends Action {
 
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil, BroadcastListener broadcastListener) throws IOException {
         String localHostname = variableExtractorUtil.extract(getHostname(), execution, getScriptLanguage());
         String localUsername = variableExtractorUtil.extract(getUsername(), execution, getScriptLanguage());
         String localPassword = variableExtractorUtil.extract(getPassword(), execution, getScriptLanguage());
