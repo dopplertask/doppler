@@ -11,10 +11,8 @@ DopplerTask is a revolutionary open-source software that allows you to easily au
 
 On top of all of this life-simplifying project, we are striving to make an climate friendly software that is fast, easy and consumes as little resources as possible.
 
-</div>
-
 ![DopplerTask - GUI](https://raw.githubusercontent.com/dopplertask/doppler/master/docs/images/dopplertask_gui.png)
-
+</div>
 ## Simple install
 Using snap:
 ```snap install dopplertask```
