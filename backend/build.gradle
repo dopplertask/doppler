@@ -15,7 +15,7 @@ apply plugin: 'io.spring.dependency-management'
 
 bootJar {
     archiveBaseName = 'doppler'
-    archiveVersion = '0.8.1'
+    archiveVersion = '0.8.2'
 }
 
 repositories {

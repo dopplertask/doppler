@@ -1,10 +1,12 @@
 package com.dopplertask.doppler.domain.action.connection;
 
 import com.dopplertask.doppler.domain.ActionResult;
+import com.dopplertask.doppler.domain.OutputType;
 import com.dopplertask.doppler.domain.SSHManager;
 import com.dopplertask.doppler.domain.StatusCode;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.action.Action;
+import com.dopplertask.doppler.service.BroadcastListener;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 
@@ -37,7 +39,7 @@ public class SSHAction extends Action {
     private String command;
 
     @Override
-    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil) throws IOException {
+    public ActionResult run(TaskService taskService, TaskExecution execution, VariableExtractorUtil variableExtractorUtil, BroadcastListener broadcastListener) throws IOException {
         String connectionIP = variableExtractorUtil.extract(getHostname(), execution, getScriptLanguage());
         String userName = variableExtractorUtil.extract(getUsername(), execution, getScriptLanguage());
         String password = variableExtractorUtil.extract(getPassword(), execution, getScriptLanguage());
@@ -55,12 +57,16 @@ public class SSHAction extends Action {
 
         // call sendCommand for each command and the output
         //(without prompts) is returned
-        String result = instance.sendCommand(command);
+        // Manual broadcast for multiple messages.
+        String result = instance.sendCommand(command, (msg) -> {
+            broadcastListener.run(msg, OutputType.STRING);
+        });
         // close only after all commands are sent
         instance.close();
 
         ActionResult actionResult = new ActionResult();
         actionResult.setOutput(result);
+        actionResult.setBroadcastMessage(false);
         actionResult.setStatusCode(StatusCode.SUCCESS);
         return actionResult;
     }

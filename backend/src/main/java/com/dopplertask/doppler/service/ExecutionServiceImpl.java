@@ -360,10 +360,21 @@ public class ExecutionServiceImpl implements ExecutionService {
 
 
                     ActionResult actionResult = new ActionResult();
+
+
                     int tries = 0;
                     do {
                         try {
-                            actionResult = currentAction.run(taskService, execution, variableExtractorUtil);
+                            actionResult = currentAction.run(taskService, execution, variableExtractorUtil, (output, outputType) -> {
+                                TaskExecutionLog log = new TaskExecutionLog();
+                                log.setTaskExecution(execution);
+                                log.setOutput(output);
+                                log.setOutputType(outputType);
+                                log.setId(-1L);
+                                broadcastResults(log);
+                            });
+
+                            addLog(execution, actionResult.getOutput(), actionResult.getOutputType(), actionResult.isBroadcastMessage());
 
                             // Handle failOn
                             if (currentAction.getFailOn() != null && !currentAction.getFailOn().isEmpty()) {
@@ -371,27 +382,29 @@ public class ExecutionServiceImpl implements ExecutionService {
                                 if (failOn != null && !failOn.isEmpty()) {
                                     actionResult.setErrorMsg("Failed on: " + failOn);
                                     actionResult.setStatusCode(StatusCode.FAILURE);
+
+                                    addLog(execution, actionResult.getErrorMsg(), actionResult.getOutputType(), true);
                                 }
                             }
                         } catch (Exception e) {
                             LOG.error("Exception occurred: {}", e);
                             actionResult.setErrorMsg(e.toString());
                             actionResult.setStatusCode(StatusCode.FAILURE);
+
+                            addLog(execution, actionResult.getOutput(), actionResult.getOutputType(), true);
                         }
 
                         tries++;
                     } while (actionResult.getStatusCode() == StatusCode.FAILURE && currentAction.getRetries() >= tries && !currentAction.isContinueOnFailure());
 
-                    TaskExecutionLog log = new TaskExecutionLog();
-                    log.setTaskExecution(execution);
 
                     LOG.info("Ran current action: {} with status code: {} and with result: {}", currentAction.getClass().getSimpleName(), actionResult.getStatusCode(), actionResult.getOutput() != null && !actionResult.getOutput().isEmpty() ? actionResult.getOutput() : actionResult.getErrorMsg());
 
-                    log.setOutput(actionResult.getOutput());
-                    log.setOutputType(actionResult.getOutputType());
 
                     // If action did not go well
                     if (actionResult.getStatusCode() == StatusCode.FAILURE && !currentAction.isContinueOnFailure()) {
+                        TaskExecutionLog log = new TaskExecutionLog();
+                        log.setTaskExecution(execution);
                         log.setOutput(actionResult.getErrorMsg());
                         log.setOutputType(actionResult.getOutputType());
                         execution.setSuccess(false);
@@ -400,11 +413,6 @@ public class ExecutionServiceImpl implements ExecutionService {
                         break;
                     }
 
-                    // Add log to the execution
-                    execution.addLog(log);
-
-                    // Send message to MQ
-                    broadcastResults(log);
 
                 }
             }
@@ -424,6 +432,23 @@ public class ExecutionServiceImpl implements ExecutionService {
             return execution;
         }
         return null;
+    }
+
+    public TaskExecutionLog addLog(TaskExecution execution, String output, OutputType outputType, boolean broadcastLog) {
+        TaskExecutionLog log = new TaskExecutionLog();
+        log.setTaskExecution(execution);
+
+        log.setOutput(output);
+        log.setOutputType(outputType);
+
+        // Add log to the execution
+        execution.addLog(log);
+
+        if (broadcastLog) {
+            broadcastResults(log);
+        }
+
+        return log;
     }
 
     private void broadcastResults(TaskExecutionLog taskExecutionLog) {

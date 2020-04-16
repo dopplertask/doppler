@@ -1,5 +1,5 @@
 name: dopplertask
-version: 0.8.1
+version: 0.8.2
 summary: Task automation
 description: |
   Doppler is a revolutionary open-source software that allows you to automate tasks easily.
@@ -13,7 +13,7 @@ parts:
     plugin: gradle
     source: https://github.com/dopplertask/doppler
     source-type: git
-    source-tag: v0.8.1
+    source-tag: v0.8.2
     source-subdir: backend
     gradle-options: [-xtest, build]
     gradle-output-dir: build/libs
@@ -21,7 +21,7 @@ parts:
   doppler:
     plugin: go
     source: https://github.com/dopplertask/doppler
-    source-tag: v0.8.1
+    source-tag: v0.8.2
     source-subdir: cli
     source-type: git
     build-packages:
@@ -29,7 +29,7 @@ parts:
 
 apps:
   doppler-api:
-    command: java -jar $SNAP/jar/doppler-0.8.1.jar
+    command: java -jar $SNAP/jar/doppler-0.8.2.jar
     daemon: simple
     plugs:
       - network-bind

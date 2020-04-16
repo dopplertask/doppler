@@ -4,12 +4,15 @@ import com.dopplertask.doppler.domain.ActionPort;
 import com.dopplertask.doppler.domain.ActionPortType;
 import com.dopplertask.doppler.domain.ActionResult;
 import com.dopplertask.doppler.domain.Connection;
+import com.dopplertask.doppler.domain.OutputType;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.action.common.IfAction;
 import com.dopplertask.doppler.domain.action.common.PrintAction;
 import com.dopplertask.doppler.domain.action.common.XMLAction;
 import com.dopplertask.doppler.domain.action.common.XMLActionType;
+import com.dopplertask.doppler.service.BroadcastListener;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
+
 import org.apache.velocity.app.VelocityEngine;
 import org.junit.Assert;
 import org.junit.Before;
@@ -69,7 +72,8 @@ public class ActionTest {
 
         ifAction.setCondition("'test' == 'test'");
 
-        ActionResult actionResult = ifAction.run(null, taskExecution, variableExtractorUtil);
+        ActionResult actionResult = ifAction.run(null, taskExecution, variableExtractorUtil, (output, outputType) -> {
+        });
         Assert.assertEquals("If evaluated to true.", actionResult.getOutput());
         Assert.assertEquals("True path", ((PrintAction) taskExecution.getCurrentAction()).getMessage());
     }
