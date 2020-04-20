@@ -21,6 +21,7 @@ import com.dopplertask.doppler.domain.action.connection.SSHAction;
 import com.dopplertask.doppler.domain.action.connection.SecureCopyAction;
 import com.dopplertask.doppler.domain.action.io.ReadFileAction;
 import com.dopplertask.doppler.domain.action.io.WriteFileAction;
+import com.dopplertask.doppler.domain.action.trigger.Webhook;
 import com.dopplertask.doppler.domain.action.ui.BrowseWebAction;
 import com.dopplertask.doppler.domain.action.ui.MouseAction;
 import com.dopplertask.doppler.service.BroadcastListener;
@@ -82,7 +83,8 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
         @JsonSubTypes.Type(value = StartAction.class, name = "StartAction"),
         @JsonSubTypes.Type(value = WriteFileAction.class, name = "WriteFileAction"),
         @JsonSubTypes.Type(value = SwitchAction.class, name = "SwitchAction"),
-        @JsonSubTypes.Type(value = XMLAction.class, name = "XMLAction")
+        @JsonSubTypes.Type(value = XMLAction.class, name = "XMLAction"),
+        @JsonSubTypes.Type(value = Webhook.class, name = "Webhook")
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class Action {
@@ -108,7 +110,11 @@ public abstract class Action {
     @Column(length = 4096)
     private String failOn;
 
+
     private Integer retries = 0;
+
+    @Column(length = 4096)
+    private String retryWait;
 
     private Integer guiXPos;
     private Integer guiYPos;
@@ -223,7 +229,8 @@ public abstract class Action {
                 new PropertyInformation("scriptLanguage", "Script Language", PropertyInformation.PropertyInformationType.DROPDOWN, "VELOCITY", "VELOCITY (default), JAVASCRIPT.",
                         List.of(new PropertyInformation("VELOCITY", "Velocity"), new PropertyInformation("JAVASCRIPT", "Javascript"))
                 ),
-                new PropertyInformation("retries", "Retries", PropertyInformation.PropertyInformationType.NUMBER, "0", "Amount of retries."),
+                new PropertyInformation("retries", "Max. Retries", PropertyInformation.PropertyInformationType.NUMBER, "0", "Amount of retries."),
+                new PropertyInformation("retryWait", "Wait between retries", PropertyInformation.PropertyInformationType.STRING, "1000", "Milliseconds to wait before next retry."),
                 new PropertyInformation("failOn", "Fail on", PropertyInformation.PropertyInformationType.STRING, "", "The current action will fail if this evaluates to anything."))
         );
     }
@@ -258,6 +265,14 @@ public abstract class Action {
 
     public void setGuiYPos(Integer guiYPos) {
         this.guiYPos = guiYPos;
+    }
+
+    public String getRetryWait() {
+        return retryWait;
+    }
+
+    public void setRetryWait(String retryWait) {
+        this.retryWait = retryWait;
     }
 
     public static class PropertyInformation {

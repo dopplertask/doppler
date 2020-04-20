@@ -3,7 +3,6 @@ package com.dopplertask.doppler.service;
 import com.dopplertask.doppler.domain.ActionResult;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.action.common.ScriptLanguage;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -36,12 +35,16 @@ public class VariableExtractorUtil {
         this.velocityEngine = velocityEngine;
     }
 
-    private String extractVelocity(String fieldValue, TaskExecution execution, ActionResult result) {
+    private String extractVelocity(String fieldValue, TaskExecution execution, ActionResult result, Map<String, Object> extraTools) {
         if (fieldValue != null) {
             VelocityContext context = new VelocityContext(getVelocityTools());
             context.put("parameters", execution.getParameters());
             context.put("executionId", execution.getId());
             context.put("logs", execution.getLogs());
+
+            if (extraTools != null && extraTools.size() > 0) {
+                extraTools.forEach((toolName, toolValue) -> context.put(toolName, toolValue));
+            }
 
             // Useful for retry
             if (result != null) {
@@ -67,38 +70,31 @@ public class VariableExtractorUtil {
         return extract(fieldValue, execution, null, scriptLanguage);
     }
 
-    public Value extractAsPolygotValue(String fieldValue, TaskExecution execution, ScriptLanguage scriptLanguage) throws IOException {
-        return extractAsPolygotValue(fieldValue, execution, null, scriptLanguage);
-    }
-
-    private Value extractAsPolygotValue(String fieldValue, TaskExecution execution, ActionResult result, ScriptLanguage scriptLanguage) throws IOException {
+    public String extract(String fieldValue, TaskExecution execution, ActionResult result, ScriptLanguage scriptLanguage, Map<String, Object> extraTools) throws IOException {
         switch (scriptLanguage) {
             case VELOCITY:
-                return Value.asValue(extractVelocity(fieldValue, execution, result));
+                return extractVelocity(fieldValue, execution, result, extraTools);
             case JAVASCRIPT:
-                return extractJavascript(fieldValue, execution, result);
+                return extractJavascript(fieldValue, execution, result, extraTools).toString();
             default:
                 throw new RuntimeException("Script language is not supported.");
         }
+
     }
 
     public String extract(String fieldValue, TaskExecution execution, ActionResult result, ScriptLanguage scriptLanguage) throws IOException {
-        switch (scriptLanguage) {
-            case VELOCITY:
-                return extractVelocity(fieldValue, execution, result);
-            case JAVASCRIPT:
-                return extractJavascript(fieldValue, execution, result).toString();
-            default:
-                throw new RuntimeException("Script language is not supported.");
-        }
+        return extract(fieldValue, execution, result, scriptLanguage, null);
     }
 
-    private Value extractJavascript(String fieldValue, TaskExecution execution, ActionResult result) throws IOException {
+    private Value extractJavascript(String fieldValue, TaskExecution execution, ActionResult result, Map<String, Object> extraTools) throws IOException {
         if (fieldValue != null) {
 
             Context context = Context.newBuilder().allowAllAccess(true).build();
 
             getVelocityTools().forEach((toolName, toolValue) -> context.getBindings("js").putMember(toolName, toolValue));
+            if (extraTools != null && extraTools.size() > 0) {
+                extraTools.forEach((toolName, toolValue) -> context.getBindings("js").putMember(toolName, toolValue));
+            }
 
             context.getBindings("js").putMember("parameters", execution.getParameters());
             context.getBindings("js").putMember("executionId", execution.getId());

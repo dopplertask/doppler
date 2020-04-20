@@ -2,7 +2,7 @@
  * jQuery UI CSS Framework 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
- * Dual licensed under the MIT or GPL Version 2 licenses.
+ * 
  * http://jquery.org/license
  *
  * http://docs.jquery.com/UI/Theming/API
@@ -100,7 +100,7 @@
  * jQuery UI CSS Framework 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
- * Dual licensed under the MIT or GPL Version 2 licenses.
+ * 
  * http://jquery.org/license
  *
  * http://docs.jquery.com/UI/Theming/API
@@ -1098,7 +1098,7 @@
  * jQuery UI Resizable 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
- * Dual licensed under the MIT or GPL Version 2 licenses.
+ * 
  * http://jquery.org/license
  *
  * http://docs.jquery.com/UI/Resizable#theming
@@ -1186,7 +1186,7 @@
  * jQuery UI Selectable 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
- * Dual licensed under the MIT or GPL Version 2 licenses.
+ * 
  * http://jquery.org/license
  *
  * http://docs.jquery.com/UI/Selectable#theming
@@ -1201,7 +1201,7 @@
  * jQuery UI Accordion 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
- * Dual licensed under the MIT or GPL Version 2 licenses.
+ * 
  * http://jquery.org/license
  *
  * http://docs.jquery.com/UI/Accordion#theming
@@ -1266,15 +1266,6 @@
     display: block;
 }
 
-/*
- * jQuery UI Autocomplete 1.8.7
- *
- * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
- * Dual licensed under the MIT or GPL Version 2 licenses.
- * http://jquery.org/license
- *
- * http://docs.jquery.com/UI/Autocomplete#theming
- */
 .ui-autocomplete {
     position: absolute;
     cursor: default;
@@ -1298,7 +1289,7 @@
  * jQuery UI Menu 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
- * Dual licensed under the MIT or GPL Version 2 licenses.
+ * 
  * http://jquery.org/license
  *
  * http://docs.jquery.com/UI/Menu#theming
@@ -1349,7 +1340,7 @@
  * jQuery UI Button 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
- * Dual licensed under the MIT or GPL Version 2 licenses.
+ * 
  * http://jquery.org/license
  *
  * http://docs.jquery.com/UI/Button#theming
@@ -1535,7 +1526,7 @@ button.ui-button::-moz-focus-inner {
  * jQuery UI Dialog 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
- * Dual licensed under the MIT or GPL Version 2 licenses.
+ * 
  * http://jquery.org/license
  *
  * http://docs.jquery.com/UI/Dialog#theming
@@ -1635,7 +1626,7 @@ button.ui-button::-moz-focus-inner {
  * jQuery UI Slider 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
- * Dual licensed under the MIT or GPL Version 2 licenses.
+ * 
  * http://jquery.org/license
  *
  * http://docs.jquery.com/UI/Slider#theming
@@ -1738,7 +1729,7 @@ button.ui-button::-moz-focus-inner {
  * jQuery UI Tabs 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
- * Dual licensed under the MIT or GPL Version 2 licenses.
+ * 
  * http://jquery.org/license
  *
  * http://docs.jquery.com/UI/Tabs#theming
@@ -1823,7 +1814,7 @@ button.ui-button::-moz-focus-inner {
  * jQuery UI Datepicker 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
- * Dual licensed under the MIT or GPL Version 2 licenses.
+ * 
  * http://jquery.org/license
  *
  * http://docs.jquery.com/UI/Datepicker#theming
@@ -2090,7 +2081,7 @@ button.ui-button::-moz-focus-inner {
  * jQuery UI Progressbar 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
- * Dual licensed under the MIT or GPL Version 2 licenses.
+ * 
  * http://jquery.org/license
  *
  * http://docs.jquery.com/UI/Progressbar#theming

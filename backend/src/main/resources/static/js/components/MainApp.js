@@ -252,15 +252,26 @@ class MainApp extends React.Component {
                                      });
             action.onDoubleClick = () => this.editModelForFigure();
         } else {
-            action = new BetweenFigure({
-                                           x: 550,
-                                           y: 340,
-                                           width: 120,
-                                           height: 120,
-                                           userData: this.state.availableActions.find(
-                                               availableAction => availableAction.name == actionName)
-                                       });
-            action.onDoubleClick = () => this.editModelForFigure();
+            let currentActionDetails = this.state.availableActions.find(availableAction => availableAction.name == actionName);
+            if (currentActionDetails.trigger) {
+                action = new StartFigure({
+                                             x: 550,
+                                             y: 340,
+                                             width: 120,
+                                             height: 120,
+                                             userData: currentActionDetails
+                                         });
+                action.onDoubleClick = () => this.editModelForFigure();
+            } else {
+                action = new BetweenFigure({
+                                               x: 550,
+                                               y: 340,
+                                               width: 120,
+                                               height: 120,
+                                               userData: currentActionDetails
+                                           });
+                action.onDoubleClick = () => this.editModelForFigure();
+            }
         }
 
         return action;
@@ -290,7 +301,7 @@ class MainApp extends React.Component {
                         }
 
                         outputBody.actions.push({
-                                                    "@type": "StartAction",
+                                                    "@type": json[i].userData.name,
                                                     ports: currentActionPorts,
                                                     guiXPos: json[i].x,
                                                     guiYPos: json[i].y
@@ -467,7 +478,7 @@ class MainApp extends React.Component {
                 <div id="sidebar-wrapper">
                     <nav id="spy">
                         <div className="sidebar-title">
-                            <span className="fa fa-home solo">Actions</span>
+                            <span>Actions</span>
                         </div>
 
                         <div className="sidebar-search">
@@ -487,8 +498,7 @@ class MainApp extends React.Component {
                                     <div className="menu-image"><img
                                         src={"images/actions/" + action.name + ".png"}/></div>
                                     <div className="menu-text">
-                                        <div className="menu-text-title"><span
-                                            className="fa fa-anchor solo">{action.name}</span></div>
+                                        <div className="menu-text-title"><span>{action.name}</span></div>
                                         <div className="menu-text-detail">{action.description}</div>
                                     </div>
                                 </a>
@@ -504,34 +514,40 @@ class MainApp extends React.Component {
 
                         <div className="col-sm-2 col-md-2 col-lg-2">
                             <nav id="spy">
-
-                                <ul className="sidebar-nav nav">
-                                    <li className="sidebar-brand">
-                                        <span className="fa fa-home solo"><img src="images/logo.png" alt=""
+                                <div className="sidebar-brand">
+                                        <span><img src="images/logo.png" alt=""
                                         /></span>
+                                </div>
+                                <ul className="sidebar-nav nav">
+
+                                    <li><a href="#" onClick={this.newWorkflow}><i className="fas fa-file"></i> New task</a>
                                     </li>
-                                    <li><a href="#" onClick={this.newWorkflow}
-                                           className="fa fa-home solo">New task</a>
-                                    </li>
-                                    <li><a href="#" onClick={() => $("#taskSettingsModal").modal("show")}
-                                           className="fa fa-home solo">Task parameters</a>
-                                    </li>
-                                    <li><a href="#" onClick={this.downloadWorkflow} className="fa fa-home solo">Export
+                                    <li><a href="#" onClick={() => $("#openTaskModal").modal("show")}><i
+                                        className="fas fa-folder-open"></i> Open
+                                        Task</a></li>
+                                    <li><a href="#" onClick={this.saveWorkflow}
+                                    ><i
+                                        className="fas fa-save"></i> Save</a></li>
+                                    <li><a href="#" onClick={() => $("#saveModal").modal("show")}
+                                    ><i
+                                        className="fas fa-copy"></i> Save as</a></li>
+
+
+                                    <li><a href="#" onClick={this.downloadWorkflow}><i
+                                        className="fas fa-file-export"></i> Export
                                         Task</a>
                                     </li>
-                                    <li><a href="#" onClick={this.saveWorkflow}
-                                           className="fa fa-home solo">Save</a></li>
-                                    <li><a href="#" onClick={() => $("#saveModal").modal("show")}
-                                           className="fa fa-home solo">Save as</a></li>
-                                    <li><a href="#" onClick={() => $("#openTaskModal").modal("show")}
-                                           className="fa fa-home solo">Open
-                                        Task</a></li>
+
                                     <li><a href="#" onClick={() => $("#importTaskModal").modal("show")}
-                                           className="fa fa-home solo">Import Task</a>
+                                    ><i
+                                        className="fas fa-file-import"></i> Import Task</a>
+                                    </li>
+                                    <li><a href="#" onClick={() => $("#taskSettingsModal").modal("show")}
+                                    ><i className="fas fa-cog"></i> Task parameters</a>
                                     </li>
                                     <li>
                                         <a href="#" onClick={() => $("#wrapper").toggleClass("active")}
-                                           className="fa fa-home solo">Show/hide
+                                        ><i className="fas fa-toggle-on"></i> Show/hide
                                             actions</a>
                                     </li>
                                 </ul>
@@ -635,7 +651,7 @@ class MainApp extends React.Component {
         // Validation before sending to API.
         let startActions = 0;
         this.state.app.view.figures.data.forEach(figure => {
-            if (figure instanceof StartFigure) {
+            if (figure instanceof StartFigure && figure.userData.name == "StartAction") {
                 startActions++;
             }
         })
