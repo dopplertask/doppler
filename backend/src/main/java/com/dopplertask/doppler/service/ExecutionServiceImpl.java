@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -79,24 +80,12 @@ public class ExecutionServiceImpl implements ExecutionService {
     public TaskExecution startExecution(TaskExecutionRequest taskExecutionRequest, TaskService taskService) {
 
         // Look up by checksum first
-        Optional<Task> taskRequest = Optional.empty();
-        if (taskExecutionRequest.getChecksum() != null && !taskExecutionRequest.getChecksum().isEmpty()) {
-            taskRequest = findOrDownloadByChecksum(taskExecutionRequest.getChecksum(), taskService);
-
-            // Search in the local database by taskName
-            if (!taskRequest.isPresent() && taskExecutionRequest.getTaskName() != null && !taskExecutionRequest.getTaskName().isEmpty()) {
-                taskRequest = findOrDownloadByName(taskExecutionRequest.getTaskName(), taskService);
-            }
-        } else if (taskExecutionRequest.getTaskName() != null && !taskExecutionRequest.getTaskName().isEmpty()) {
-            taskRequest = findOrDownloadByName(taskExecutionRequest.getTaskName(), taskService);
-        }
-
+        Optional<Task> taskRequest = lookupTask(taskExecutionRequest, taskService);
 
         Optional<TaskExecution> executionReq = taskExecutionDao.findById(taskExecutionRequest.getExecutionId());
         if (taskRequest.isPresent() && executionReq.isPresent()) {
             Task task = taskRequest.get();
             TaskExecution execution = executionReq.get();
-
 
             // Assign task to execution
             execution.setTask(task);
@@ -119,13 +108,13 @@ public class ExecutionServiceImpl implements ExecutionService {
 
             if (!missingParameters.isEmpty()) {
                 execution.setStatus(TaskExecutionStatus.FAILED);
-
+                String missingParametersAsString = Arrays.toString(missingParameters.toArray());
                 TaskExecutionLog executionFailed = new TaskExecutionLog();
                 executionFailed.setTaskExecution(execution);
-                executionFailed.setOutput("Task execution failed, missing parameters: " + Arrays.toString(missingParameters.toArray()) + " [taskId=" + task.getId() + ", executionId=" + execution.getId() + "]");
+                executionFailed.setOutput("Task execution failed, missing parameters: " + missingParametersAsString + " [taskId=" + task.getId() + ", executionId=" + execution.getId() + "]");
                 execution.addLog(executionFailed);
                 execution.setSuccess(false);
-                LOG.info("Task execution failed, missing parameters: {} [taskId={}, executionId={}]", Arrays.toString(missingParameters.toArray()), task.getId(), execution.getId());
+                LOG.info("Task execution failed, missing parameters: {} [taskId={}, executionId={}]", missingParametersAsString, task.getId(), execution.getId());
                 broadcastResults(executionFailed, true);
 
                 return execution;
@@ -155,12 +144,28 @@ public class ExecutionServiceImpl implements ExecutionService {
                 taskExecution.setId(executionReq.get().getId());
                 taskExecution.setSuccess(false);
                 TaskExecutionLog noTaskLog = new TaskExecutionLog();
+                noTaskLog.setDate(new Date());
                 noTaskLog.setOutput("Task could not be found [taskId=" + taskExecutionRequest.getTaskName() + "]");
                 noTaskLog.setTaskExecution(taskExecution);
                 broadcastResults(noTaskLog, true);
             }
             return null;
         }
+    }
+
+    private Optional<Task> lookupTask(TaskExecutionRequest taskExecutionRequest, TaskService taskService) {
+        Optional<Task> taskRequest = Optional.empty();
+        if (taskExecutionRequest.getChecksum() != null && !taskExecutionRequest.getChecksum().isEmpty()) {
+            taskRequest = findOrDownloadByChecksum(taskExecutionRequest.getChecksum(), taskService);
+
+            // Search in the local database by taskName
+            if (!taskRequest.isPresent() && taskExecutionRequest.getTaskName() != null && !taskExecutionRequest.getTaskName().isEmpty()) {
+                taskRequest = findOrDownloadByName(taskExecutionRequest.getTaskName(), taskService);
+            }
+        } else if (taskExecutionRequest.getTaskName() != null && !taskExecutionRequest.getTaskName().isEmpty()) {
+            taskRequest = findOrDownloadByName(taskExecutionRequest.getTaskName(), taskService);
+        }
+        return taskRequest;
     }
 
     public Optional<Task> findOrDownloadByName(String taskName, TaskService taskService) {
@@ -326,129 +331,161 @@ public class ExecutionServiceImpl implements ExecutionService {
 
             execution.setCurrentAction(task.getStartAction());
 
-            boolean running = true;
-            if (execution.getCurrentAction() != null) {
-                while (running) {
-                    // Start processing task
-                    Action currentAction = execution.getCurrentAction();
-
-                    // Add count to action
-                    execution.addActionAccessCountByOne(currentAction.getId());
-
-                    // Prevent overflood (Hard limit)
-                    if (execution.getActionAccessCount(currentAction.getId()) > MAX_ACTION_ACCESS_LIMIT) {
-                        TaskExecutionLog log = new TaskExecutionLog();
-                        log.setTaskExecution(execution);
-                        log.setOutput("Action access amount has reached it's maximum limit. Please consider using less loops." + currentAction.getClass().getName());
-                        log.setOutputType(OutputType.STRING);
-                        execution.setSuccess(false);
-                        execution.addLog(log);
-                        broadcastResults(log);
-                        break;
-                    }
-
-                    // If output port does not have a connection then we've reached the end of the execution.
-                    boolean outputPortAvailable = currentAction.getOutputPorts() != null && !currentAction.getOutputPorts().isEmpty() && currentAction.getOutputPorts().get(0) != null;
-                    if (currentAction.getOutputPorts() == null || currentAction.getOutputPorts() != null && currentAction.getOutputPorts().isEmpty() || outputPortAvailable && currentAction.getOutputPorts().get(0).getConnectionSource() == null) {
-                        running = false;
-                    } else {
-                        // There is a port so lets pick the first one.
-                        ActionPort targetPort = currentAction.getOutputPorts().get(0).getConnectionSource().getTarget();
-                        Action nextAction = targetPort.getAction();
-                        execution.setCurrentAction(nextAction);
-                    }
-
-
-                    ActionResult actionResult = new ActionResult();
-
-
-                    int tries = 0;
-                    do {
-                        try {
-                            actionResult = currentAction.run(taskService, execution, variableExtractorUtil, (output, outputType) -> {
-                                TaskExecutionLog log = new TaskExecutionLog();
-                                log.setTaskExecution(execution);
-                                log.setOutput(output);
-                                log.setOutputType(outputType);
-                                log.setId(-1L);
-                                broadcastResults(log);
-                            });
-
-                            addLog(execution, actionResult.getOutput(), actionResult.getOutputType(), actionResult.isBroadcastMessage());
-
-                            // Handle failOn
-                            if (currentAction.getFailOn() != null && !currentAction.getFailOn().isEmpty()) {
-                                String failOn = variableExtractorUtil.extract(currentAction.getFailOn(), execution, currentAction.getScriptLanguage());
-                                if (failOn != null && !failOn.isEmpty()) {
-                                    actionResult.setErrorMsg("Failed on: " + failOn);
-                                    actionResult.setStatusCode(StatusCode.FAILURE);
-
-                                    addLog(execution, actionResult.getErrorMsg(), actionResult.getOutputType(), true);
-                                }
-                            }
-                        } catch (Exception e) {
-                            LOG.error("Exception occurred: {}", e);
-                            actionResult.setErrorMsg(e.toString());
-                            actionResult.setStatusCode(StatusCode.FAILURE);
-
-                            addLog(execution, actionResult.getOutput(), actionResult.getOutputType(), true);
-                        }
-
-                        tries++;
-                    } while (actionResult.getStatusCode() == StatusCode.FAILURE && currentAction.getRetries() >= tries && !currentAction.isContinueOnFailure());
-
-
-                    LOG.info("Ran current action: {} with status code: {} and with result: {}", currentAction.getClass().getSimpleName(), actionResult.getStatusCode(), actionResult.getOutput() != null && !actionResult.getOutput().isEmpty() ? actionResult.getOutput() : actionResult.getErrorMsg());
-
-
-                    // If action did not go well
-                    if (actionResult.getStatusCode() == StatusCode.FAILURE && !currentAction.isContinueOnFailure()) {
-                        TaskExecutionLog log = new TaskExecutionLog();
-                        log.setTaskExecution(execution);
-                        log.setOutput(actionResult.getErrorMsg());
-                        log.setOutputType(actionResult.getOutputType());
-                        execution.setSuccess(false);
-                        execution.addLog(log);
-                        broadcastResults(log);
-                        break;
-                    }
-
-
-                }
-            }
-
-            TaskExecutionLog executionCompleted = new TaskExecutionLog();
-            executionCompleted.setTaskExecution(execution);
-            executionCompleted.setOutput("Task execution completed [taskId=" + task.getId() + ", executionId=" + execution.getId() + ", success=" + execution.isSuccess() + "]");
-            execution.addLog(executionCompleted);
-            broadcastResults(executionCompleted, true);
-
-            LOG.info("Task execution completed [taskId={}, executionId={}]", task.getId(), execution.getId());
-
-            execution.setEnddate(new Date());
-            execution.setStatus(execution.isSuccess() ? TaskExecutionStatus.FINISHED : TaskExecutionStatus.FAILED);
-
-
-            return execution;
+            return executeActions(taskService, task, execution);
         }
         return null;
     }
 
-    public TaskExecutionLog addLog(TaskExecution execution, String output, OutputType outputType, boolean broadcastLog) {
+    @Override
+    @Transactional
+    public TaskExecution processActions(Long taskId, Long executionId, TaskService taskService, String triggerName, String path) {
+        Optional<Task> taskRequest = taskDao.findById(taskId);
+        Optional<TaskExecution> executionReq = taskExecutionDao.findById(executionId);
+        if (taskRequest.isPresent() && executionReq.isPresent()) {
+            Task task = taskRequest.get();
+            TaskExecution execution = executionReq.get();
+            Action action = task.getStartAction(triggerName, path);
+
+            // Check if the trigger exists
+            if (action == null) {
+                addLog(execution, "The selected trigger was not found. Cannot start task", OutputType.STRING, true);
+                return execution;
+            }
+
+            execution.setCurrentAction(action);
+
+            return executeActions(taskService, task, execution);
+        }
+        return null;
+    }
+
+    private TaskExecution executeActions(TaskService taskService, Task task, TaskExecution execution) {
+        boolean running = true;
+        if (execution.getCurrentAction() != null) {
+            while (running) {
+                // Start processing task
+                Action currentAction = execution.getCurrentAction();
+
+                // Add count to action
+                execution.addActionAccessCountByOne(currentAction.getId());
+
+                // Prevent overflood (Hard limit)
+                if (checkActionOverfloodAccess(execution, currentAction)) {
+                    break;
+                }
+
+                // If output port does not have a connection then we've reached the end of the execution.
+                boolean outputPortAvailable = currentAction.getOutputPorts() != null && !currentAction.getOutputPorts().isEmpty() && currentAction.getOutputPorts().get(0) != null;
+                if (currentAction.getOutputPorts() == null || currentAction.getOutputPorts() != null && currentAction.getOutputPorts().isEmpty() || outputPortAvailable && currentAction.getOutputPorts().get(0).getConnectionSource() == null) {
+                    running = false;
+                } else {
+                    // There is a port so lets pick the first one.
+                    ActionPort targetPort = currentAction.getOutputPorts().get(0).getConnectionSource().getTarget();
+                    Action nextAction = targetPort.getAction();
+                    execution.setCurrentAction(nextAction);
+                }
+
+                ActionResult actionResult = runAction(taskService, execution, currentAction);
+
+                LOG.info("Ran current action: {} with status code: {} and with result: {}", currentAction.getClass().getSimpleName(), actionResult.getStatusCode(), actionResult.getOutput() != null && !actionResult.getOutput().isEmpty() ? actionResult.getOutput() : actionResult.getErrorMsg());
+
+                // If action did not go well
+                if (actionResult.getStatusCode() == StatusCode.FAILURE && !currentAction.isContinueOnFailure()) {
+                    addLog(execution, actionResult.getErrorMsg(), actionResult.getOutputType(), true, false, false);
+                    break;
+                }
+
+
+            }
+        }
+
+        TaskExecutionLog executionCompleted = new TaskExecutionLog();
+        executionCompleted.setTaskExecution(execution);
+        executionCompleted.setOutput("Task execution completed [taskId=" + task.getId() + ", executionId=" + execution.getId() + ", success=" + execution.isSuccess() + "]");
+        execution.addLog(executionCompleted);
+        broadcastResults(executionCompleted, true);
+
+        LOG.info("Task execution completed [taskId={}, executionId={}]", task.getId(), execution.getId());
+
+        execution.setEnddate(new Date());
+        execution.setStatus(execution.isSuccess() ? TaskExecutionStatus.FINISHED : TaskExecutionStatus.FAILED);
+
+
+        return execution;
+    }
+
+    private ActionResult runAction(TaskService taskService, TaskExecution execution, Action currentAction) {
+        ActionResult actionResult = new ActionResult();
+
+        int tries = 0;
+        do {
+            try {
+                // Only wait if we are in a retry.
+                if (tries > 0) {
+                    String retryWaitAmount = variableExtractorUtil.extract(currentAction.getRetryWait(), execution, null, currentAction.getScriptLanguage(), Map.of("retryCount", tries + 1));
+                    Thread.sleep(Long.parseLong(retryWaitAmount));
+                }
+                actionResult = currentAction.run(taskService, execution, variableExtractorUtil, (output, outputType) -> addLog(execution, output, outputType, true));
+
+                addLog(execution, actionResult.getOutput(), actionResult.getOutputType(), actionResult.isBroadcastMessage());
+
+                // Handle failOn
+                if (currentAction.getFailOn() != null && !currentAction.getFailOn().isEmpty()) {
+                    String failOn = variableExtractorUtil.extract(currentAction.getFailOn(), execution, actionResult, currentAction.getScriptLanguage(), Map.of("retryCount", tries + 1));
+                    if (failOn != null && !failOn.isEmpty()) {
+                        actionResult.setErrorMsg("Failed on: " + failOn);
+                        actionResult.setStatusCode(StatusCode.FAILURE);
+
+                        addLog(execution, actionResult.getErrorMsg(), actionResult.getOutputType(), true);
+                    }
+                }
+            } catch (Exception e) {
+                LOG.error("Exception occurred: {}", e);
+                actionResult.setErrorMsg(e.toString());
+                actionResult.setStatusCode(StatusCode.FAILURE);
+
+                addLog(execution, actionResult.getOutput(), actionResult.getOutputType(), true);
+            }
+
+            tries++;
+        } while (actionResult.getStatusCode() == StatusCode.FAILURE && currentAction.getRetries() >= tries && !currentAction.isContinueOnFailure());
+        return actionResult;
+    }
+
+    private boolean checkActionOverfloodAccess(TaskExecution execution, Action currentAction) {
+        if (execution.getActionAccessCount(currentAction.getId()) > MAX_ACTION_ACCESS_LIMIT) {
+            addLog(execution, "Action access amount has reached it's maximum limit. Please consider using less loops." + currentAction.getClass().getName(), OutputType.STRING, true, false, false);
+            return true;
+        }
+        return false;
+    }
+
+    public TaskExecutionLog addLog(TaskExecution execution, String output, OutputType outputType, boolean broadcastLog, boolean success, boolean lastBroadcastMessage) {
         TaskExecutionLog log = new TaskExecutionLog();
         log.setTaskExecution(execution);
 
         log.setOutput(output);
         log.setOutputType(outputType);
+        log.setDate(new Date());
+
+        execution.setSuccess(success);
 
         // Add log to the execution
         execution.addLog(log);
 
         if (broadcastLog) {
-            broadcastResults(log);
+            broadcastResults(log, lastBroadcastMessage);
         }
 
         return log;
+    }
+
+    public TaskExecutionLog addLog(TaskExecution execution, String output, OutputType outputType, boolean broadcastLog, boolean success) {
+        return addLog(execution, output, outputType, broadcastLog, success, false);
+    }
+
+    public TaskExecutionLog addLog(TaskExecution execution, String output, OutputType outputType, boolean broadcastLog) {
+        return addLog(execution, output, outputType, broadcastLog, true);
     }
 
     private void broadcastResults(TaskExecutionLog taskExecutionLog) {

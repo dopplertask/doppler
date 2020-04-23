@@ -7,6 +7,7 @@ import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
 import com.dopplertask.doppler.domain.TaskExecutionLog;
 import com.dopplertask.doppler.domain.action.Action;
+import com.dopplertask.doppler.domain.action.trigger.Trigger;
 import com.dopplertask.doppler.dto.ActionInfoDto;
 import com.dopplertask.doppler.dto.ActionListResponseDto;
 import com.dopplertask.doppler.dto.LoginParameters;
@@ -25,7 +26,6 @@ import com.dopplertask.doppler.service.TaskRequest;
 import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.apache.velocity.app.VelocityEngine;
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -114,6 +115,33 @@ public class TaskController {
         }
 
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+    }
+
+    @PostMapping(path = "/webhook/{taskName}/{triggerName}/{path}")
+    public ResponseEntity<TaskExecutionLogResponseDTO> runWebhook(@PathVariable("taskName") String taskName, @PathVariable("triggerName") String triggerName, @PathVariable("path") String path) {
+        TaskRequest request = new TaskRequest(taskName, Collections.emptyMap());
+        request.setTriggerName(triggerName);
+        request.setTriggerPath(path);
+        TaskExecution execution = taskService.runRequest(request);
+
+        //TODO: Initialize the trigger because we need to know if there is an authentication required.
+        TaskExecutionLogResponseDTO responseDTO = new TaskExecutionLogResponseDTO();
+        if (execution != null) {
+            for (TaskExecutionLog log : execution.getLogs()) {
+                responseDTO.getOutput().add(log.getOutput());
+            }
+
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+    }
+
+    @PostMapping(path = "/webhook/{taskName}/{triggerName}")
+    public ResponseEntity<TaskExecutionLogResponseDTO> runWebhook(@PathVariable("taskName") String taskName, @PathVariable("triggerName") String triggerName) {
+        return runWebhook(taskName, triggerName, "");
 
     }
 
@@ -360,8 +388,12 @@ public class TaskController {
 
         ActionListResponseDto actionListResponseDto = new ActionListResponseDto();
         for (Class<? extends Action> currentClass : classes) {
+            if (Modifier.isAbstract(currentClass.getModifiers())) {
+                continue;
+            }
             Action instance = currentClass.getDeclaredConstructor().newInstance();
-            actionListResponseDto.getActions().add(new ActionInfoDto(currentClass.getSimpleName(), instance.getDescription(), instance.getActionInfo()));
+            boolean trigger = instance.getClass().getSuperclass().getSimpleName().equals(Trigger.class.getSimpleName()) ? true : false;
+            actionListResponseDto.getActions().add(new ActionInfoDto(currentClass.getSimpleName(), instance.getDescription(), instance.getActionInfo(), trigger));
         }
 
         Collections.sort(actionListResponseDto.getActions(), (Comparator.comparing(ActionInfoDto::getName)));

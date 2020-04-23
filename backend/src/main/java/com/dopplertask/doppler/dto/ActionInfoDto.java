@@ -8,11 +8,13 @@ public class ActionInfoDto {
     private String name;
     private String description;
     private List<Action.PropertyInformation> propertyInformationList;
+    private boolean trigger;
 
-    public ActionInfoDto(String name, String description, List<Action.PropertyInformation> propertyInformationList) {
+    public ActionInfoDto(String name, String description, List<Action.PropertyInformation> propertyInformationList, boolean trigger) {
         this.name = name;
         this.description = description;
         this.propertyInformationList = propertyInformationList;
+        this.trigger = trigger;
     }
 
     public String getName() {
@@ -37,5 +39,13 @@ public class ActionInfoDto {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isTrigger() {
+        return trigger;
+    }
+
+    public void setTrigger(boolean trigger) {
+        this.trigger = trigger;
     }
 }

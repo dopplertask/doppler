@@ -12,14 +12,14 @@ let StartFigure = draw2d.shape.node.Start.extend({
         this.getPorts().each(function (i, port) {
             port.setName(port.getId())
         })
-        let label = new draw2d.shape.basic.Label({text: "StartAction"});
+        let label = new draw2d.shape.basic.Label({text: this.userData.name});
         label.setStroke(0);
         this.add(label, new draw2d.layout.locator.BottomLocator(this));
         let actionIcon = new draw2d.shape.basic.Image({
-                                                          path: 'images/actions/StartAction.png',
+                                                          path: 'images/actions/' + this.userData.name + '.png',
                                                           width: 32,
                                                           height: 32,
-                                                          minWidth: 32,
+                                                          minWidth: 20,
                                                           minHeight: 20,
                                                           boundingBox: new draw2d.geo.Rectangle(0, 0, 32, 32),
                                                           className: 'activity-image'
@@ -30,24 +30,28 @@ let StartFigure = draw2d.shape.node.Start.extend({
         this.add(actionIcon, new draw2d.layout.locator.CenterLocator(this));
     },
 
-    setLabels: function (amount) {
-        this.labels = amount;
-        return this;
-    },
+                                                     setLabels: function (amount) {
+                                                         this.labels = amount;
+                                                         return this;
+                                                     },
 
-    getLabels: function getLabels() {
-        return this.labels;
-    },
+                                                     getLabels: function getLabels() {
+                                                         return this.labels;
+                                                     },
 
-    /**
-     * @method
-     * Called if the user drop this element onto the dropTarget.
-     *
-     * In this Example we create a "smart insert" of an existing connection.
-     * COOL and fast network editing.
-     *
-     * @param {draw2d.Figure} dropTarget The drop target.
-     * @param {Number} x the x coordinate of the drop
+                                                     onDoubleClick: function () {
+
+                                                     },
+
+                                                     /**
+                                                      * @method
+                                                      * Called if the user drop this element onto the dropTarget.
+                                                      *
+                                                      * In this Example we create a "smart insert" of an existing connection.
+                                                      * COOL and fast network editing.
+                                                      *
+                                                      * @param {draw2d.Figure} dropTarget The drop target.
+                                                      * @param {Number} x the x coordinate of the drop
      * @param {Number} y the y coordinate of the drop
      * @param {Boolean} shiftKey true if the shift key has been pressed during this event
      * @param {Boolean} ctrlKey true if the ctrl key has been pressed during the event

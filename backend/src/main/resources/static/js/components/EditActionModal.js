@@ -105,11 +105,13 @@ class EditActionModal extends React.Component {
                         }
                         temp =
                             <div className="form-group" key={propertyInformation.name}><label
-                                htmlFor={propertyInformation.name}>{propertyInformation.displayName}</label> <input type="checkbox"
-                                                                                                                    id={propertyInformation.name}
-                                                                                                                    checked={booleanCheckedValue
-                                                                                                                             || false}
-                                                                                                                    onChange={this.valueChange}/>
+                                htmlFor={propertyInformation.name}>{propertyInformation.displayName}</label><small
+                                className="form-text text-muted">{propertyInformation.description}</small> <input type="checkbox"
+                                                                                                                  id={propertyInformation.name}
+                                                                                                                  checked={booleanCheckedValue
+                                                                                                                           || false}
+                                                                                                                  onChange={this.valueChange}/>
+
                             </div>;
                         break;
                     case "DROPDOWN":
@@ -227,6 +229,7 @@ class EditActionModal extends React.Component {
             htmlFor={fieldName}>{propertyInformation.displayName}</label>) : ("");
         return <div className="form-group" key={fieldName}>
             {includeTitle}
+            <small className="form-text text-muted">{propertyInformation.description}</small>
             <select className="form-control" id={fieldName}
                     onChange={callBack}
                     value={actionProperty
@@ -238,6 +241,7 @@ class EditActionModal extends React.Component {
                                     value={selectOption.name}>{selectOption.displayName}</option>)
                 })}
             </select>
+
         </div>;
     }
 
@@ -252,6 +256,7 @@ class EditActionModal extends React.Component {
     getStringField(propertyInformation, actionProperty, singleLine) {
         return <div className="form-group" key={propertyInformation.name}><label
             htmlFor={propertyInformation.name}>{propertyInformation.displayName}</label>
+            <small className="form-text text-muted">{propertyInformation.description}</small>
             <Editor id={propertyInformation.name} onChange={(value) => {
 
                 this.editorValueChange(propertyInformation.name, value)
@@ -261,6 +266,7 @@ class EditActionModal extends React.Component {
                            || ""}
                     scriptLanguage={this.props.selectedAction.userData.customData["scriptLanguage"].toLowerCase()
                                     || "velocity"}/>
+
         </div>;
     }
 
@@ -273,13 +279,16 @@ class EditActionModal extends React.Component {
      */
     getNumberField(propertyInformation, actionProperty) {
         return <div className="form-group" key={propertyInformation.name}><label
-            htmlFor={propertyInformation.name}>{propertyInformation.displayName}</label> <input
-            className="form-control"
-            type="number"
-            id={propertyInformation.name}
-            value={actionProperty
-                   || propertyInformation.defaultValue || ""}
-            onChange={this.valueChange}/>
+            htmlFor={propertyInformation.name}>{propertyInformation.displayName}</label>
+            <small className="form-text text-muted">{propertyInformation.description}</small>
+            <input
+                className="form-control"
+                type="number"
+                id={propertyInformation.name}
+                value={actionProperty
+                       || propertyInformation.defaultValue || ""}
+                onChange={this.valueChange}/>
+
         </div>;
     }
 

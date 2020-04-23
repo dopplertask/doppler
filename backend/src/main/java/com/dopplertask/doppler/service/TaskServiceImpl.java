@@ -72,6 +72,8 @@ public class TaskServiceImpl implements TaskService {
         taskExecutionRequest.setExecutionId(execution.getId());
         taskExecutionRequest.setChecksum(request.getChecksum());
         taskExecutionRequest.setRemoveTaskAfterExecution(request.isRemoveTaskAfterExecution());
+        taskExecutionRequest.setTriggerName(request.getTriggerName());
+        taskExecutionRequest.setTriggerPath(request.getTriggerPath());
 
         jmsTemplate.convertAndSend("automation_destination", taskExecutionRequest);
 
@@ -98,8 +100,12 @@ public class TaskServiceImpl implements TaskService {
 
                 return execution;
             } else {
-                TaskExecution taskExecution = executionService.processActions(execution.getTask().getId(), execution.getId(), this);
-
+                TaskExecution taskExecution;
+                if (taskExecutionRequest.getTriggerName() != null && !taskExecutionRequest.getTriggerName().isEmpty()) {
+                    taskExecution = executionService.processActions(execution.getTask().getId(), execution.getId(), this, taskExecutionRequest.getTriggerName(), taskExecutionRequest.getTriggerPath());
+                } else {
+                    taskExecution = executionService.processActions(execution.getTask().getId(), execution.getId(), this);
+                }
                 // If set to true, then remove the task after finish executing. This is used for mainly for unsaved workflows.
                 if (taskExecutionRequest.isRemoveTaskAfterExecution()) {
                     this.deleteTask(taskExecutionRequest.getTaskName());
@@ -362,6 +368,8 @@ public class TaskServiceImpl implements TaskService {
         taskExecutionRequest.setExecutionId(execution.getId());
         taskExecutionRequest.setDepth(request.getDepth());
         taskExecutionRequest.setChecksum(request.getChecksum());
+        taskExecutionRequest.setTriggerName(request.getTriggerName());
+        taskExecutionRequest.setTriggerPath(request.getTriggerPath());
 
         return this.runRequest(taskExecutionRequest);
     }

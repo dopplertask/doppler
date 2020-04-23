@@ -9,6 +9,10 @@ public class TaskRequest {
     private int depth = 0;
     private boolean removeTaskAfterExecution;
 
+    // If defined then automation starts from a trigger
+    private String triggerName;
+    private String triggerPath;
+
     public TaskRequest(String taskName, Map<String, String> parameters) {
         this(taskName, parameters, false);
     }
@@ -69,5 +73,21 @@ public class TaskRequest {
 
     public void setRemoveTaskAfterExecution(boolean removeTaskAfterExecution) {
         this.removeTaskAfterExecution = removeTaskAfterExecution;
+    }
+
+    public String getTriggerName() {
+        return triggerName;
+    }
+
+    public void setTriggerName(String triggerName) {
+        this.triggerName = triggerName;
+    }
+
+    public String getTriggerPath() {
+        return triggerPath;
+    }
+
+    public void setTriggerPath(String triggerPath) {
+        this.triggerPath = triggerPath;
     }
 }

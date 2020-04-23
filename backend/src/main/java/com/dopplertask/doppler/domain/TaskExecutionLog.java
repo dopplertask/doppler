@@ -1,5 +1,8 @@
 package com.dopplertask.doppler.domain;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -31,6 +34,8 @@ public class TaskExecutionLog {
     @Column
     private OutputType outputType = OutputType.STRING;
 
+    private Date date;
+
     public Long getId() {
         return id;
     }
@@ -61,5 +66,13 @@ public class TaskExecutionLog {
 
     public void setOutputType(OutputType outputType) {
         this.outputType = outputType;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 }

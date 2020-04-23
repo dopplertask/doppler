@@ -2,6 +2,7 @@ package com.dopplertask.doppler.service;
 
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -39,4 +40,7 @@ public interface ExecutionService {
     Optional<TaskExecution> getExecution(long id);
 
     void deleteExecution(long id);
+
+    @Transactional
+    TaskExecution processActions(Long taskId, Long executionId, TaskService taskService, String triggerName, String path);
 }

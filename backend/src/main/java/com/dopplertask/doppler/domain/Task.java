@@ -3,6 +3,7 @@ package com.dopplertask.doppler.domain;
 
 import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.domain.action.StartAction;
+import com.dopplertask.doppler.domain.action.trigger.Trigger;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayList;
@@ -125,6 +126,14 @@ public class Task {
 
     public Action getStartAction() {
         List<Action> actions = actionList.stream().filter(action -> action instanceof StartAction).collect(Collectors.toList());
+        if (actions.isEmpty()) {
+            return null;
+        }
+        return actions.get(0);
+    }
+
+    public Action getStartAction(String actionName, String path) {
+        List<Action> actions = actionList.stream().filter(action -> action.getClass().getSimpleName().equalsIgnoreCase(actionName) && action instanceof Trigger && ((Trigger) action).getPath().equals(path == null ? "" : path)).collect(Collectors.toList());
         if (actions.isEmpty()) {
             return null;
         }

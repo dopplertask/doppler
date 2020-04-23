@@ -30,13 +30,14 @@ module.exports = {
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
         new HtmlWebpackPlugin({
-            template: "./src/index.html",
-            filename: "./index.html"
-        }),
+                                  template: "./src/index.html",
+                                  filename: "./index.html"
+                              }),
         new CopyPlugin([
-            {from: 'css', to: 'css'},
-            {from: 'images', to: 'images'}
-        ]),
+                           {from: 'css', to: 'css'},
+                           {from: 'webfonts', to: 'webfonts'},
+                           {from: 'images', to: 'images'}
+                       ]),
     ],
     optimization: {
         minimize: true,

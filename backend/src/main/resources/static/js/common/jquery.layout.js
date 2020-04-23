@@ -1,23 +1,4 @@
-/**
- * @preserve jquery.layout 1.3.0 - Release Candidate 30.62
- * $Date: 2012-08-04 08:00:00 (Thu, 23 Aug 2012) $
- * $Rev: 303006 $
- *
- * Copyright (c) 2012
- *   Fabrizio Balliano (http://www.fabrizioballiano.net)
- *   Kevin Dalman (http://allpro.net)
- *
- * Dual licensed under the GPL (http://www.gnu.org/licenses/gpl.html)
- * and MIT (http://www.opensource.org/licenses/mit-license.php) licenses.
- *
- * Changelog: http://layout.jquery-dev.net/changelog.cfm#1.3.0.rc30.62
- * NOTE: This is a short-term release to patch a couple of bugs.
- * These bugs are listed as officially fixed in RC30.7, which will be released shortly.
- *
- * Docs: http://layout.jquery-dev.net/documentation.html
- * Tips: http://layout.jquery-dev.net/tips.html
- * Help: http://groups.google.com/group/jquery-ui-layout
- */
+
 
 /* JavaDoc Info: http://code.google.com/closure/compiler/docs/js-for-compiler.html
  * {!Object}	non-nullable type (never NULL)
@@ -4754,21 +4735,6 @@
 	});
 
 
-	/**
-	 * jquery.layout.state 1.0
-	 * $Date: 2011-07-16 08:00:00 (Sat, 16 July 2011) $
-	 *
-	 * Copyright (c) 2010
-	 *   Kevin Dalman (http://allpro.net)
-	 *
-	 * Dual licensed under the GPL (http://www.gnu.org/licenses/gpl.html)
-	 * and MIT (http://www.opensource.org/licenses/mit-license.php) licenses.
-	 *
-	 * @dependancies: UI Layout 1.3.0.rc30.1 or higher
-	 * @dependancies: $.ui.cookie (above)
-	 *
-	 * @support: http://groups.google.com/group/jquery-ui-layout
-	 */
 	/*
  *	State-management options stored in options.stateManagement, which includes a .cookie hash
  *	Default options saves ALL KEYS for ALL PANES, ie: pane.size, pane.isClosed, pane.isHidden
@@ -5110,23 +5076,6 @@
 
 
 
-	/**
-	 * jquery.layout.buttons 1.0
-	 * $Date: 2011-07-16 08:00:00 (Sat, 16 July 2011) $
-	 *
-	 * Copyright (c) 2010
-	 *   Kevin Dalman (http://allpro.net)
-	 *
-	 * Dual licensed under the GPL (http://www.gnu.org/licenses/gpl.html)
-	 * and MIT (http://www.opensource.org/licenses/mit-license.php) licenses.
-	 *
-	 * @dependancies: UI Layout 1.3.0.rc30.1 or higher
-	 *
-	 * @support: http://groups.google.com/group/jquery-ui-layout
-	 *
-	 * Docs: [ to come ]
-	 * Tips: [ to come ]
-	 */
 
 // tell Layout that the state plugin is available
 	$.layout.plugins.buttons = true;
@@ -5391,23 +5340,6 @@
 
 
 
-	/**
-	 * jquery.layout.browserZoom 1.0
-	 * $Date: 2011-12-29 08:00:00 (Thu, 29 Dec 2011) $
-	 *
-	 * Copyright (c) 2012
-	 *   Kevin Dalman (http://allpro.net)
-	 *
-	 * Dual licensed under the GPL (http://www.gnu.org/licenses/gpl.html)
-	 * and MIT (http://www.opensource.org/licenses/mit-license.php) licenses.
-	 *
-	 * @dependancies: UI Layout 1.3.0.rc30.1 or higher
-	 *
-	 * @support: http://groups.google.com/group/jquery-ui-layout
-	 *
-	 * @todo: Extend logic to handle other problematic zooming in browsers
-	 * @todo: Add hotkey/mousewheel bindings to _instantly_ respond to these zoom event
-	 */
 
 // tell Layout that the plugin is available
 	$.layout.plugins.browserZoom = true;

@@ -3414,7 +3414,7 @@ canvg(target, s)
 
 // module
                 exports.push([module.i,
-                              "\n\n/*!\n * jQuery contextMenu - Plugin for simple contextMenu handling\n *\n * Version: 1.5.24\n *\n * Authors: Rodney Rehm, Addy Osmani (patches for FF)\n * Web: http://medialize.github.com/jQuery-contextMenu/\n *\n * Licensed under\n *   MIT License http://www.opensource.org/licenses/mit-license\n *   GPL v3 http://opensource.org/licenses/GPL-3.0\n *\n */\n.context-menu-list {\n    margin:0;\n    padding:0;\n\n    min-width: 120px;\n    max-width: 250px;\n    display: inline-block;\n    position: absolute;\n    list-style-type: none;\n\n    border: 1px solid #DDD;\n    background: #EEE;\n\n    -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);\n       -moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);\n        -ms-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);\n         -o-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);\n            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);\n\n    font-family: Verdana, Arial, Helvetica, sans-serif;\n    font-size: 11px;\n}\n\n.context-menu-item {\n    padding: 2px 2px 2px 24px;\n    background-color: #EEE;\n    position: relative;\n    -webkit-user-select: none;\n       -moz-user-select: -moz-none;\n        -ms-user-select: none;\n            user-select: none;\n}\n\n.context-menu-separator {\n    padding-bottom:0;\n    border-bottom: 1px solid #DDD;\n}\n\n.context-menu-item > label > input,\n.context-menu-item > label > textarea {\n    -webkit-user-select: text;\n       -moz-user-select: text;\n        -ms-user-select: text;\n            user-select: text;\n}\n\n.context-menu-item.hover {\n    cursor: pointer;\n    background-color: #39F;\n}\n\n.context-menu-item.disabled {\n    color: #666;\n}\n\n.context-menu-input.hover,\n.context-menu-item.disabled.hover {\n    cursor: default;\n    background-color: #EEE;\n}\n\n.context-menu-submenu:after {\n    content: \">\";\n    color: #666;\n    position: absolute;\n    top: 0;\n    right: 3px;\n    z-index: 1;\n}\n\n/* icons\n    #protip:\n    In case you want to use sprites for icons (which I would suggest you do) have a look at\n    http://css-tricks.com/13224-pseudo-spriting/ to get an idea of how to implement\n    .context-menu-item.icon:before {}\n */\n.context-menu-item.icon { min-height: 18px; background-repeat: no-repeat; background-position: 4px 2px; }\n\n/* vertically align inside labels */\n.context-menu-input > label > * { vertical-align: top; }\n\n/* position checkboxes and radios as icons */\n.context-menu-input > label > input[type=\"checkbox\"],\n.context-menu-input > label > input[type=\"radio\"] {\n    margin-left: -17px;\n}\n.context-menu-input > label > span {\n    margin-left: 5px;\n}\n\n.context-menu-input > label,\n.context-menu-input > label > input[type=\"text\"],\n.context-menu-input > label > textarea,\n.context-menu-input > label > select {\n    display: block;\n    width: 100%;\n\n    -webkit-box-sizing: border-box;\n       -moz-box-sizing: border-box;\n        -ms-box-sizing: border-box;\n         -o-box-sizing: border-box;\n            box-sizing: border-box;\n}\n\n.context-menu-input > label > textarea {\n    height: 100px;\n}\n.context-menu-item > .context-menu-list {\n    display: none;\n    /* re-positioned by js */\n    right: -5px;\n    top: 5px;\n}\n\n.context-menu-item.hover > .context-menu-list {\n    display: block;\n}\n\n.context-menu-accesskey {\n    text-decoration: underline;\n}\n",
+                              "\n\n/*!\n * jQuery contextMenu - Plugin for simple contextMenu handling\n *\n * Version: 1.5.24\n *\n * Authors: Rodney Rehm, Addy Osmani (patches for FF)\n * Web: http://medialize.github.com/jQuery-contextMenu/\n *\n * Licensed under\n * \n *\n */\n.context-menu-list {\n    margin:0;\n    padding:0;\n\n    min-width: 120px;\n    max-width: 250px;\n    display: inline-block;\n    position: absolute;\n    list-style-type: none;\n\n    border: 1px solid #DDD;\n    background: #EEE;\n\n    -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);\n       -moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);\n        -ms-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);\n         -o-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);\n            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);\n\n    font-family: Verdana, Arial, Helvetica, sans-serif;\n    font-size: 11px;\n}\n\n.context-menu-item {\n    padding: 2px 2px 2px 24px;\n    background-color: #EEE;\n    position: relative;\n    -webkit-user-select: none;\n       -moz-user-select: -moz-none;\n        -ms-user-select: none;\n            user-select: none;\n}\n\n.context-menu-separator {\n    padding-bottom:0;\n    border-bottom: 1px solid #DDD;\n}\n\n.context-menu-item > label > input,\n.context-menu-item > label > textarea {\n    -webkit-user-select: text;\n       -moz-user-select: text;\n        -ms-user-select: text;\n            user-select: text;\n}\n\n.context-menu-item.hover {\n    cursor: pointer;\n    background-color: #39F;\n}\n\n.context-menu-item.disabled {\n    color: #666;\n}\n\n.context-menu-input.hover,\n.context-menu-item.disabled.hover {\n    cursor: default;\n    background-color: #EEE;\n}\n\n.context-menu-submenu:after {\n    content: \">\";\n    color: #666;\n    position: absolute;\n    top: 0;\n    right: 3px;\n    z-index: 1;\n}\n\n/* icons\n    #protip:\n    In case you want to use sprites for icons (which I would suggest you do) have a look at\n    http://css-tricks.com/13224-pseudo-spriting/ to get an idea of how to implement\n    .context-menu-item.icon:before {}\n */\n.context-menu-item.icon { min-height: 18px; background-repeat: no-repeat; background-position: 4px 2px; }\n\n/* vertically align inside labels */\n.context-menu-input > label > * { vertical-align: top; }\n\n/* position checkboxes and radios as icons */\n.context-menu-input > label > input[type=\"checkbox\"],\n.context-menu-input > label > input[type=\"radio\"] {\n    margin-left: -17px;\n}\n.context-menu-input > label > span {\n    margin-left: 5px;\n}\n\n.context-menu-input > label,\n.context-menu-input > label > input[type=\"text\"],\n.context-menu-input > label > textarea,\n.context-menu-input > label > select {\n    display: block;\n    width: 100%;\n\n    -webkit-box-sizing: border-box;\n       -moz-box-sizing: border-box;\n        -ms-box-sizing: border-box;\n         -o-box-sizing: border-box;\n            box-sizing: border-box;\n}\n\n.context-menu-input > label > textarea {\n    height: 100px;\n}\n.context-menu-item > .context-menu-list {\n    display: none;\n    /* re-positioned by js */\n    right: -5px;\n    top: 5px;\n}\n\n.context-menu-item.hover > .context-menu-list {\n    display: block;\n}\n\n.context-menu-accesskey {\n    text-decoration: underline;\n}\n",
                               ""]);
 
 // exports
@@ -28882,7 +28882,7 @@ OTHER DEALINGS IN THE SOFTWARE.
  *
  * Licensed under
  *   MIT License http://www.opensource.org/licenses/mit-license
- *   GPL v3 http://opensource.org/licenses/GPL-3.0
+ *
  *
  */
                 (function ($, undefined) {
@@ -67239,63 +67239,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
                 "use strict";
 
-                /*!
- * JavaScript Debug - v0.4 - 6/22/2010
- * http://benalman.com/projects/javascript-debug-console-log/
- *
- * Copyright (c) 2010 "Cowboy" Ben Alman
- * Dual licensed under the MIT and GPL licenses.
- * http://benalman.com/about/license/
- *
- * With lots of help from Paul Irish!
- * http://paulirish.com/
- */
-// Script: JavaScript Debug: A simple wrapper for console.log
-//
-// *Version: 0.4, Last Updated: 6/22/2010*
-//
-// Tested with Internet Explorer 6-8, Firefox 3-3.6, Safari 3-4, Chrome 3-5, Opera 9.6-10.5
-//
-// Home       - http://benalman.com/projects/javascript-debug-console-log/
-// GitHub     - http://github.com/cowboy/javascript-debug/
-// Source     - http://github.com/cowboy/javascript-debug/raw/master/ba-debug.js
-// (Minified) - http://github.com/cowboy/javascript-debug/raw/master/ba-debug.min.js (1.1kb)
-//
-// About: License
-//
-// Copyright (c) 2010 "Cowboy" Ben Alman,
-// Dual licensed under the MIT and GPL licenses.
-// http://benalman.com/about/license/
-//
-// About: Support and Testing
-//
-// Information about what browsers this code has been tested in.
-//
-// Browsers Tested - Internet Explorer 6-8, Firefox 3-3.6, Safari 3-4, Chrome
-// 3-5, Opera 9.6-10.5
-//
-// About: Examples
-//
-// These working examples, complete with fully commented code, illustrate a few
-// ways in which this plugin can be used.
-//
-// Examples - http://benalman.com/code/projects/javascript-debug/examples/debug/
-//
-// About: Revision History
-//
-// 0.4 - (6/22/2010) Added missing passthrough methods: exception,
-//       groupCollapsed, table
-// 0.3 - (6/8/2009) Initial release
-//
-// Topic: Pass-through console methods
-//
-// assert, clear, count, dir, dirxml, exception, group, groupCollapsed,
-// groupEnd, profile, profileEnd, table, time, timeEnd, trace
-//
-// These console methods are passed through (but only if both the console and
-// the method exists), so use them without fear of reprisal. Note that these
-// methods will not be passed through if the logging level is set to 0 via
-// <debug.setLevel>.
+
 
                 window.debug = function () {
                     var window = this,
