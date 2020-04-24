@@ -132,8 +132,8 @@ public class Task {
         return actions.get(0);
     }
 
-    public Action getStartAction(String actionName, String path) {
-        List<Action> actions = actionList.stream().filter(action -> action.getClass().getSimpleName().equalsIgnoreCase(actionName) && action instanceof Trigger && ((Trigger) action).getPath().equals(path == null ? "" : path)).collect(Collectors.toList());
+    public Action getStartAction(String triggerName, String triggerSuffix, String path) {
+        List<Action> actions = actionList.stream().filter(action -> action.getClass().getSimpleName().equalsIgnoreCase(triggerName) && action instanceof Trigger && ((Trigger) action).getPath().equals(path == null ? "" : path) && ((Trigger) action).getTriggerSuffix().equals(triggerSuffix == null ? "" : triggerSuffix)).collect(Collectors.toList());
         if (actions.isEmpty()) {
             return null;
         }

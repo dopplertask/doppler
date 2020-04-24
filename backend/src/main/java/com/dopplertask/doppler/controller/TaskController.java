@@ -24,8 +24,10 @@ import com.dopplertask.doppler.dto.TaskResponseSingleDTO;
 import com.dopplertask.doppler.service.ExecutionService;
 import com.dopplertask.doppler.service.TaskRequest;
 import com.dopplertask.doppler.service.TaskService;
+import com.dopplertask.doppler.service.TriggerInfo;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.velocity.app.VelocityEngine;
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -118,11 +121,15 @@ public class TaskController {
 
     }
 
-    @PostMapping(path = "/webhook/{taskName}/{triggerName}/{path}")
-    public ResponseEntity<TaskExecutionLogResponseDTO> runWebhook(@PathVariable("taskName") String taskName, @PathVariable("triggerName") String triggerName, @PathVariable("path") String path) {
+    @PostMapping(path = "/webhook/{taskName}/{triggerName}/{triggerSuffix}/{path}")
+    public ResponseEntity<TaskExecutionLogResponseDTO> runWebhook(@RequestHeader(required = false) Map<String, String> headers, @RequestBody(required = false) String body, @PathVariable("taskName") String taskName, @PathVariable("triggerName") String triggerName, @PathVariable("triggerSuffix") String triggerSuffix, @PathVariable("path") String path) {
         TaskRequest request = new TaskRequest(taskName, Collections.emptyMap());
-        request.setTriggerName(triggerName);
-        request.setTriggerPath(path);
+
+        Map<String, String> triggerParameters = new HashMap<>(headers);
+        triggerParameters.put("body", body);
+        TriggerInfo triggerInfo = new TriggerInfo(triggerName, path, triggerSuffix, triggerParameters);
+        request.setTriggerInfo(triggerInfo);
+
         TaskExecution execution = taskService.runRequest(request);
 
         //TODO: Initialize the trigger because we need to know if there is an authentication required.
@@ -139,9 +146,9 @@ public class TaskController {
 
     }
 
-    @PostMapping(path = "/webhook/{taskName}/{triggerName}")
-    public ResponseEntity<TaskExecutionLogResponseDTO> runWebhook(@PathVariable("taskName") String taskName, @PathVariable("triggerName") String triggerName) {
-        return runWebhook(taskName, triggerName, "");
+    @PostMapping(path = "/webhook/{taskName}/{triggerName}/{triggerSuffix}")
+    public ResponseEntity<TaskExecutionLogResponseDTO> runWebhook(@RequestHeader(required = false) Map<String, String> headers, @RequestBody(required = false) String body, @PathVariable("taskName") String taskName, @PathVariable("triggerName") String triggerName, @PathVariable("triggerSuffix") String triggerSuffix) {
+        return runWebhook(headers, body, taskName, triggerName, triggerSuffix, "");
 
     }
 

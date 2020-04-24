@@ -12,6 +12,7 @@ import com.dopplertask.doppler.domain.TaskExecutionLog;
 import com.dopplertask.doppler.domain.TaskExecutionStatus;
 import com.dopplertask.doppler.domain.TaskParameter;
 import com.dopplertask.doppler.domain.action.Action;
+import com.dopplertask.doppler.domain.action.trigger.Trigger;
 import com.dopplertask.doppler.dto.TaskCreationDTO;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -338,18 +339,23 @@ public class ExecutionServiceImpl implements ExecutionService {
 
     @Override
     @Transactional
-    public TaskExecution processActions(Long taskId, Long executionId, TaskService taskService, String triggerName, String path) {
+    public TaskExecution processActions(Long taskId, Long executionId, TaskService taskService, TriggerInfo triggerInfo) {
         Optional<Task> taskRequest = taskDao.findById(taskId);
         Optional<TaskExecution> executionReq = taskExecutionDao.findById(executionId);
         if (taskRequest.isPresent() && executionReq.isPresent()) {
             Task task = taskRequest.get();
             TaskExecution execution = executionReq.get();
-            Action action = task.getStartAction(triggerName, path);
+            Action action = task.getStartAction(triggerInfo.getTriggerName(), triggerInfo.getTriggerSuffix(), triggerInfo.getTriggerPath());
 
             // Check if the trigger exists
             if (action == null) {
                 addLog(execution, "The selected trigger was not found. Cannot start task", OutputType.STRING, true);
                 return execution;
+            }
+
+            // Set params
+            if (triggerInfo.getTriggerParameters() != null) {
+                ((Trigger) action).setParameters(triggerInfo.getTriggerParameters());
             }
 
             execution.setCurrentAction(action);

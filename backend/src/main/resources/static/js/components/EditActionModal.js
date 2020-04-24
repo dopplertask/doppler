@@ -81,6 +81,19 @@ class EditActionModal extends React.Component {
         let fields = [];
         if (this.props.selectedAction.userData !== undefined && this.props.selectedAction.userData.propertyInformationList
             !== undefined) {
+            // See if this is a trigger
+            if (this.props.selectedAction.userData.customData.triggerSuffix != undefined) {
+                let triggerSuffix = <div className="form-group"><label
+                    htmlFor="triggerSuffix">Webhook URL</label>
+                    <span
+                        style={{"word-wrap": "break-word"}}>/webhook/{this.props.taskName}/{this.props.selectedAction.userData.name}/{this.props.selectedAction.userData.customData.triggerSuffix}/{this.props.selectedAction.userData.customData.path
+                                                                                                                                                                                                    != null
+                                                                                                                                                                                                    && this.props.selectedAction.userData.customData.path}</span>
+                </div>;
+
+                fields.push(triggerSuffix);
+            }
+
             this.props.selectedAction.userData.propertyInformationList.map(propertyInformation => {
                 let temp;
                 let actionProperty = this.props.selectedAction.userData.customData[propertyInformation.name];

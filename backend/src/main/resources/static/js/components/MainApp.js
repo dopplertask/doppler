@@ -42,7 +42,7 @@ class MainApp extends React.Component {
         this.searchActions = this.searchActions.bind(this);
         this.importTask = this.importTask.bind(this);
         this.applyJSONToCanvas = this.applyJSONToCanvas.bind(this);
-
+        this.generateString = this.generateString.bind(this);
     }
 
     executeAction() {
@@ -219,6 +219,16 @@ class MainApp extends React.Component {
         return app;
     }
 
+    generateString(length) {
+        let result = '';
+        let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let charactersLength = characters.length;
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
+
     createNode(actionName) {
         let action;
         if (actionName == "IfAction") {
@@ -262,6 +272,7 @@ class MainApp extends React.Component {
                                              userData: currentActionDetails
                                          });
                 action.onDoubleClick = () => this.editModelForFigure();
+                action.userData.customData.triggerSuffix = this.generateString(10);
             } else {
                 action = new BetweenFigure({
                                                x: 550,
@@ -302,6 +313,7 @@ class MainApp extends React.Component {
 
                         outputBody.actions.push({
                                                     "@type": json[i].userData.name,
+                                                    ...json[i].userData.customData,
                                                     ports: currentActionPorts,
                                                     guiXPos: json[i].x,
                                                     guiYPos: json[i].y
@@ -576,7 +588,7 @@ class MainApp extends React.Component {
             </div>
 
 
-            <EditActionModal updateFieldData={this.updateFieldData}
+            <EditActionModal taskName={this.state.taskName} updateFieldData={this.updateFieldData}
                              executeAction={this.executeAction}
                              selectedAction={this.state.selectedAction}
                              discardActionSettings={this.discardActionSettings}/>

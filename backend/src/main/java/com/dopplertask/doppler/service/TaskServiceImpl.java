@@ -72,8 +72,7 @@ public class TaskServiceImpl implements TaskService {
         taskExecutionRequest.setExecutionId(execution.getId());
         taskExecutionRequest.setChecksum(request.getChecksum());
         taskExecutionRequest.setRemoveTaskAfterExecution(request.isRemoveTaskAfterExecution());
-        taskExecutionRequest.setTriggerName(request.getTriggerName());
-        taskExecutionRequest.setTriggerPath(request.getTriggerPath());
+        taskExecutionRequest.setTriggerInfo(request.getTriggerInfo());
 
         jmsTemplate.convertAndSend("automation_destination", taskExecutionRequest);
 
@@ -101,8 +100,8 @@ public class TaskServiceImpl implements TaskService {
                 return execution;
             } else {
                 TaskExecution taskExecution;
-                if (taskExecutionRequest.getTriggerName() != null && !taskExecutionRequest.getTriggerName().isEmpty()) {
-                    taskExecution = executionService.processActions(execution.getTask().getId(), execution.getId(), this, taskExecutionRequest.getTriggerName(), taskExecutionRequest.getTriggerPath());
+                if (taskExecutionRequest.getTriggerInfo() != null && taskExecutionRequest.getTriggerInfo().getTriggerName() != null && !taskExecutionRequest.getTriggerInfo().getTriggerName().isEmpty()) {
+                    taskExecution = executionService.processActions(execution.getTask().getId(), execution.getId(), this, taskExecutionRequest.getTriggerInfo());
                 } else {
                     taskExecution = executionService.processActions(execution.getTask().getId(), execution.getId(), this);
                 }
@@ -368,8 +367,7 @@ public class TaskServiceImpl implements TaskService {
         taskExecutionRequest.setExecutionId(execution.getId());
         taskExecutionRequest.setDepth(request.getDepth());
         taskExecutionRequest.setChecksum(request.getChecksum());
-        taskExecutionRequest.setTriggerName(request.getTriggerName());
-        taskExecutionRequest.setTriggerPath(request.getTriggerPath());
+        taskExecutionRequest.setTriggerInfo(request.getTriggerInfo());
 
         return this.runRequest(taskExecutionRequest);
     }
