@@ -250,22 +250,6 @@ All actions have retry mechanisms to allow you to retry an action.
 * failOn: The current action will fail if this evaluates to anything.
 * retries: (Integer) Amount of retries.
 
-### Webhooks
-Besides actions, there is the webhooks nodes which can be added to the Task to start the task from a REST call.
-
-Call the webhook using the following URL with a POST method:
-http://localhost:8090/webhook/taskName/triggerName
-
-or with path:
-http://localhost:8090/webhook/taskName/triggerName/path
-
-* taskName: Name of the task to run
-* triggerName: Name of the webhook trigger, like Webhook.
-* path: The specific path for the desired webhook.
-
-#### Webhook
-This webhook will respond to a REST call and start the flow.
-
 
 ## Authors
 
@@ -273,4 +257,4 @@ This webhook will respond to a REST call and start the flow.
 
 ## License
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details
+This project is licensed under the MIT license - see the [LICENSE](LICENSE) file for details
