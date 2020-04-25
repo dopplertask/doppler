@@ -84,11 +84,11 @@ class EditActionModal extends React.Component {
             // See if this is a trigger
             if (this.props.selectedAction.userData.customData.triggerSuffix != undefined) {
                 let triggerSuffix = <div className="form-group"><label
-                    htmlFor="triggerSuffix">Webhook URL</label>
-                    <span
-                        style={{"word-wrap": "break-word"}}>/webhook/{this.props.taskName}/{this.props.selectedAction.userData.name}/{this.props.selectedAction.userData.customData.triggerSuffix}/{this.props.selectedAction.userData.customData.path
+                    htmlFor="triggerSuffix">Webhook URL (POST)</label>
+                    <div
+                        style={{wordWrap: "break-word", fontSize: "small"}}>{location.protocol}//{window.location.hostname}:{location.port}/webhook/{this.props.taskName}/{this.props.selectedAction.userData.name}/{this.props.selectedAction.userData.customData.triggerSuffix}/{this.props.selectedAction.userData.customData.path
                                                                                                                                                                                                     != null
-                                                                                                                                                                                                    && this.props.selectedAction.userData.customData.path}</span>
+                                                                                                                                                                                                    && this.props.selectedAction.userData.customData.path}</div>
                 </div>;
 
                 fields.push(triggerSuffix);
