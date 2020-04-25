@@ -47,7 +47,7 @@ public class ScriptAction extends Action {
 
     @Override
     public List<PropertyInformation> getActionInfo() {
-        List<PropertyInformation> actionInfo = super.getActionInfo();
+        List<PropertyInformation> actionInfo = super.actionInfo;
 
         actionInfo.add(new PropertyInformation("script", "Script", PropertyInformation.PropertyInformationType.MULTILINE, "", "Command to execute."));
         return actionInfo;

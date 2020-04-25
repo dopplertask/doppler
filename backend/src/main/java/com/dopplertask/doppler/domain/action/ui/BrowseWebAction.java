@@ -199,7 +199,7 @@ public class BrowseWebAction extends Action {
 
     @Override
     public List<PropertyInformation> getActionInfo() {
-        List<PropertyInformation> actionInfo = super.getActionInfo();
+        List<PropertyInformation> actionInfo = super.actionInfo;
 
         actionInfo.add(new PropertyInformation("url", "URL", PropertyInformation.PropertyInformationType.STRING, "", "URL of the web page"));
         actionInfo.add(new PropertyInformation("headless", "Headless mode", PropertyInformation.PropertyInformationType.BOOLEAN, "true", "URL of the web page"));

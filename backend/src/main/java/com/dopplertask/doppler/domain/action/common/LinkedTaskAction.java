@@ -116,7 +116,7 @@ public class LinkedTaskAction extends Action {
 
     @Override
     public List<PropertyInformation> getActionInfo() {
-        List<PropertyInformation> actionInfo = super.getActionInfo();
+        List<PropertyInformation> actionInfo = super.actionInfo;
 
         actionInfo.add(new PropertyInformation("name", "Task name"));
         return actionInfo;

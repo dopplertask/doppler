@@ -55,7 +55,7 @@ public class SetVariableAction extends Action {
 
     @Override
     public List<PropertyInformation> getActionInfo() {
-        List<PropertyInformation> actionInfo = super.getActionInfo();
+        List<PropertyInformation> actionInfo = super.actionInfo;
 
         actionInfo.add(new PropertyInformation("setVariableList", "Variables", PropertyInformation.PropertyInformationType.MAP, "", "", List.of(
                 new PropertyInformation("name", "Name"),

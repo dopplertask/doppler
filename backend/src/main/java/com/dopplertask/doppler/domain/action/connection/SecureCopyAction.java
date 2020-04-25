@@ -123,7 +123,7 @@ public class SecureCopyAction extends Action {
 
     @Override
     public List<PropertyInformation> getActionInfo() {
-        List<PropertyInformation> actionInfo = super.getActionInfo();
+        List<PropertyInformation> actionInfo = super.actionInfo;
 
         actionInfo.add(new PropertyInformation("hostname", "Hostname", PropertyInformation.PropertyInformationType.STRING, "", "Hostname or IP"));
         actionInfo.add(new PropertyInformation("username", "Username", PropertyInformation.PropertyInformationType.STRING, "", "Username"));

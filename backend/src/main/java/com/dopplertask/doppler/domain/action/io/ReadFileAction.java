@@ -82,7 +82,7 @@ public class ReadFileAction extends Action {
 
     @Override
     public List<PropertyInformation> getActionInfo() {
-        List<PropertyInformation> actionInfo = super.getActionInfo();
+        List<PropertyInformation> actionInfo = super.actionInfo;
 
         actionInfo.add(new PropertyInformation("filename", "File location", PropertyInformation.PropertyInformationType.STRING, "", "File path. eg. /home/user/file.txt"));
         actionInfo.add(new PropertyInformation("parameterName", "Parameter Name", PropertyInformation.PropertyInformationType.STRING, "", "Parameter name to store contents."));

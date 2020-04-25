@@ -73,7 +73,7 @@ public class IfAction extends Action {
 
     @Override
     public List<PropertyInformation> getActionInfo() {
-        List<PropertyInformation> actionInfo = super.getActionInfo();
+        List<PropertyInformation> actionInfo = super.actionInfo;
 
         actionInfo.add(new PropertyInformation("condition", "Condition", PropertyInformation.PropertyInformationType.STRING, "", "Condition to evaluate."));
         return actionInfo;

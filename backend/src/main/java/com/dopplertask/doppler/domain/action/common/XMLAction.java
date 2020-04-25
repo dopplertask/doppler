@@ -77,7 +77,7 @@ public class XMLAction extends Action {
 
     @Override
     public List<PropertyInformation> getActionInfo() {
-        List<PropertyInformation> actionInfo = super.getActionInfo();
+        List<PropertyInformation> actionInfo = super.actionInfo;
 
         actionInfo.add(new PropertyInformation("content", "Content", PropertyInformation.PropertyInformationType.MULTILINE));
         actionInfo.add(new PropertyInformation("type", "Mode", PropertyInformation.PropertyInformationType.DROPDOWN, "JSON_TO_XML", "Convert from and to XML", List.of(

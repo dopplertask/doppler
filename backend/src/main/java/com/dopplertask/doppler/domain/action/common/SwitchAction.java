@@ -122,7 +122,7 @@ public class SwitchAction extends Action {
 
     @Override
     public List<PropertyInformation> getActionInfo() {
-        List<PropertyInformation> actionInfo = super.getActionInfo();
+        List<PropertyInformation> actionInfo = super.actionInfo;
 
         actionInfo.add(new PropertyInformation("value", "Value", PropertyInformation.PropertyInformationType.STRING, "", "Value to compare"));
         actionInfo.add(new PropertyInformation("switchCases", "Cases", PropertyInformation.PropertyInformationType.MAP, "", "Cases to match the value", List.of(

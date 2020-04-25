@@ -117,7 +117,7 @@ public class MouseAction extends Action {
 
     @Override
     public java.util.List<PropertyInformation> getActionInfo() {
-        java.util.List<PropertyInformation> actionInfo = super.getActionInfo();
+        java.util.List<PropertyInformation> actionInfo = super.actionInfo;
 
         actionInfo.add(new PropertyInformation("button", "Button", PropertyInformation.PropertyInformationType.DROPDOWN, "LEFT", "Button to press", List.of(
                 new PropertyInformation("LEFT", "Left click"),

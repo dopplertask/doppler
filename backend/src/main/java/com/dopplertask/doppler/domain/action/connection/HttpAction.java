@@ -108,7 +108,7 @@ public class HttpAction extends Action {
 
     @Override
     public List<PropertyInformation> getActionInfo() {
-        List<PropertyInformation> actionInfo = super.getActionInfo();
+        List<PropertyInformation> actionInfo = super.actionInfo;
 
         actionInfo.add(new PropertyInformation("url", "URL", PropertyInformation.PropertyInformationType.STRING, "", "Hostname or IP"));
         actionInfo.add(new PropertyInformation("method", "Method", PropertyInformation.PropertyInformationType.DROPDOWN, "GET", "HTTP Method",

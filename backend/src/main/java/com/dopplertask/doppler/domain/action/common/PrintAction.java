@@ -60,7 +60,7 @@ public class PrintAction extends Action {
 
     @Override
     public List<PropertyInformation> getActionInfo() {
-        List<PropertyInformation> actionInfo = super.getActionInfo();
+        List<PropertyInformation> actionInfo = super.actionInfo;
 
         actionInfo.add(new PropertyInformation("message", "Message", PropertyInformation.PropertyInformationType.MULTILINE));
         return actionInfo;
