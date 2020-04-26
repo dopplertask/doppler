@@ -2,7 +2,6 @@ package com.dopplertask.doppler.service;
 
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
-
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -12,9 +11,10 @@ public interface ExecutionService {
      * Initiates execution based on a request.
      *
      * @param taskExecutionRequest with information about what task to run and with what parameters.
+     * @param startedByTrigger
      * @return task execution containing task info and initial logs.
      */
-    TaskExecution startExecution(TaskExecutionRequest taskExecutionRequest, TaskService taskService);
+    TaskExecution startExecution(TaskExecutionRequest taskExecutionRequest, TaskService taskService, boolean startedByTrigger);
 
     /**
      * Pulls task from online repository, compares it to local tasks to determine if there is a need to save it.

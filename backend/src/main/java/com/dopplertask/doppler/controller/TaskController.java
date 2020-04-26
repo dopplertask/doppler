@@ -27,7 +27,6 @@ import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.TriggerInfo;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.apache.velocity.app.VelocityEngine;
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,7 +84,7 @@ public class TaskController {
         boolean removeTaskAfterExecution = false;
         String token = "_UNSAVED_" + (int) (Math.random() * 1000000);
         if (taskRequestDTO.getTask() != null) {
-            this.taskService.createTask(taskRequestDTO.getTask().getName() + token, taskRequestDTO.getTask().getParameters(), taskRequestDTO.getTask().getActions(), taskRequestDTO.getTask().getDescription(), taskRequestDTO.getTask().getConnections(), taskRequestDTO.getTask().getName() + token);
+            this.taskService.createTask(taskRequestDTO.getTask().getName() + token, taskRequestDTO.getTask().getParameters(), taskRequestDTO.getTask().getActions(), taskRequestDTO.getTask().getDescription(), taskRequestDTO.getTask().getConnections(), taskRequestDTO.getTask().getName() + token, taskRequestDTO.getTask().isActive());
             removeTaskAfterExecution = true;
         }
         TaskRequest request = new TaskRequest(removeTaskAfterExecution ? taskRequestDTO.getTaskName() + token : taskRequestDTO.getTaskName(), taskRequestDTO.getParameters(), removeTaskAfterExecution);
@@ -178,7 +177,7 @@ public class TaskController {
         byte[] encodedhash = digest.digest(compactJSON.getBytes(StandardCharsets.UTF_8));
         String sha3_256hex = bytesToHex(encodedhash);
 
-        Long id = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), taskCreationDTO.getConnections(), sha3_256hex);
+        Long id = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), taskCreationDTO.getConnections(), sha3_256hex, taskCreationDTO.isActive());
 
         if (id != null) {
             SimpleChecksumResponseDto checksumResponseDto = new SimpleChecksumResponseDto();

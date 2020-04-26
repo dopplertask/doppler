@@ -6,11 +6,6 @@ import com.dopplertask.doppler.domain.action.StartAction;
 import com.dopplertask.doppler.domain.action.trigger.Trigger;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -23,6 +18,10 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "Task")
@@ -59,6 +58,8 @@ public class Task {
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
     private List<Connection> connections;
+
+    private boolean active = false;
 
     public Long getId() {
         return id;
@@ -146,5 +147,13 @@ public class Task {
 
     public void setConnections(List<Connection> connections) {
         this.connections = connections;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }
