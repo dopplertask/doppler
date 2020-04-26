@@ -13,7 +13,6 @@ import com.dopplertask.doppler.domain.action.Action;
 import com.dopplertask.doppler.domain.action.common.LinkedTaskAction;
 import com.dopplertask.doppler.dto.TaskCreationDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +86,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskExecution runRequest(TaskExecutionRequest taskExecutionRequest) {
-        TaskExecution execution = executionService.startExecution(taskExecutionRequest, this);
+        boolean isTrigger = taskExecutionRequest.getTriggerInfo() != null && taskExecutionRequest.getTriggerInfo().getTriggerName() != null && !taskExecutionRequest.getTriggerInfo().getTriggerName().isEmpty();
+
+        TaskExecution execution = executionService.startExecution(taskExecutionRequest, this, isTrigger);
 
         if (execution != null) {
             if (execution.getStatus() == TaskExecutionStatus.FAILED) {
@@ -100,7 +101,7 @@ public class TaskServiceImpl implements TaskService {
                 return execution;
             } else {
                 TaskExecution taskExecution;
-                if (taskExecutionRequest.getTriggerInfo() != null && taskExecutionRequest.getTriggerInfo().getTriggerName() != null && !taskExecutionRequest.getTriggerInfo().getTriggerName().isEmpty()) {
+                if (isTrigger) {
                     taskExecution = executionService.processActions(execution.getTask().getId(), execution.getId(), this, taskExecutionRequest.getTriggerInfo());
                 } else {
                     taskExecution = executionService.processActions(execution.getTask().getId(), execution.getId(), this);
@@ -128,13 +129,13 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    public Long createTask(String name, List<TaskParameter> taskParameters, List<Action> actions, String description, List<Connection> connections, String checksum) {
-        return createTask(name, taskParameters, actions, description, connections, checksum, true);
+    public Long createTask(String name, List<TaskParameter> taskParameters, List<Action> actions, String description, List<Connection> connections, String checksum, boolean active) {
+        return createTask(name, taskParameters, actions, description, connections, checksum, active, true);
     }
 
     @Override
     @Transactional
-    public Long createTask(String name, List<TaskParameter> taskParameters, List<Action> actions, String description, List<Connection> connections, String checksum, boolean buildTask) {
+    public Long createTask(String name, List<TaskParameter> taskParameters, List<Action> actions, String description, List<Connection> connections, String checksum, boolean active, boolean buildTask) {
 
         if (name.contains(" ")) {
             throw new WhiteSpaceInNameException("Could not create task. Task name contains whitespace.");
@@ -144,6 +145,7 @@ public class TaskServiceImpl implements TaskService {
         Optional<Task> existingTask = taskDao.findByChecksum(checksum);
         if (existingTask.isPresent()) {
             existingTask.get().setCreated(new Date());
+            existingTask.get().setActive(active);
             return existingTask.get().getId();
         }
 
@@ -183,6 +185,8 @@ public class TaskServiceImpl implements TaskService {
             task.setTaskParameterList(taskParameters);
         }
         task.setActionList(actions);
+
+        task.setActive(active);
 
         // Check if action is available
         if (task.getStartAction() == null) {
@@ -272,7 +276,7 @@ public class TaskServiceImpl implements TaskService {
         if (taskOptional.isPresent()) {
             Task task = taskOptional.get();
 
-            TaskCreationDTO dto = new TaskCreationDTO(task.getName(), task.getTaskParameterList(), task.getActionList(), task.getDescription(), task.getConnections());
+            TaskCreationDTO dto = new TaskCreationDTO(task.getName(), task.getConnections(), task.getTaskParameterList(), task.getActionList(), task.getDescription(), task.isActive());
 
             ObjectMapper mapper = new ObjectMapper();
             try {

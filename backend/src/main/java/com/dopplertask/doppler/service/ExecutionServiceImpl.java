@@ -16,7 +16,6 @@ import com.dopplertask.doppler.domain.action.trigger.Trigger;
 import com.dopplertask.doppler.dto.TaskCreationDTO;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +77,7 @@ public class ExecutionServiceImpl implements ExecutionService {
     }
 
     @Transactional
-    public TaskExecution startExecution(TaskExecutionRequest taskExecutionRequest, TaskService taskService) {
+    public TaskExecution startExecution(TaskExecutionRequest taskExecutionRequest, TaskService taskService, boolean startedByTrigger) {
 
         // Look up by checksum first
         Optional<Task> taskRequest = lookupTask(taskExecutionRequest, taskService);
@@ -95,6 +94,12 @@ public class ExecutionServiceImpl implements ExecutionService {
             execution.getParameters().putAll(taskExecutionRequest.getParameters());
 
             execution.setStartdate(new Date());
+
+            // Check if task is started by trigger when the active is set to false, if so, fail.
+            if (startedByTrigger && !task.isActive()) {
+                addLog(execution, "Task is not active. Please set task to active to respond to webhooks", OutputType.STRING, true, false);
+                return execution;
+            }
 
             // Check that all required parameters are present
             List<String> missingParameters = new ArrayList<>();
@@ -203,7 +208,7 @@ public class ExecutionServiceImpl implements ExecutionService {
                     String sha256 = bytesToHex(encodedhash);
 
                     //TODO: check that there is no other checksum with the same value in the DB
-                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), taskCreationDTO.getConnections(), sha256);
+                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), taskCreationDTO.getConnections(), sha256, taskCreationDTO.isActive());
 
                     return taskDao.findById(onlineTaskId);
                 }
@@ -262,7 +267,7 @@ public class ExecutionServiceImpl implements ExecutionService {
                 // Check current database for existing task with checksum.
                 Optional<Task> existingTask = taskDao.findFirstByChecksumStartingWith(sha256);
                 if (!existingTask.isPresent()) {
-                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), taskCreationDTO.getConnections(), sha256, false);
+                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), taskCreationDTO.getConnections(), sha256, taskCreationDTO.isActive(), false);
                     return taskDao.findById(onlineTaskId);
                 } else {
                     return existingTask;
@@ -308,7 +313,7 @@ public class ExecutionServiceImpl implements ExecutionService {
                     byte[] encodedhash = digest.digest(response.body().getBytes(StandardCharsets.UTF_8));
                     String sha256 = bytesToHex(encodedhash);
 
-                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), taskCreationDTO.getConnections(), sha256);
+                    Long onlineTaskId = taskService.createTask(taskCreationDTO.getName(), taskCreationDTO.getParameters(), taskCreationDTO.getActions(), taskCreationDTO.getDescription(), taskCreationDTO.getConnections(), sha256, taskCreationDTO.isActive());
 
                     return taskDao.findById(onlineTaskId);
                 }

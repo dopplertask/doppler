@@ -10,18 +10,20 @@ import java.util.List;
 
 public class TaskCreationDTO {
     private String name;
+    private boolean active;
     private List<TaskParameter> parameters;
     private List<Action> actions;
     private String description;
     private List<Connection> connections;
 
     @JsonCreator
-    public TaskCreationDTO(@JsonProperty(value = "name", required = true) String name, @JsonProperty(value = "parameters") List<TaskParameter> parameters, @JsonProperty(value = "actions", required = true) List<Action> actions, @JsonProperty(value = "description", required = true) String description, @JsonProperty(value = "connections", required = true) List<Connection> connections) {
+    public TaskCreationDTO(@JsonProperty(value = "name", required = true) String name, @JsonProperty(value = "connections", required = true) List<Connection> connections, @JsonProperty(value = "parameters") List<TaskParameter> parameters, @JsonProperty(value = "actions", required = true) List<Action> actions, @JsonProperty(value = "description", required = true) String description, @JsonProperty(value = "active", required = true) boolean active) {
         this.name = name;
         this.parameters = parameters;
         this.actions = actions;
         this.description = description;
         this.connections = connections;
+        this.active = active;
     }
 
     public String getName() {
@@ -63,5 +65,13 @@ public class TaskCreationDTO {
 
     public void setConnections(List<Connection> connections) {
         this.connections = connections;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

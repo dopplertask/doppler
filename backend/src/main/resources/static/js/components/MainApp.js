@@ -19,7 +19,8 @@ class MainApp extends React.Component {
             saveDialogVisible: false,
             taskName: "task" + unsavedTaskNamePrefix,
             start: false,
-            saved: false
+            saved: false,
+            active: false
         }
 
         this.showNotification = this.showNotification.bind(this);
@@ -43,6 +44,7 @@ class MainApp extends React.Component {
         this.importTask = this.importTask.bind(this);
         this.applyJSONToCanvas = this.applyJSONToCanvas.bind(this);
         this.generateString = this.generateString.bind(this);
+        this.activateTask = this.activateTask.bind(this);
     }
 
     executeAction() {
@@ -64,31 +66,31 @@ class MainApp extends React.Component {
             ports
         }
         $.ajax({
-                   type: "POST",
-                   url: "/task/action",
-                   data: JSON.stringify(json),
-                   contentType: 'application/json',
-                   success: success => {
-                       console.log(success);
-                       let output = "Last executed: " + new Date() + " No output. ";
-                       if (success.output != undefined && success.output != "") {
-                           output = success.output;
-                       } else if (success.errorMsg != undefined && success.errorMsg != "") {
-                           output = success.errorMsg;
-                       }
-                       this.setState(prevState => ({
-                           selectedAction: {
-                               ...prevState.selectedAction,
-                               userData: {
-                                   ...prevState.selectedAction.userData,
-                                   lastSingleActionExecutionOutput: output
-                               }
-                           }
-                       }));
+            type: "POST",
+            url: "/task/action",
+            data: JSON.stringify(json),
+            contentType: 'application/json',
+            success: success => {
+                console.log(success);
+                let output = "Last executed: " + new Date() + " No output. ";
+                if (success.output != undefined && success.output != "") {
+                    output = success.output;
+                } else if (success.errorMsg != undefined && success.errorMsg != "") {
+                    output = success.errorMsg;
+                }
+                this.setState(prevState => ({
+                    selectedAction: {
+                        ...prevState.selectedAction,
+                        userData: {
+                            ...prevState.selectedAction.userData,
+                            lastSingleActionExecutionOutput: output
+                        }
+                    }
+                }));
 
-                   },
-                   dataType: "json"
-               });
+            },
+            dataType: "json"
+        });
     }
 
     searchActions() {
@@ -110,29 +112,29 @@ class MainApp extends React.Component {
 
     setStart(start) {
         this.setState({
-                          start: start
-                      })
+            start: start
+        })
     }
 
     newWorkflow() {
         function createNewTask() {
             let unsavedTaskNamePrefix = "_" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2,
-                                                                                                                                 15);
+                15);
             this.state.app.view.clear();
             this.state.app.view.add(new StartFigure({
-                                                        x: 50,
-                                                        y: 340,
-                                                        width: 120,
-                                                        height: 120,
-                                                        userData: this.state.availableActions.find(
-                                                            availableAction => availableAction.name == "StartAction")
-                                                    }));
+                x: 50,
+                y: 340,
+                width: 120,
+                height: 120,
+                userData: this.state.availableActions.find(
+                    availableAction => availableAction.name == "StartAction")
+            }));
 
             this.setState({
-                              taskName: "task" + unsavedTaskNamePrefix,
-                              parameters: [],
-                              saved: false
-                          });
+                taskName: "task" + unsavedTaskNamePrefix,
+                parameters: [],
+                saved: false
+            });
         }
 
         if (!this.state.saved && confirm("You have unsaved changes. Do you want to continue?")) {
@@ -193,14 +195,14 @@ class MainApp extends React.Component {
         var createConnection = function (sourcePort, targetPort) {
 
             let conn = new draw2d.Connection({
-                                                 router: new draw2d.layout.connection.InteractiveManhattanConnectionRouter(),
-                                                 color: "#334455",
-                                                 radius: 20,
-                                                 outlineColor: "#334455",
-                                                 source: sourcePort,
-                                                 target: targetPort,
-                                                 stroke: 2
-                                             });
+                router: new draw2d.layout.connection.InteractiveManhattanConnectionRouter(),
+                color: "#334455",
+                radius: 20,
+                outlineColor: "#334455",
+                source: sourcePort,
+                target: targetPort,
+                stroke: 2
+            });
 
             return conn;
 
@@ -209,8 +211,8 @@ class MainApp extends React.Component {
         let app = new example.Application();
 
         app.view.installEditPolicy(new draw2d.policy.connection.DragConnectionCreatePolicy({
-                                                                                               createConnection: createConnection
-                                                                                           }));
+            createConnection: createConnection
+        }));
         app.view.getCommandStack().on("change", function (e) {
             if (e.isPostChangeEvent()) {
                 mainApp.setState({saved: false})
@@ -233,54 +235,54 @@ class MainApp extends React.Component {
         let action;
         if (actionName == "IfAction") {
             action = new IfAction({
-                                      x: 550,
-                                      y: 340,
-                                      width: 120,
-                                      height: 120,
-                                      userData: this.state.availableActions.find(
-                                          availableAction => availableAction.name == actionName)
-                                  });
+                x: 550,
+                y: 340,
+                width: 120,
+                height: 120,
+                userData: this.state.availableActions.find(
+                    availableAction => availableAction.name == actionName)
+            });
             action.onDoubleClick = () => this.editModelForFigure();
         } else if (actionName == "SwitchAction") {
             action = new SwitchAction({
-                                          x: 550,
-                                          y: 340,
-                                          width: 120,
-                                          height: 120,
-                                          userData: this.state.availableActions.find(
-                                              availableAction => availableAction.name == actionName)
-                                      });
+                x: 550,
+                y: 340,
+                width: 120,
+                height: 120,
+                userData: this.state.availableActions.find(
+                    availableAction => availableAction.name == actionName)
+            });
             action.onDoubleClick = () => this.editModelForFigure();
         } else if (actionName == "StartAction") {
             action = new StartFigure({
-                                         x: 550,
-                                         y: 340,
-                                         width: 120,
-                                         height: 120,
-                                         userData: this.state.availableActions.find(
-                                             availableAction => availableAction.name == actionName)
-                                     });
+                x: 550,
+                y: 340,
+                width: 120,
+                height: 120,
+                userData: this.state.availableActions.find(
+                    availableAction => availableAction.name == actionName)
+            });
             action.onDoubleClick = () => this.editModelForFigure();
         } else {
             let currentActionDetails = this.state.availableActions.find(availableAction => availableAction.name == actionName);
             if (currentActionDetails.trigger) {
                 action = new StartFigure({
-                                             x: 550,
-                                             y: 340,
-                                             width: 120,
-                                             height: 120,
-                                             userData: currentActionDetails
-                                         });
+                    x: 550,
+                    y: 340,
+                    width: 120,
+                    height: 120,
+                    userData: currentActionDetails
+                });
                 action.onDoubleClick = () => this.editModelForFigure();
                 action.userData.customData.triggerSuffix = this.generateString(10);
             } else {
                 action = new BetweenFigure({
-                                               x: 550,
-                                               y: 340,
-                                               width: 120,
-                                               height: 120,
-                                               userData: currentActionDetails
-                                           });
+                    x: 550,
+                    y: 340,
+                    width: 120,
+                    height: 120,
+                    userData: currentActionDetails
+                });
                 action.onDoubleClick = () => this.editModelForFigure();
             }
         }
@@ -296,6 +298,7 @@ class MainApp extends React.Component {
         let writer = new draw2d.io.json.Writer();
         let outputBody = {
             name: this.state.taskName,
+            active: this.state.active,
             description: "",
             parameters: this.state.parameters,
             actions: [],
@@ -312,12 +315,12 @@ class MainApp extends React.Component {
                         }
 
                         outputBody.actions.push({
-                                                    "@type": json[i].userData.name,
-                                                    ...json[i].userData.customData,
-                                                    ports: currentActionPorts,
-                                                    guiXPos: json[i].x,
-                                                    guiYPos: json[i].y
-                                                });
+                            "@type": json[i].userData.name,
+                            ...json[i].userData.customData,
+                            ports: currentActionPorts,
+                            guiXPos: json[i].x,
+                            guiYPos: json[i].y
+                        });
                     }
                     if (json[i].type == "draw2d.shape.node.Between") {
                         let currentActionPorts = [];
@@ -327,12 +330,12 @@ class MainApp extends React.Component {
                         }
 
                         outputBody.actions.push({
-                                                    "@type": json[i].userData.name,
-                                                    ...json[i].userData.customData,
-                                                    ports: currentActionPorts,
-                                                    guiXPos: json[i].x,
-                                                    guiYPos: json[i].y
-                                                });
+                            "@type": json[i].userData.name,
+                            ...json[i].userData.customData,
+                            ports: currentActionPorts,
+                            guiXPos: json[i].x,
+                            guiYPos: json[i].y
+                        });
                     }
                     if (json[i].type == "draw2d.Connection") {
                         outputBody.connections.push(
@@ -367,15 +370,15 @@ class MainApp extends React.Component {
     openTask(checksum) {
         let mainApp = this;
         $.ajax({
-                   type: "GET",
-                   url: "/task/" + checksum + "/checksum",
-                   contentType: 'application/json',
-                   success: task => {
-                       this.applyJSONToCanvas(task, mainApp);
-                   }
-                   ,
-                   dataType: "json"
-               }
+                type: "GET",
+                url: "/task/" + checksum + "/checksum",
+                contentType: 'application/json',
+                success: task => {
+                    this.applyJSONToCanvas(task, mainApp);
+                }
+                ,
+                dataType: "json"
+            }
         )
         ;
     }
@@ -413,25 +416,25 @@ class MainApp extends React.Component {
         // TODO: Improve performance
         task.connections.forEach(connection => {
             let conVisual = new draw2d.Connection({
-                                                      router: new draw2d.layout.connection.InteractiveManhattanConnectionRouter(),
-                                                      color: "#334455",
-                                                      radius: 20,
-                                                      outlineColor: "#334455",
-                                                      stroke: 2
-                                                  });
+                router: new draw2d.layout.connection.InteractiveManhattanConnectionRouter(),
+                color: "#334455",
+                radius: 20,
+                outlineColor: "#334455",
+                stroke: 2
+            });
 
             this.state.app.view.figures.data.forEach(figure => {
                 figure.outputPorts.data.forEach(outputPort => {
-                                                    if (outputPort.name == connection.source.externalId) {
-                                                        conVisual.setSource(outputPort);
-                                                    }
-                                                }
+                        if (outputPort.name == connection.source.externalId) {
+                            conVisual.setSource(outputPort);
+                        }
+                    }
                 )
                 figure.inputPorts.data.forEach(inputPort => {
-                                                   if (inputPort.name == connection.target.externalId) {
-                                                       conVisual.setTarget(inputPort);
-                                                   }
-                                               }
+                        if (inputPort.name == connection.target.externalId) {
+                            conVisual.setTarget(inputPort);
+                        }
+                    }
                 )
             })
 
@@ -439,10 +442,10 @@ class MainApp extends React.Component {
         })
 
         mainApp.setState({
-                             taskName: task.name,
-                             parameters: task.parameters,
-                             saved: true
-                         });
+            taskName: task.name,
+            parameters: task.parameters,
+            saved: true
+        });
     }
 
     editModelForFigure() {
@@ -478,7 +481,13 @@ class MainApp extends React.Component {
         return <div id="container" style={{position: "relative", minHeight: "200px"}}>
 
             <div role="alert" aria-live="assertive" aria-atomic="true" className="toast" data-autohide="true"
-                 style={{position: "absolute", left: "50%", bottom: "10px", transform: "translate(-50%,-50%)", zIndex: 2000}}
+                 style={{
+                     position: "absolute",
+                     left: "50%",
+                     bottom: "10px",
+                     transform: "translate(-50%,-50%)",
+                     zIndex: 2000
+                 }}
                  id="notificationAlert">
                 <div className="toast-body" id="notificationAlertMessage">
                     Hello, world! This is a toast message.
@@ -573,6 +582,15 @@ class MainApp extends React.Component {
                             <br/>
                             Current task:<br/>
                             {!this.state.saved ? ("[UNSAVED]") : ("")} {this.state.taskName}
+
+                            <br/><br/>
+
+                            <div className="btn-group-toggle" data-toggle="buttons">
+                                <label className="btn btn-secondary active">
+                                    <input type="checkbox" onClick={this.activateTask}
+                                           autoComplete="off"/> Active triggers
+                                </label>
+                            </div>
                         </div>
                         <div className="col-sm-10 col-md-10 col-lg-10 m-0 p-0">
                             <div id="canvas" className="w-100 h-100"></div>
@@ -654,8 +672,8 @@ class MainApp extends React.Component {
 
     saveSettings(parameters) {
         this.setState({
-                          parameters: parameters
-                      })
+            parameters: parameters
+        })
 
     }
 
@@ -677,17 +695,17 @@ class MainApp extends React.Component {
         this.prepareJSON(json => {
             console.log(json);
             $.ajax({
-                       type: "POST",
-                       url: "/task",
-                       data: json,
-                       contentType: 'application/json',
-                       success: success => {
-                           console.log(success)
-                           this.setState({saved: true})
-                           this.showNotification("Task saved!");
-                       },
-                       dataType: "json"
-                   });
+                type: "POST",
+                url: "/task",
+                data: json,
+                contentType: 'application/json',
+                success: success => {
+                    console.log(success)
+                    this.setState({saved: true})
+                    this.showNotification("Task saved!");
+                },
+                dataType: "json"
+            });
         });
 
     }
@@ -714,6 +732,13 @@ class MainApp extends React.Component {
 
     }
 
+    activateTask(event) {
+        this.setState({
+            active: event.target.checked
+        }, event => {
+            this.saveWorkflow();
+        })
+    }
 }
 
 export default MainApp;
