@@ -9,7 +9,9 @@ import com.dopplertask.doppler.domain.action.common.IfAction;
 import com.dopplertask.doppler.domain.action.common.PrintAction;
 import com.dopplertask.doppler.domain.action.common.XMLAction;
 import com.dopplertask.doppler.domain.action.common.XMLActionType;
+import com.dopplertask.doppler.service.TaskServiceImpl;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
+
 import org.apache.velocity.app.VelocityEngine;
 import org.junit.Assert;
 import org.junit.Before;
@@ -69,7 +71,7 @@ public class ActionTest {
 
         ifAction.setCondition("'test' == 'test'");
 
-        ActionResult actionResult = ifAction.run(null, taskExecution, variableExtractorUtil, (output, outputType) -> {
+        ActionResult actionResult = ifAction.run(new TaskServiceImpl(), taskExecution, variableExtractorUtil, (output, outputType) -> {
         });
         Assert.assertEquals("If evaluated to true.", actionResult.getOutput());
         Assert.assertEquals("True path", ((PrintAction) taskExecution.getCurrentAction()).getMessage());
@@ -112,7 +114,7 @@ public class ActionTest {
 
         ifAction.setCondition("'test' == 'test_false'");
 
-        ActionResult actionResult = ifAction.run(null, taskExecution, variableExtractorUtil);
+        ActionResult actionResult = ifAction.run(new TaskServiceImpl(), taskExecution, variableExtractorUtil);
         Assert.assertEquals("If evaluated to false.", actionResult.getOutput());
         Assert.assertEquals("False path", ((PrintAction) taskExecution.getCurrentAction()).getMessage());
     }
@@ -125,7 +127,7 @@ public class ActionTest {
         xmlAction.setContent("<xml><doppler style=\"blue\"></doppler><example>Some text</example></xml>");
         xmlAction.setType(XMLActionType.XML_TO_JSON);
 
-        ActionResult actionResult = xmlAction.run(null, taskExecution, variableExtractorUtil);
+        ActionResult actionResult = xmlAction.run(new TaskServiceImpl(), taskExecution, variableExtractorUtil);
         Assert.assertEquals("{\"doppler\":{\"style\":\"blue\"},\"example\":\"Some text\"}", actionResult.getOutput());
     }
 
@@ -137,7 +139,7 @@ public class ActionTest {
         xmlAction.setContent("{\"doppler\":{\"style\":\"blue\"},\"example\":\"Some text\"}");
         xmlAction.setType(XMLActionType.JSON_TO_XML);
 
-        ActionResult actionResult = xmlAction.run(null, taskExecution, variableExtractorUtil);
+        ActionResult actionResult = xmlAction.run(new TaskServiceImpl(), taskExecution, variableExtractorUtil);
         Assert.assertEquals("<xml><doppler><style>blue</style></doppler><example>Some text</example></xml>", actionResult.getOutput());
     }
 

@@ -35,9 +35,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
+
+import javax.transaction.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -74,6 +75,7 @@ public class TaskControllerTests {
         String createJson = "{\n" +
                 "    \"name\":\"accept-alert\",\n" +
                 "\"description\":\"Testing\"," +
+                "\"active\": false," +
                 "    \"actions\":[\n" +
                 "        {\n" +
                 "            \"@type\":\"StartAction\"\n" +
@@ -101,6 +103,7 @@ public class TaskControllerTests {
         String createJson = "{\n" +
                 "    \"name\":\"example-task-2\",\n" +
                 "\"description\":\"Testing\"," +
+                "\"active\": false," +
                 "    \"actions\":[\n" +
                 "        {\n" +
                 "            \"@type\":\"StartAction\"\n" +

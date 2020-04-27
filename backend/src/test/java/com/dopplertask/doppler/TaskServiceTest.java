@@ -11,6 +11,7 @@ import com.dopplertask.doppler.domain.action.common.PrintAction;
 import com.dopplertask.doppler.service.ExecutionService;
 import com.dopplertask.doppler.service.TaskExecutionRequest;
 import com.dopplertask.doppler.service.TaskServiceImpl;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -75,7 +76,7 @@ public class TaskServiceTest {
             taskExecutionRet.addLog(new TaskExecutionLog());
 
             return taskExecutionRet;
-        }).when(executionService).startExecution(eq(request), eq(taskService), false);
+        }).when(executionService).startExecution(eq(request), eq(taskService), eq(false));
 
         doAnswer(invocation -> {
             TaskExecution taskExecutionRet = new TaskExecution();
@@ -137,7 +138,7 @@ public class TaskServiceTest {
             taskExecutionRet.addLog(new TaskExecutionLog());
 
             return taskExecutionRet;
-        }).when(executionService).startExecution(eq(request), eq(taskService), false);
+        }).when(executionService).startExecution(eq(request), eq(taskService), eq(false));
 
         doAnswer(invocation -> {
             TaskExecution taskExecutionRet = new TaskExecution();

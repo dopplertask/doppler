@@ -64,10 +64,9 @@ class SwitchAction : Action() {
                     }
                     statement.append("outputPort;")
                 }
-                else -> throw IllegalStateException("Unexpected script engine")
             }
             localCondition = variableExtractorUtil.extract(statement.toString(), execution, scriptLanguage)
-            var portNr = 0
+            var portNr: Int
             try {
                 portNr = localCondition.toInt()
                 if (portNr < outputPorts.size) {

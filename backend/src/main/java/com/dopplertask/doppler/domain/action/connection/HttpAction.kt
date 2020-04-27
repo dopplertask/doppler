@@ -56,7 +56,7 @@ class HttpAction : Action() {
         }
         val client = HttpClient.newHttpClient()
         val request = builder.build()
-        var response: HttpResponse<String>? = null
+        var response: HttpResponse<String>?
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString())
             actionResult.output = "Status Code: " + response.statusCode() + "\nBody: " + response.body()

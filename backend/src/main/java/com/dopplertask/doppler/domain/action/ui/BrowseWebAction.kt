@@ -103,7 +103,6 @@ class BrowseWebAction : Action {
                 UIFieldFindByType.NAME -> wait.until(ExpectedConditions.visibilityOfElementLocated(By.name(uiAction.fieldName)))
                 UIFieldFindByType.XPATH -> wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(uiAction.fieldName)))
                 UIFieldFindByType.CSS -> wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(uiAction.fieldName)))
-                else -> throw IllegalStateException("Unexpected value: " + uiAction.findByType)
             }
         } catch (e: Exception) { // Could not find element, ignore, add to action result
             actionResult.errorMsg = "Exception occured: $e"
