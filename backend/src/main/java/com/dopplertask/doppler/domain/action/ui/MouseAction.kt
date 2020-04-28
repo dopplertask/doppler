@@ -24,6 +24,7 @@ class MouseAction : Action() {
     var positionX: String? = null
     var positionY: String? = null
     var button: String? = null
+
     @Throws(IOException::class)
     override fun run(taskService: TaskService, execution: TaskExecution, variableExtractorUtil: VariableExtractorUtil, broadcastListener: BroadcastListener?): ActionResult {
         val localPositionX = variableExtractorUtil.extract(positionX, execution, scriptLanguage)

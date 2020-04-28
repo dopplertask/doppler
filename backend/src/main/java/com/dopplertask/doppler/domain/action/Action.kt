@@ -23,10 +23,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
 import java.io.IOException
-import java.util.*
 import java.util.stream.Collectors
 import javax.persistence.*
-import kotlin.collections.ArrayList
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -41,28 +39,35 @@ abstract class Action {
     @Column(name = "id", updatable = false, nullable = false)
     @JsonIgnore
     var id: Long? = null
+
     @ManyToOne
     @JoinColumn
     @JsonIgnore
     var task: Task? = null
+
     @Column
     @JsonIgnore
     var orderPosition: Int? = null
+
     @Column(nullable = false, columnDefinition = "TINYINT(1)")
     var isContinueOnFailure = false
+
     @Column(length = 4096)
     var failOn: String? = null
     var retries = 0
+
     @Column(length = 4096)
     var retryWait: String? = null
     var guiXPos: Int? = null
     var guiYPos: Int? = null
+
     /**
      * All action values are evaluated with VELOCITY as standard, but can be changed to other languages.
      */
     @Enumerated(EnumType.STRING)
     @Column
     var scriptLanguage = ScriptLanguage.VELOCITY
+
     @OneToMany(mappedBy = "action", cascade = [CascadeType.ALL])
     @Fetch(value = FetchMode.JOIN)
     var ports: MutableList<ActionPort>? = ArrayList()

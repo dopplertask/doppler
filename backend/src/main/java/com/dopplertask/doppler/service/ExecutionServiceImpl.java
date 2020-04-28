@@ -16,6 +16,7 @@ import com.dopplertask.doppler.domain.action.trigger.Trigger;
 import com.dopplertask.doppler.dto.TaskCreationDTO;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -438,7 +439,7 @@ public class ExecutionServiceImpl implements ExecutionService {
                 }
                 actionResult = currentAction.run(taskService, execution, variableExtractorUtil, (output, outputType) -> addLog(execution, output, outputType, true));
 
-                addLog(execution, actionResult.getOutput(), actionResult.getOutputType(), actionResult.isBroadcastMessage());
+                addLog(execution, actionResult.getErrorMsg(), actionResult.getOutputType(), actionResult.isBroadcastMessage());
 
                 // Handle failOn
                 if (currentAction.getFailOn() != null && !currentAction.getFailOn().isEmpty()) {

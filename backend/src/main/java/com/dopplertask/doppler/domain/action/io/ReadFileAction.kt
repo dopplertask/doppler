@@ -24,6 +24,7 @@ import javax.persistence.Table
 class ReadFileAction : Action() {
     @Column
     var filename: String? = null
+
     @Column
     var parameterName: String? = null
 

@@ -18,26 +18,23 @@ import javax.persistence.Table
 @DiscriminatorValue("if_action")
 class IfAction : Action() {
     var condition: String? = null
+
     @Throws(IOException::class)
     override fun run(taskService: TaskService, execution: TaskExecution, variableExtractorUtil: VariableExtractorUtil, broadcastListener: BroadcastListener?): ActionResult {
         val actionResult = ActionResult()
         val localCondition: String
-        if (condition != null && !condition!!.isEmpty()) {
+
+        if (condition?.isNotEmpty() == true) {
             localCondition = when (scriptLanguage) {
                 ScriptLanguage.VELOCITY -> variableExtractorUtil.extract("#if($condition)\ntrue#else\nfalse#end", execution, scriptLanguage)
                 ScriptLanguage.JAVASCRIPT -> variableExtractorUtil.extract("if($condition) {\n\"true\"; } else {\n\"false\";}", execution, ScriptLanguage.JAVASCRIPT)
-                else -> throw IllegalStateException("Unexpected script engine")
             }
             if ("true" == localCondition) {
                 actionResult.output = "If evaluated to true."
-                if (outputPorts.size > 0 && outputPorts[0].connectionSource != null && outputPorts[0].connectionSource.target != null) {
-                    execution.currentAction = outputPorts[0].connectionSource.target.action
-                }
+                if (outputPorts.isNotEmpty()) execution.currentAction = outputPorts[0].connectionSource?.target?.action
             } else {
                 actionResult.output = "If evaluated to false."
-                if (outputPorts.size > 1 && outputPorts[1].connectionSource != null && outputPorts[1].connectionSource.target != null) {
-                    execution.currentAction = outputPorts[1].connectionSource.target.action
-                }
+                if (outputPorts.size > 1) execution.currentAction = outputPorts[1].connectionSource?.target?.action
             }
         } else {
             actionResult.statusCode = StatusCode.FAILURE
@@ -53,6 +50,5 @@ class IfAction : Action() {
             return actionInfo
         }
 
-    override val description: String
-        get() = "Evaluate a condition to decide the workflow route"
+    override val description: String = "Evaluate a condition to decide the workflow route"
 }

@@ -13,6 +13,7 @@ class SetVariable {
     private val id: Long? = null
     var name: String? = null
     var value: String? = null
+
     @ManyToOne
     @JoinColumn(nullable = false)
     @JsonIgnore

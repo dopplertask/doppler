@@ -34,6 +34,93 @@ public class ActionTest {
     }
 
     @Test
+    public void testIfActionWithNoConditionShouldReturnFalseKotlin() throws IOException {
+        IfAction ifAction = new IfAction();
+        PrintAction printActionTrue = new PrintAction();
+        printActionTrue.setMessage("True path");
+
+        PrintAction printActionFalse = new PrintAction();
+        printActionFalse.setMessage("False path");
+
+        TaskExecution taskExecution = new TaskExecution();
+
+        Connection connectionTrue = new Connection();
+        connectionTrue.setTarget(new ActionPort() {{
+            setAction(printActionTrue);
+        }});
+
+        Connection connectionFalse = new Connection();
+        connectionFalse.setTarget(new ActionPort() {{
+            setAction(printActionFalse);
+        }});
+
+
+        ActionPort output1 = new ActionPort();
+        output1.setPortType(ActionPortType.OUTPUT);
+        output1.setConnectionSource(connectionTrue);
+        output1.setAction(ifAction);
+
+        ActionPort output2 = new ActionPort();
+        output2.setPortType(ActionPortType.OUTPUT);
+        output2.setConnectionSource(connectionFalse);
+        output2.setAction(ifAction);
+
+
+        ifAction.setPorts(List.of(output1, output2));
+
+
+        ifAction.setCondition(null);
+
+        ActionResult actionResult = ifAction.run(new TaskServiceImpl(), taskExecution, variableExtractorUtil, (output, outputType) -> {
+        });
+        Assert.assertEquals("Please enter a condition.", actionResult.getErrorMsg());
+    }
+
+    @Test
+    public void testIfActionWithEmptyConditionShouldReturnFalseKotlin() throws IOException {
+        IfAction ifAction = new IfAction();
+        PrintAction printActionTrue = new PrintAction();
+        printActionTrue.setMessage("True path");
+
+        PrintAction printActionFalse = new PrintAction();
+        printActionFalse.setMessage("False path");
+
+        TaskExecution taskExecution = new TaskExecution();
+
+        Connection connectionTrue = new Connection();
+        connectionTrue.setTarget(new ActionPort() {{
+            setAction(printActionTrue);
+        }});
+
+        Connection connectionFalse = new Connection();
+        connectionFalse.setTarget(new ActionPort() {{
+            setAction(printActionFalse);
+        }});
+
+
+        ActionPort output1 = new ActionPort();
+        output1.setPortType(ActionPortType.OUTPUT);
+        output1.setConnectionSource(connectionTrue);
+        output1.setAction(ifAction);
+
+        ActionPort output2 = new ActionPort();
+        output2.setPortType(ActionPortType.OUTPUT);
+        output2.setConnectionSource(connectionFalse);
+        output2.setAction(ifAction);
+
+
+        ifAction.setPorts(List.of(output1, output2));
+
+
+        ifAction.setCondition("");
+
+        ActionResult actionResult = ifAction.run(new TaskServiceImpl(), taskExecution, variableExtractorUtil, (output, outputType) -> {
+        });
+        Assert.assertEquals("Please enter a condition.", actionResult.getErrorMsg());
+    }
+
+
+    @Test
     public void testIfActionShouldReturnTrue() throws IOException {
         IfAction ifAction = new IfAction();
         PrintAction printActionTrue = new PrintAction();

@@ -28,8 +28,10 @@ import javax.persistence.*
 class BrowseWebAction : Action {
     @Column
     var url: String? = null
+
     @OneToMany(mappedBy = "browseWebAction", cascade = [CascadeType.ALL])
     private var actionList: List<UIAction> = ArrayList()
+
     @Column(columnDefinition = "BOOLEAN")
     var isHeadless = true
 

@@ -24,10 +24,13 @@ import javax.persistence.*
 class HttpAction : Action() {
     @Column
     var url: String? = null
+
     @OneToMany(mappedBy = "httpAction", cascade = [CascadeType.ALL])
     private var headers: List<HttpHeader> = ArrayList()
+
     @Column
     var method: String? = null
+
     @Lob
     @Column(columnDefinition = "TEXT")
     var body: String? = null

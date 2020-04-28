@@ -21,16 +21,22 @@ import javax.persistence.*
 class MySQLAction : Action() {
     @Column
     var hostname: String? = null
+
     @Column
     var username: String? = null
+
     @Column
     var password: String? = null
+
     @Column
     var port: String? = null
+
     @Column
     var database: String? = null
+
     @Column
     var timezone: String? = null
+
     @Lob
     @Column(columnDefinition = "TEXT")
     var command: String? = null

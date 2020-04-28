@@ -20,6 +20,7 @@ import javax.persistence.Table
 class LinkedTaskAction : Action() {
     @Column
     var name: String? = null
+
     @Column
     @JsonIgnore
     var checksum: String? = null

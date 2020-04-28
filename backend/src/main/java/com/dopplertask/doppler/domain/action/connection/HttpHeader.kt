@@ -11,6 +11,7 @@ class HttpHeader {
     @Column(name = "id", updatable = false, nullable = false)
     @JsonIgnore
     var id: Long? = null
+
     @ManyToOne
     @JoinColumn(nullable = false)
     @JsonIgnore
