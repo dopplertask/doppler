@@ -24,12 +24,16 @@ import javax.persistence.Table
 class SecureCopyAction : Action() {
     @Column
     var hostname: String? = null
+
     @Column
     var username: String? = null
+
     @Column
     var password: String? = null
+
     @Column
     var sourceFilename: String? = null
+
     @Column
     var destinationFilename: String? = null
 

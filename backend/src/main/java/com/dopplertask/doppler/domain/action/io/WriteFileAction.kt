@@ -21,6 +21,7 @@ import javax.persistence.*
 class WriteFileAction : Action() {
     @Column
     var filename: String? = null
+
     @Lob
     @Column(columnDefinition = "TEXT")
     var contents: String? = null
@@ -35,7 +36,7 @@ class WriteFileAction : Action() {
             }
             Files.writeString(Paths.get(filenameVariable), contentsVariable, StandardOpenOption.CREATE, StandardOpenOption.WRITE)
             val actionResult = ActionResult()
-            actionResult.output = contents
+            actionResult.output = contents!!
             actionResult.outputType = OutputType.STRING
             actionResult.statusCode = StatusCode.SUCCESS
             actionResult

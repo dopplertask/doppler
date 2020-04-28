@@ -20,6 +20,7 @@ class XMLAction : Action() {
     @Lob
     @Column(columnDefinition = "TEXT")
     var content: String? = null
+
     @Column
     var type = XMLActionType.JSON_TO_XML
 

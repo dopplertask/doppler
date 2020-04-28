@@ -28,7 +28,7 @@ class PrintAction : Action {
     override fun run(taskService: TaskService, execution: TaskExecution, variableExtractorUtil: VariableExtractorUtil, broadcastListener: BroadcastListener?): ActionResult {
         val messageVariable = variableExtractorUtil.extract(message, execution, scriptLanguage)
         val actionResult = ActionResult()
-        if (messageVariable != null && !messageVariable.isEmpty()) {
+        if (messageVariable.isNotEmpty()) {
             actionResult.output = messageVariable
             actionResult.statusCode = StatusCode.SUCCESS
         } else {
@@ -45,6 +45,5 @@ class PrintAction : Action {
             return actionInfo
         }
 
-    override val description: String
-        get() = "Print a console message"
+    override val description: String = "Print a console message"
 }

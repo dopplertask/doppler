@@ -1,7 +1,6 @@
 package com.dopplertask.doppler.controller;
 
 import com.dopplertask.doppler.domain.ActionResult;
-import com.dopplertask.doppler.domain.OutputType;
 import com.dopplertask.doppler.domain.StatusCode;
 import com.dopplertask.doppler.domain.Task;
 import com.dopplertask.doppler.domain.TaskExecution;
@@ -27,6 +26,7 @@ import com.dopplertask.doppler.service.TaskService;
 import com.dopplertask.doppler.service.TriggerInfo;
 import com.dopplertask.doppler.service.VariableExtractorUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.velocity.app.VelocityEngine;
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -197,10 +197,7 @@ public class TaskController {
                 return new ResponseEntity<>(actionResult, HttpStatus.OK);
             }
         } catch (Exception e) {
-            ActionResult actionResult = new ActionResult();
-            actionResult.setErrorMsg(e.toString());
-            actionResult.setStatusCode(StatusCode.FAILURE);
-            actionResult.setOutputType(OutputType.STRING);
+            ActionResult actionResult = new ActionResult(StatusCode.FAILURE, "", e.toString());
             return new ResponseEntity<>(actionResult, HttpStatus.OK);
         }
 

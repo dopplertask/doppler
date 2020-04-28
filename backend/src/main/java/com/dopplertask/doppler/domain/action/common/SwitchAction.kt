@@ -18,6 +18,7 @@ import javax.persistence.*
 @DiscriminatorValue("switch_action")
 class SwitchAction : Action() {
     var value: String? = null
+
     @OneToMany(mappedBy = "switchAction", cascade = [CascadeType.ALL])
     private var switchCases: List<SwitchCase> = ArrayList()
 

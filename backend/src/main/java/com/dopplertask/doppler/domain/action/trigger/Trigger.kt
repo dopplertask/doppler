@@ -11,8 +11,10 @@ import javax.persistence.Transient
 abstract class Trigger : Action() {
     @Column
     var path = ""
+
     @Column
     var triggerSuffix = ""
+
     @JsonIgnore
     @Transient
     var parameters: Map<String, String>? = null

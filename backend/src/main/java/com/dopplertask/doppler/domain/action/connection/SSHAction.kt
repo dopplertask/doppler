@@ -15,10 +15,13 @@ import javax.persistence.*
 class SSHAction : Action() {
     @Column
     var hostname: String? = null
+
     @Column
     var username: String? = null
+
     @Column
     var password: String? = null
+
     @Lob
     @Column(columnDefinition = "TEXT")
     var command: String? = null
