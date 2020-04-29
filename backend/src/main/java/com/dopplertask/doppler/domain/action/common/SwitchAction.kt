@@ -27,7 +27,7 @@ class SwitchAction : Action() {
         val actionResult = ActionResult()
         val localCondition: String
         val evaluatedCases: MutableList<String> = ArrayList()
-        if (value != null && !value!!.isEmpty()) {
+        if (value != null && value!!.isNotEmpty()) {
             val statement = StringBuilder()
             var i = 0
             when (scriptLanguage) {
