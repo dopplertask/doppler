@@ -4,6 +4,7 @@ package com.dopplertask.dopplertask.domain;
 import com.dopplertask.dopplertask.domain.action.Action;
 import com.dopplertask.dopplertask.domain.action.StartAction;
 import com.dopplertask.dopplertask.domain.action.trigger.Trigger;
+import com.dopplertask.dopplertask.domain.action.trigger.Webhook;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.Basic;
@@ -18,9 +19,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
@@ -141,6 +140,14 @@ public class Task {
         return actions.get(0);
     }
 
+    public List<Trigger> getTriggerActions() {
+        List<Trigger> triggers = actionList.stream().filter(action -> action instanceof Trigger && !(action instanceof Webhook)).map(action -> (Trigger) action).collect(Collectors.toList());
+        if (triggers.isEmpty()) {
+            return Collections.EMPTY_LIST;
+        }
+        return triggers;
+    }
+
     public List<Connection> getConnections() {
         return connections;
     }
@@ -155,5 +162,20 @@ public class Task {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+
+    // Two customers are equal if their IDs are equal
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return name.equals(task.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }

@@ -26,7 +26,6 @@ import com.dopplertask.dopplertask.service.TaskService;
 import com.dopplertask.dopplertask.service.TriggerInfo;
 import com.dopplertask.dopplertask.service.VariableExtractorUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.apache.velocity.app.VelocityEngine;
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -215,6 +214,7 @@ public class TaskController {
             taskDto.setChecksum(task.getChecksum());
             taskDto.setName(task.getName());
             taskDto.setCreated(task.getCreated());
+            taskDto.setActive(task.isActive());
 
             taskResponseDTOList.add(taskDto);
         }
@@ -232,6 +232,7 @@ public class TaskController {
             taskDto.setChecksum(task.getChecksum());
             taskDto.setName(task.getName());
             taskDto.setCreated(task.getCreated());
+            taskDto.setActive(task.isActive());
 
             if (!groupedTasks.containsKey(task.getName())) {
                 groupedTasks.put(task.getName(), new ArrayList<>());
@@ -261,6 +262,7 @@ public class TaskController {
             taskDto.setActions(task.getActionList());
             taskDto.setParameters(task.getTaskParameterList());
             taskDto.setConnections(task.getConnections());
+            taskDto.setActive(task.isActive());
 
             taskResponseDTOList.add(taskDto);
         }
@@ -279,6 +281,7 @@ public class TaskController {
             taskDto.setChecksum(task.getChecksum());
             taskDto.setParameters(task.getTaskParameterList());
             taskDto.setConnections(task.getConnections());
+            taskDto.setActive(task.isActive());
 
             return new ResponseEntity<>(taskDto, HttpStatus.OK);
         }
@@ -297,6 +300,7 @@ public class TaskController {
             taskDto.setChecksum(task.getChecksum());
             taskDto.setParameters(task.getTaskParameterList());
             taskDto.setConnections(task.getConnections());
+            taskDto.setActive(task.isActive());
 
             return new ResponseEntity<>(taskDto, HttpStatus.OK);
         }
@@ -315,6 +319,8 @@ public class TaskController {
             taskDto.setChecksum(task.getChecksum());
             taskDto.setParameters(task.getTaskParameterList());
             taskDto.setConnections(task.getConnections());
+            taskDto.setActive(task.isActive());
+
 
             return new ResponseEntity<>(taskDto, HttpStatus.OK);
         }

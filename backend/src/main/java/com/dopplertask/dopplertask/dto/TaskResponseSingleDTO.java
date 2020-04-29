@@ -13,6 +13,7 @@ public class TaskResponseSingleDTO {
 
     private String name;
     private String checksum;
+    private boolean active;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Date created;
     private List<TaskParameter> parameters;
@@ -81,5 +82,13 @@ public class TaskResponseSingleDTO {
 
     public void setParameters(List<TaskParameter> parameters) {
         this.parameters = parameters;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

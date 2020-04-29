@@ -21,6 +21,11 @@ class Webhook : Trigger() {
         return result
     }
 
+    override fun trigger(): TriggerResult {
+        // Do nothing.
+        return TriggerResult(mutableMapOf())
+    }
+
     override val description: String
         get() = "Starts the workflow when the webhook URL is called."
 }
