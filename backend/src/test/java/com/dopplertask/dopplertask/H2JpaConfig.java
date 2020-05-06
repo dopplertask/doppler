@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 
 @Configuration
-@EntityScan(basePackages = {"com.dopplertask.doppler"})
+@EntityScan(basePackages = {"com.dopplertask.dopplertask"})
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = "com.dopplertask.dopplertask")
 @TestPropertySource({"classpath:application-test.properties"})

@@ -34,7 +34,7 @@ class ExecuteCommandAction : Action() {
             builder.command("sh", "-c", commandVar)
         }
         builder.directory(File(System.getProperty("user.home")))
-        var process: Process? = null
+        var process: Process?
         val actionResult = ActionResult()
         try {
             process = builder.start()

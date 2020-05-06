@@ -3,7 +3,7 @@
 ![DopplerTask - Open-source Workflow Automation](https://raw.githubusercontent.com/dopplertask/doppler/master/docs/images/dopplertask_logo.png)
 
 
-[![Build Status](https://travis-ci.org/dopplertask/doppler.svg?branch=master)](https://travis-ci.org/dopplertask/doppler) [![Dependencies](https://img.shields.io/david/dopplertask/dopplertask?path=backend/src/main/resources/static)](https://david-dm.org/dopplertask/dopplertask) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdopplertask%2Fdopplertask.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdopplertask%2Fdopplertask?ref=badge_shield)
+[![Build Status](https://travis-ci.org/dopplertask/dopplertask.svg?branch=master)](https://travis-ci.org/dopplertask/dopplertask) [![Dependencies](https://img.shields.io/david/dopplertask/dopplertask?path=backend/src/main/resources/static)](https://david-dm.org/dopplertask/dopplertask) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdopplertask%2Fdopplertask.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdopplertask%2Fdopplertask?ref=badge_shield)
 
 <h1>DopplerTask - Task Automation</h1>
 

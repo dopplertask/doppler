@@ -386,7 +386,7 @@ public class TaskController {
     public ResponseEntity<ActionListResponseDto> getAllActions() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
 
 
-        Reflections reflections = new Reflections("com.dopplertask.doppler.domain.action");
+        Reflections reflections = new Reflections("com.dopplertask.dopplertask.domain.action");
         Set<Class<? extends Action>> classes = reflections.getSubTypesOf(Action.class);
 
         ActionListResponseDto actionListResponseDto = new ActionListResponseDto();
