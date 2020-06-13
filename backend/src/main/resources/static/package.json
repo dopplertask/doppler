@@ -10,18 +10,18 @@
   "author": "Feras Wilson",
   "license": "",
   "dependencies": {
-    "@babel/runtime": "^7.10.1",
+    "@babel/runtime": "^7.10.2",
     "express": "^4.17.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.1",
-    "@babel/core": "^7.10.1",
+    "@babel/core": "^7.10.2",
     "@babel/node": "^7.10.1",
     "@babel/plugin-proposal-class-properties": "^7.10.1",
     "@babel/plugin-transform-runtime": "^7.10.1",
-    "@babel/preset-env": "^7.10.1",
+    "@babel/preset-env": "^7.10.2",
     "@babel/preset-react": "^7.10.1",
     "autoprefixer": "^9.8.0",
     "babel-loader": "^8.1.0",
