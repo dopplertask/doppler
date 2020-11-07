@@ -52,6 +52,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.apache.activemq/activemq-broker
     compile group: 'org.apache.activemq', name: 'activemq-broker', version: '5.15.12'
+    // https://mvnrepository.com/artifact/org.apache.activemq/activemq-kahadb-store
+    testCompile group: 'org.apache.activemq', name: 'activemq-kahadb-store', version: '5.15.12'
+
 
     // https://mvnrepository.com/artifact/mysql/mysql-connector-java
     compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.15'

@@ -19,6 +19,8 @@ abstract class Trigger : Action() {
     @Transient
     var parameters: Map<String, String>? = null
 
+    abstract fun trigger(): TriggerResult
+
     override val actionInfo: MutableList<PropertyInformation>
         get() {
             val actionInfo = super.actionInfo
@@ -26,3 +28,5 @@ abstract class Trigger : Action() {
             return actionInfo
         }
 }
+
+data class TriggerResult(val resultMap : MutableMap<String, String>)

@@ -444,7 +444,8 @@ class MainApp extends React.Component {
         mainApp.setState({
             taskName: task.name,
             parameters: task.parameters,
-            saved: true
+            saved: true,
+            active: task.active
         });
     }
 
@@ -585,10 +586,11 @@ class MainApp extends React.Component {
 
                             <br/><br/>
 
+                            Triggers active: {this.state.active ? "Activated" : "Not active"}
                             <div className="btn-group-toggle" data-toggle="buttons">
                                 <label className="btn btn-secondary active">
                                     <input type="checkbox" onClick={this.activateTask}
-                                           autoComplete="off"/> Active triggers
+                                           autoComplete="off"/> Toggle triggers
                                 </label>
                             </div>
                         </div>

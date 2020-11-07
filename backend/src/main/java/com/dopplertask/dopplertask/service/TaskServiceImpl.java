@@ -56,6 +56,9 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     private ExecutionService executionService;
 
+    @Autowired
+    private TriggerListenerServiceImpl triggerListenerService;
+
 
     @Override
     public TaskExecution delegate(TaskRequest request) {
@@ -146,6 +149,9 @@ public class TaskServiceImpl implements TaskService {
         if (existingTask.isPresent()) {
             existingTask.get().setCreated(new Date());
             existingTask.get().setActive(active);
+
+            // Update threadpools
+            triggerListenerService.updateTriggers(existingTask.get().getId());
             return existingTask.get().getId();
         }
 
@@ -218,6 +224,9 @@ public class TaskServiceImpl implements TaskService {
 
         // Save the new task
         taskDao.save(task);
+
+        // Update threadpools
+        triggerListenerService.updateTriggers(task.getId());
 
         return task.getId();
     }

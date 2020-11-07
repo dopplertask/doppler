@@ -39,6 +39,9 @@ ENV PATH="$PATH:$JAVA_HOME/bin"
 
 COPY --from=jlink-package /root/start.sh /opt/spring-boot/
 COPY --from=golang-packagge /bin/doppler /bin/doppler
+COPY --from=jlink-package /root/backend/bin/chromedriver /opt/spring-boot/bin
+COPY --from=jlink-package /root/backend/bin/chromedriver-mac /opt/spring-boot/bin
+COPY --from=jlink-package /root/backend/bin/chromedriver.exe /opt/spring-boot/bin
 COPY --from=jlink-package /root/backend/build/libs/doppler-0.8.2.jar /opt/spring-boot/
 COPY --from=jlink-package /opt/jdk-11-mini-runtime /opt/jdk-11-mini-runtime
 
