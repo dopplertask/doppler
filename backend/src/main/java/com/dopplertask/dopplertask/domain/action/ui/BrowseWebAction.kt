@@ -53,9 +53,17 @@ class BrowseWebAction : Action {
             System.setProperty(CHROME_DRIVER, "bin/chromedriver")
         }
         val chromeOptions = ChromeOptions()
+
+        // Users of docker image usually uses headless mode so we will include additional arguments to support it.
         if (isHeadless) {
             chromeOptions.addArguments("--headless")
+            chromeOptions.addArguments("--no-sandbox")
+            chromeOptions.addArguments("--disable-gpu")
         }
+
+        System.setProperty("webdriver.chrome.whitelistedIps", "");
+
+
         val webDriver: WebDriver = ChromeDriver(chromeOptions)
         val wait = WebDriverWait(webDriver, 10)
         // Open page
@@ -68,7 +76,7 @@ class BrowseWebAction : Action {
                     Thread.sleep(uiActionValueVariable.toLong())
                     actionResult.output = actionResult.output + "Slept a specific amount of time [time=" + uiActionValueVariable + "]\n"
                 } catch (e: Exception) {
-                    actionResult.errorMsg = "Exception occured during sleeping in UI Action"
+                    actionResult.errorMsg = "Exception occurred during sleeping in UI Action"
                     actionResult.statusCode = StatusCode.FAILURE
                     return actionResult
                 }
@@ -147,7 +155,7 @@ class BrowseWebAction : Action {
         get() {
             val actionInfo = super.actionInfo
             actionInfo.add(PropertyInformation("url", "URL", PropertyInformationType.STRING, "", "URL of the web page"))
-            actionInfo.add(PropertyInformation("headless", "Headless mode", PropertyInformationType.BOOLEAN, "true", "URL of the web page"))
+            actionInfo.add(PropertyInformation("headless", "Headless mode", PropertyInformationType.BOOLEAN, "true", "Start web driver without graphics"))
             actionInfo.add(PropertyInformation("actionList", "Action list", PropertyInformationType.MAP, "", "", java.util.List.of(
                     PropertyInformation("fieldName", "Field name"),
                     PropertyInformation("action", "Action", PropertyInformationType.DROPDOWN, "PRESS", "", java.util.List.of(

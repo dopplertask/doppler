@@ -37,13 +37,14 @@ MAINTAINER Feras Wilson, http://www.dopplertask.com
 ENV JAVA_HOME=/opt/jdk-11-mini-runtime
 ENV PATH="$PATH:$JAVA_HOME/bin"
 
+RUN apk add chromium chromium-chromedriver
+
 COPY --from=jlink-package /root/start.sh /opt/spring-boot/
 COPY --from=golang-packagge /bin/doppler /bin/doppler
-COPY --from=jlink-package /root/backend/bin/chromedriver /opt/spring-boot/bin
-COPY --from=jlink-package /root/backend/bin/chromedriver-mac /opt/spring-boot/bin
-COPY --from=jlink-package /root/backend/bin/chromedriver.exe /opt/spring-boot/bin
-COPY --from=jlink-package /root/backend/build/libs/doppler-0.8.2.jar /opt/spring-boot/
+COPY --from=jlink-package /root/backend/build/libs/doppler-*.jar /opt/spring-boot/
 COPY --from=jlink-package /opt/jdk-11-mini-runtime /opt/jdk-11-mini-runtime
+
+RUN mkdir /opt/spring-boot/bin && cd /opt/spring-boot/bin && ln /usr/lib/chromium/chromedriver chromedriver
 
 
 EXPOSE 8090

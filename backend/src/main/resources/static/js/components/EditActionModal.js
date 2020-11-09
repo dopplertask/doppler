@@ -320,17 +320,18 @@ class EditActionModal extends React.Component {
                     <div className="modal-body" id="actionEditModalBody">
                         <div className="container">
                             <div className="row">
-                                <div className="col-6">
+                                <div className="col-8">
                                     {this.renderFields()}
                                 </div>
-                                <div className="col-6">
+                                <div className="col-4">
                                     Action execution result:
                                     <br/>
-                                    <pre id="actionExecutionOutput" className="code-pre">{this.props.selectedAction.userData
-                                                                                          != undefined
-                                                                                          && this.props.selectedAction.userData.lastSingleActionExecutionOutput
-                                                                                          != undefined
-                                                                                          && this.props.selectedAction.userData.lastSingleActionExecutionOutput}</pre>
+                                    <pre id="actionExecutionOutput"
+                                         className="code-pre">{this.props.selectedAction.userData
+                                    != undefined
+                                    && this.props.selectedAction.userData.lastSingleActionExecutionOutput
+                                    != undefined
+                                    && this.props.selectedAction.userData.lastSingleActionExecutionOutput}</pre>
                                 </div>
                             </div>
                         </div>
